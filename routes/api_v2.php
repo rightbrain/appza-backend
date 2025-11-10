@@ -11,13 +11,14 @@ use App\Http\Controllers\Api\V2\LicenseController as LicenseControllerV2;
 use App\Http\Controllers\Api\V1\PageComponentController;
 use App\Http\Controllers\Api\V1\PluginController;
 use App\Http\Controllers\Api\V1\ThemeController;
+use App\Http\Middleware\ApiVersionDeprecationMiddleware;
 use App\Http\Middleware\LogActivity;
 use App\Http\Middleware\LogRequestResponse;
 use Illuminate\Support\Facades\Route;
 
 
 Route::prefix('/appza/v2')
-    ->middleware([LogRequestResponse::class,LogActivity::class])
+    ->middleware([LogRequestResponse::class,LogActivity::class,ApiVersionDeprecationMiddleware::class])
     ->group(function () {
         // lead api
         Route::prefix('lead')->name('v2_')->group(function () {

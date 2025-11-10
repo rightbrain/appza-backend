@@ -16,7 +16,7 @@ use App\Http\Middleware\ApiVersionDeprecationMiddleware;
 use Illuminate\Support\Facades\Route;
 
 
-Route::prefix('/appza/v1')
+Route::prefix('/appza/v0')
     ->middleware([LogRequestResponse::class,LogActivity::class,ApiVersionDeprecationMiddleware::class])
     ->group(function () {
         // lead api
