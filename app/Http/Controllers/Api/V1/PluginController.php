@@ -13,6 +13,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Exception;
@@ -124,7 +125,7 @@ class PluginController extends Controller
         return response()->json($response, $status, ['Content-Type' => 'application/json'], JSON_UNESCAPED_SLASHES);
     }
 
-    public function pluginVersionCheck(Request $request)
+    public function pluginVersionCheckForUpdate(Request $request)
     {
         // Create validator
         $validator = Validator::make($request->all(), [
@@ -157,6 +158,38 @@ class PluginController extends Controller
             $pluginData['version'] = $validated['installed_version'];
             $pluginData['download_url'] = null;
         }
+        return response()->json($pluginData);
+    }
+
+    public function pluginInstallLatestVersion(Request $request)
+    {
+        $allowedSlugs = ['fcom-mobile', 'lazytasks-premium', 'lazytasks-whiteboard'];
+        // Create validator
+        $validator = Validator::make($request->all(), [
+            'plugin_slug' => ['required', Rule::in($allowedSlugs)],
+        ]);
+
+        // Check for validation errors
+        if ($validator->fails()) {
+            return $this->jsonResponse(
+                Response::HTTP_BAD_REQUEST,
+                'Validation Error',
+                ['errors' => $validator->errors()]
+            );
+        }
+
+        // Get validated data as array
+        $validated = $validator->validated();
+
+        // Find the plugin
+        $findPluginJson = ProductAddon::where('addon_slug', $validated['plugin_slug'])->first();
+
+        if (!$findPluginJson) {
+            return $this->jsonResponse(Response::HTTP_NOT_FOUND, 'Plugin not found');
+        }
+
+        $pluginData = json_decode($findPluginJson->addon_json_info, true);
+
         return response()->json($pluginData);
     }
 

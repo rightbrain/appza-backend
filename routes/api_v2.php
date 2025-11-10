@@ -94,7 +94,11 @@ Route::prefix('/appza/v2')
         // for app api
         Route::prefix('plugin')->name('v2_')->group(function () {
             Route::get('check-disable', [PluginController::class,'checkDisablePlugin'])->name('check_disable_plugin');
-            Route::get('version-check', [PluginController::class,'pluginVersionCheck'])->name('plugin_version_check');
-        });
+
+            // addon version update & install link
+            Route::get('install-latest-version', [PluginController::class,'pluginInstallLatestVersion'])
+                ->name('plugin_version_check_for_update');
+            Route::get('version-check', [PluginController::class,'pluginVersionCheckForUpdate'])
+                ->name('plugin_version_check_for_update');        });
     });
 

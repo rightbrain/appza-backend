@@ -93,7 +93,7 @@ Route::prefix('/appza/v0')
         // for app api
         Route::prefix('plugin')->group(function () {
             Route::get('check-disable', [PluginController::class,'checkDisablePlugin'])->name('check_disable_plugin');
-            Route::get('version-check', [PluginController::class,'pluginVersionCheck'])->name('plugin_version_check');
+            Route::get('version-check', [PluginController::class,'pluginVersionCheckForUpdate'])->name('plugin_version_check_for_update');
         });
     });
 
