@@ -136,6 +136,57 @@
                                         </div>
                                     </div>
 
+                                    {{--<div class="form-group row mg-top">
+                                        <div class="col-sm-2">
+                                            <label for="transparent" class="form-label">Plugin is premium</label>
+                                        </div>
+
+                                        <div class="col-sm-4">
+                                            {{ html()->checkbox('is_premium_plugin') }}
+                                        </div>
+                                    </div>--}}
+
+                                    <div class="form-group row mg-top">
+                                        <div class="col-sm-2">
+                                            <label for="" class="form-label">Plugin is premium</label>
+                                        </div>
+
+                                        <div class="col-sm-4">
+                                            <div class="from-group">
+                                                <?php
+                                                $pluginIsPremiumTrue = '';
+                                                $pluginIsPremiumFalse = '';
+                                                if (isset($data->show_no_data_view)) {
+                                                    if ($data->show_no_data_view == 1) {
+                                                        $pluginIsPremiumTrue = 'checked="checked"';
+                                                    } else {
+                                                        $pluginIsPremiumFalse = 'checked="checked"';
+                                                    }
+                                                } else {
+                                                    $pluginIsPremiumTrue = 'checked="checked"';
+                                                }
+                                                ?>
+                                                <div class="input-group mb-3">
+                                                    <div class="form-check form-check-inline">
+                                                        <input style="margin-top: 0px"
+                                                               class="form-check-input isChecked"
+                                                               type="radio" name="is_premium_plugin" id="showNoDataViewTrue"
+                                                               value="1" {{$pluginIsPremiumTrue}}>
+                                                        <label class="form-check-label" for="showNoDataViewTrue">True</label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input style="margin-top: 0px"
+                                                               class="form-check-input isChecked"
+                                                               type="radio" name="is_premium_plugin" id="showNoDataViewFalse"
+                                                               value="0" {{$pluginIsPremiumFalse}}>
+                                                        <label class="form-check-label" for="showNoDataViewFalse">False</label>
+                                                    </div>
+                                                    <span class="textRed">{!! $errors->first('show_no_data_view') !!}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <div class="row mg-top">
                                         <div class="col-md-2"></div>
                                         <div class="col-md-10" >

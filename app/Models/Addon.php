@@ -11,7 +11,7 @@ class Addon extends Model
     protected $guarded = ['id'];
     protected $dates = ['created_at', 'updated_at'];
     protected $fillable = [
-        'product_id','addon_name','addon_slug','addon_json_info','is_active'
+        'product_id','addon_name','addon_slug','addon_json_info','is_active','is_premium_plugin'
     ];
 
     public static function boot() {

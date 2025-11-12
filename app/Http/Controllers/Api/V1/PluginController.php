@@ -155,8 +155,8 @@ class PluginController extends Controller
         $pluginData = json_decode($findPluginJson->addon_json_info, true);
 
         if (!$this->authorization) {
-            $pluginData['version'] = $validated['installed_version'];
-            if ($validated['plugin_slug'] !== 'lazytasks-whiteboard'){
+            if ($findPluginJson->is_premium_plugin){
+                $pluginData['version'] = $validated['installed_version'];
                 $pluginData['download_url'] = null;
             }
         }

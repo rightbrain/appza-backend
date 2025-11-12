@@ -122,6 +122,7 @@ class AddonRequest extends FormRequest
             'addon_name' => 'required|string',
             'addon_slug' => 'required|string',
             'version' => 'required|string',
+            'is_premium_plugin' => 'required|boolean',
             'addon_json_info' => 'required|json',
         ];
 
