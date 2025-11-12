@@ -29,6 +29,7 @@ class AddonController extends Controller
                 'appza_product_addons_versions.version',
                 'appza_product_addons.addon_name',
                 'appza_product_addons.addon_slug',
+                'appza_product_addons.is_premium_plugin',
                 'appza_product_addons.addon_json_info',
                 'appza_fluent_informations.product_slug',
                 'appza_fluent_informations.product_name',

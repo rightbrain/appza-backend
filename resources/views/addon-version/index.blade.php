@@ -33,6 +33,7 @@
                                     <th>{{__('messages.name')}}</th>
                                     <th>{{__('messages.slug')}}</th>
                                     <th>{{__('messages.version')}}</th>
+                                    <th>Type</th>
 {{--                                    <th>{{__('messages.prefix')}}</th>--}}
 {{--                                    <th>{{__('messages.Disable')}}</th>--}}
 {{--                                    <th>{{__('messages.image')}}</th>--}}
@@ -57,6 +58,14 @@
                                                 <td>{{$addon->addon_name}}</td>
                                                 <td>{{$addon->addon_slug}}</td>
                                                 <td>{{$addon->version}}</td>
+                                                <td>
+                                                    @if($addon->is_premium_plugin)
+                                                        <span class="badge bg-success">Premium</span>
+                                                    @else
+                                                        <span class="badge bg-warning">Free</span>
+                                                    @endif
+
+                                                </td>
                                                 <td>
                                                     <div class="btn-group" role="group" aria-label="Basic outlined example">
                                                         <a title="Added Version" class="btn btn-outline-danger btn-sm" href="{{route('addon_version_added',$addon->addon_id)}}"><i class="fas fa-font"></i></a>
