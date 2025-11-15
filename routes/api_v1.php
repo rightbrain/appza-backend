@@ -73,10 +73,10 @@ Route::prefix('/appza/v1')
 
         // build api
         Route::prefix('build')->group(function () {
-            Route::post('', [ApkBuildHistoryController::class,'apkBuild'])->name('create_building_apk');
-            Route::get('history', [ApkBuildHistoryController::class,'apkBuildHistoryList'])->name('build_history_list');
             Route::post('resource', [ApkBuildResourceController::class,'buildResource'])->name('create_build_resource');
             Route::post('ios-keys-verify', [ApkBuildResourceController::class,'iosResourceAndVerify'])->name('create_ios_resource_and_verify');
+            Route::post('', [ApkBuildHistoryController::class,'apkBuild'])->name('create_building_apk');
+            Route::get('history', [ApkBuildHistoryController::class,'apkBuildHistoryList'])->name('build_history_list');
             Route::post('ios-check-app-name', [ApkBuildResourceController::class,'iosCheckAppName'])->name('ios_app_name_check');;
 
             // build response by builder application
@@ -92,14 +92,11 @@ Route::prefix('/appza/v1')
 
         // for app api
         Route::prefix('plugin')->group(function () {
-            Route::get('check-disable', [PluginController::class,'checkDisablePlugin'])
-                ->name('check_disable_plugin');
+            Route::get('check-disable', [PluginController::class,'checkDisablePlugin'])->name('check_disable_plugin');
 
             // addon version update & install link
-            Route::get('install-latest-version', [PluginController::class,'pluginInstallLatestVersion'])
-                ->name('plugin_version_check_for_update');
-            Route::get('version-check', [PluginController::class,'pluginVersionCheckForUpdate'])
-                ->name('plugin_version_check_for_update');
+            Route::get('install-latest-version', [PluginController::class,'pluginInstallLatestVersion'])->name('plugin_version_check_for_update');
+            Route::get('version-check', [PluginController::class,'pluginVersionCheckForUpdate'])->name('plugin_version_check_for_update');
         });
     });
 
