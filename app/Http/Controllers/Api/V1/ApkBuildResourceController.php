@@ -294,7 +294,7 @@ class ApkBuildResourceController extends Controller
 
         $service = app(IosBuildValidationService::class);
         $result = $service->iosBuildProcessValidation($findSiteUrl);
-        
+
         if ($result['success'] === false) {
             Log::warning('IOS validation failed', $result);
             return $jsonResponse($result['status'], $result['message']);

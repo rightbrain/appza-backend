@@ -193,7 +193,7 @@ class ApkBuildHistoryController extends Controller
             'domain' => $findSiteUrl->site_url,
             'base_suffix' => '/wp-json/appza/api/v1/',
             'base_url' => rtrim($findSiteUrl->site_url, '/') . '/wp-json/appza/api/v1/',
-            'icon_url' => url('') . '/upload/build-apk/logo/' . $buildHistory->app_logo,
+            'icon_url' => $buildHistory->app_logo,
             'history_id' => $buildHistory->id,
         ];
 
@@ -255,7 +255,7 @@ class ApkBuildHistoryController extends Controller
 
             $data['issuer_id'] = $buildHistory->ios_issuer_id;
             $data['key_id'] = $buildHistory->ios_key_id;
-            $data['api_key_url'] = url('') . '/upload/build-apk/p8file/' . $buildHistory->ios_p8_file_content;
+            $data['api_key_url'] = $buildHistory->ios_p8_file_content;
             $data['team_id'] = $buildHistory->ios_team_id;
             $data['app_identifier'] = $findSiteUrl->package_name;
             $data['app_name'] = $buildHistory->ios_app_name;
