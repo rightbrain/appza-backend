@@ -16,6 +16,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -125,31 +126,6 @@ class ApkBuildResourceController extends Controller
         }
 
         $fluentApiUrl = $getFluentInfo->api_url;
-
-        /*try {
-            $response = Http::get($fluentApiUrl, $params);
-        } catch (\Exception $e) {
-            return $jsonResponse(Response::HTTP_INTERNAL_SERVER_ERROR, 'Failed to connect to the license server.');
-        }
-
-        // Decode response
-        $data = json_decode($response->getBody()->getContents(), true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
-            return $jsonResponse(Response::HTTP_INTERNAL_SERVER_ERROR, 'Invalid response from license server.');
-        }
-
-        // Handle license errors
-        if (!$data['success'] ?? false) {
-            $messages = [
-                'missing' => 'License not found.',
-                'expired' => 'License has expired.',
-                'disabled' => 'License key revoked.',
-                'invalid_item_id' => 'Item id is invalid.',
-            ];
-            $message = $messages[$data['error']] ?? 'License not valid.';
-            return $jsonResponse(Response::HTTP_NOT_FOUND, $message);
-        }*/
-
         $response = Http::timeout(10)->get($fluentApiUrl, $params);
         $data = $response->json();
 
@@ -159,55 +135,38 @@ class ApkBuildResourceController extends Controller
             return $jsonResponse(Response::HTTP_NOT_FOUND, $message);
         }
 
-        $targetLocationLogo = public_path().'/upload/build-apk/logo/';
-        $targetLocationSplash = public_path().'/upload/build-apk/splash/';
+        // Upload Logo to R2
+        if (!empty($input['app_logo'])) {
 
-        if ($input['app_logo']) {
-            $url = $input['app_logo'];
-            $fileHeaders = @get_headers($url);
-            if (!$fileHeaders || $fileHeaders[0] == 'HTTP/1.1 404 Not Found') {
-                return $jsonResponse(Response::HTTP_BAD_REQUEST, 'App logo invalid file URL.');
+            $path = $this->uploadFromUrlToR2(
+                $input['app_logo'],
+                'app-file/logo',
+                'r2'
+            );
+
+            if (!$path) {
+                return $jsonResponse(Response::HTTP_BAD_REQUEST, 'App logo invalid or cannot be downloaded.');
             }
 
-            if(!File::exists($targetLocationLogo)) {
-                File::makeDirectory($targetLocationLogo, 0777, true);
-            }
-
-            $fileName = bin2hex(random_bytes(5)).'_'.basename($url);
-            $fileContent = @file_get_contents($url);
-
-            // Check if the file was able to be opened
-            if ($fileContent === FALSE) {
-                return $jsonResponse(Response::HTTP_NOT_FOUND, 'App logo could not open file at URL.');
-            }
-
-            file_put_contents($targetLocationLogo . $fileName, $fileContent);
-            $appLogo = $fileName;
+            $appLogo = config('app.image_public_path').$path;
         }
 
-        if ($input['app_splash_screen_image']) {
-            // Check if the URL points to a valid file
-            $url = $input['app_splash_screen_image'];
-            $fileHeaders = @get_headers($url);
-            if (!$fileHeaders || $fileHeaders[0] == 'HTTP/1.1 404 Not Found') {
-                return $jsonResponse(Response::HTTP_BAD_REQUEST, 'App splash screen image invalid file URL.');
+        // Upload Splash Screen to R2
+        if (!empty($input['app_splash_screen_image'])) {
+
+            $path = $this->uploadFromUrlToR2(
+                $input['app_splash_screen_image'],
+                'app-file/splash',
+                'r2'
+            );
+
+            if (!$path) {
+                return $jsonResponse(Response::HTTP_BAD_REQUEST, 'App splash invalid or cannot be downloaded.');
             }
 
-            if(!File::exists($targetLocationSplash)) {
-                File::makeDirectory($targetLocationSplash, 0777, true);
-            }
-
-            $fileName = bin2hex(random_bytes(5)).'_'.basename($url);
-            $fileContent = @file_get_contents($url);
-
-            // Check if the file was able to be opened
-            if ($fileContent === FALSE) {
-                return $jsonResponse(Response::HTTP_NOT_FOUND, 'App splash screen image could not open file at URL.');
-            }
-
-            file_put_contents($targetLocationSplash . $fileName, $fileContent);
-            $splash_screen_image = $fileName;
+            $splash_screen_image = config('app.image_public_path').$path;
         }
+
 
         $findAppVersion = AppVersion::where('is_active', 1)->latest()->first();
 
@@ -251,6 +210,33 @@ class ApkBuildResourceController extends Controller
         return response()->json($payload, $status);
     }
 
+    private function uploadFromUrlToR2(string $url, string $directory, string $disk = 'r2')
+    {
+        // Check URL valid or 404
+        $fileHeaders = @get_headers($url);
+        if (!$fileHeaders || strpos($fileHeaders[0], '404') !== false) {
+            return false;
+        }
+
+        // Download file content
+        $fileContent = @file_get_contents($url);
+        if ($fileContent === false) {
+            return false;
+        }
+
+        // Generate unique filename
+        $extension = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION);
+        $fileName = bin2hex(random_bytes(5)) . '_' . basename($url);
+
+        $path = $directory . '/' . $fileName;
+
+        // Upload file to R2
+        Storage::disk($disk)->put($path, $fileContent);
+
+        return $path; // return path for DB
+    }
+
+
     public function iosResourceAndVerify(IosBuildRequest $request)
     {
         $input = $request->validated();
@@ -270,7 +256,7 @@ class ApkBuildResourceController extends Controller
             return $jsonResponse(Response::HTTP_NOT_FOUND, 'Domain or license key is incorrect');
         }
 
-        $p8Dir = public_path('/upload/build-apk/p8file/');
+        /*$p8Dir = public_path('/upload/build-apk/p8file/');
         File::ensureDirectoryExists($p8Dir, 0777, true);
 
         $p8FileName = 'key_' . uniqid() . '.p8';
@@ -281,11 +267,34 @@ class ApkBuildResourceController extends Controller
             'ios_key_id' => $input['ios_key_id'],
             'team_id' => $input['ios_team_id'],
             'ios_p8_file_content' => $p8FileName,
+        ]);*/
+
+        $directory = 'app-file/p8file';
+        $disk = 'r2';
+
+
+        // Generate file name
+        $p8FileName = 'key_' . uniqid() . '.p8';
+
+        // Upload the .p8 content to R2
+        Storage::disk($disk)->put(
+            $directory . '/' . $p8FileName,
+            $input['ios_p8_file_content']
+        );
+
+        // Save filename in DB
+        $findSiteUrl->update([
+            'ios_issuer_id' => $input['ios_issuer_id'],
+            'ios_key_id' => $input['ios_key_id'],
+            'team_id' => $input['ios_team_id'],
+            'ios_p8_file_content' => config('app.image_public_path').$directory . '/' . $p8FileName,
         ]);
+
+        $findSiteUrl->refresh();
 
         $service = app(IosBuildValidationService::class);
         $result = $service->iosBuildProcessValidation($findSiteUrl);
-
+        
         if ($result['success'] === false) {
             Log::warning('IOS validation failed', $result);
             return $jsonResponse($result['status'], $result['message']);

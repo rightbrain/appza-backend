@@ -4,6 +4,7 @@ namespace App\Services;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
+use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
 use Firebase\JWT\JWT;
 
@@ -88,17 +89,26 @@ class IosBuildValidationService
 
     private function generateJwt($findSiteUrl)
     {
-        $filePath = public_path('/upload/build-apk/p8file/' . $findSiteUrl->ios_p8_file_content);
+        $filePath = $findSiteUrl->ios_p8_file_content;
 
-        if (!file_exists($filePath)) {
+        // Convert full URL → R2 path
+        if (str_starts_with($filePath, 'http')) {
+            $filePath = parse_url($filePath, PHP_URL_PATH);
+            $filePath = ltrim($filePath, '/');
+        }
+
+        // Check in R2
+        if (!Storage::disk('r2')->exists($filePath)) {
             return [
                 'success' => false,
                 'status' => Response::HTTP_NOT_FOUND,
-                'message' => 'The .p8 file was not found',
+                'message' => 'The .p8 file was not found in R2 storage.',
             ];
         }
 
-        $privateKey = file_get_contents($filePath);
+        // Read from R2
+        $privateKey = Storage::disk('r2')->get($filePath);
+
         if (!$privateKey) {
             return [
                 'success' => false,
