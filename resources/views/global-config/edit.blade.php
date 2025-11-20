@@ -675,7 +675,7 @@
                                                                 </td>
                                                                 <td>{{$com->name}}</td>
                                                                 <td>{{$com->plugin_name}}</td>
-                                                                @if($data['mode'] === 'navbar')
+                                                                @if($data['mode'] === 'navbar' || $data['mode'] === 'drawer')
                                                                     <td>
                                                                         {{ html()->text('position', isset($positions[$com->id]) ? $positions[$com->id] : null)
                                                                             ->class('form-control component_position')
@@ -684,7 +684,7 @@
                                                                             ->attribute('component_id', $com->id)
                                                                         }}
                                                                     </td>
-                                                                @else
+                                                                @elseif($data['mode'] === 'appbar')
                                                                     <td>
                                                                         @php
                                                                             $position['title_area'] = 'Title Area';
