@@ -343,9 +343,15 @@ class ThemeController extends Controller
                                 ->where('appfiy_global_config_component.global_config_id', $configData->id)
                                 ->where('appfiy_component.plugin_slug', $pluginSlug)
                                 ->whereNull('appfiy_component.deleted_at');
+
                             if ($configData->mode === 'navbar') {
                                 $getComponents = $getComponents->orderBy('appfiy_global_config_component.component_position', 'asc');
                             }
+
+                            if ($configData->mode === 'drawer') {
+                                $getComponents = $getComponents->orderByRaw('CAST(appfiy_global_config_component.component_position AS UNSIGNED) ASC');
+                            }
+
                             $getComponents = $getComponents->get()->toArray();
 
                             $componentWithStyle = [];
@@ -625,7 +631,7 @@ class ThemeController extends Controller
                         'persistent_footer_buttons' => isset($page->persistent_footer_buttons) ? (string)$page->persistent_footer_buttons : null,
                         'properties' => $pageProperties,
                         'customize_properties' => $pageProperties,
-                        'components' => $page->screen_status === 'dynamic' ? $final : []
+                        'components' => $final
                     ];
                 }
             }

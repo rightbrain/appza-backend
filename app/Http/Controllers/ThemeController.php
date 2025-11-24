@@ -343,9 +343,9 @@ class ThemeController extends Controller
             $themePage->update([
                 'screen_status' => $value ?? 'dynamic'
             ]);
-            if ($value == 'static'){
+            /*if ($value == 'static'){
                 ThemeComponent::where('theme_id', $themePage->theme_id)->where('theme_page_id', $id)->update(['selected_id' => 0]);
-            }
+            }*/
             $response['status'] = 'ok';
         } elseif ($fieldName === 'static_screen_message'){
             $themePage->update([
