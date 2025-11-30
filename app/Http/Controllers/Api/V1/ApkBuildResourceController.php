@@ -368,58 +368,54 @@ class ApkBuildResourceController extends Controller
 
         /*
         |--------------------------------------------------------------------------
-        | DELETE OLD ANDROID FILE IF EXISTS
+        | ANDROID
         |--------------------------------------------------------------------------
         */
         if (!empty($input['android_notification_content'])) {
 
+            // Convert array to JSON string if needed
+            $androidContent = is_array($input['android_notification_content'])
+                ? json_encode($input['android_notification_content'], JSON_PRETTY_PRINT)
+                : (string) $input['android_notification_content'];
+
+            // Delete old file
             if ($findSiteUrl->android_push_notification_url) {
-
-                // Extract R2 path from full URL
                 $oldAndroidPath = str_replace(config('app.image_public_path'), '', $findSiteUrl->android_push_notification_url);
-
-                // Delete from R2 if exists
                 if (Storage::disk($disk)->exists($oldAndroidPath)) {
                     Storage::disk($disk)->delete($oldAndroidPath);
                 }
             }
 
-            // Upload new android file
+            // Upload new file
             $fileNameAndroid = 'push_notification_' . uniqid() . '.json';
-            Storage::disk($disk)->put(
-                "$directory/android/$fileNameAndroid",
-                $input['android_notification_content']
-            );
+            Storage::disk($disk)->put("$directory/android/$fileNameAndroid", $androidContent);
         }
 
         /*
         |--------------------------------------------------------------------------
-        | DELETE OLD IOS FILE IF EXISTS
+        | IOS
         |--------------------------------------------------------------------------
         */
         if (!empty($input['ios_notification_content'])) {
 
+            // Ensure the content is string
+            $iosContent = (string) $input['ios_notification_content'];
+
             if ($findSiteUrl->ios_push_notification_url) {
-
-                // Extract path
                 $oldIosPath = str_replace(config('app.image_public_path'), '', $findSiteUrl->ios_push_notification_url);
-
                 if (Storage::disk($disk)->exists($oldIosPath)) {
                     Storage::disk($disk)->delete($oldIosPath);
                 }
             }
 
-            // Upload new iOS file
             $fileNameIos = 'push_notification_' . uniqid() . '.plist';
-            Storage::disk($disk)->put(
-                "$directory/ios/$fileNameIos",
-                $input['ios_notification_content']
-            );
+            Storage::disk($disk)->put("$directory/ios/$fileNameIos", $iosContent);
         }
+
 
         /*
         |--------------------------------------------------------------------------
-        | UPDATE ONLY NEW FILES
+        | UPDATE NEW PATHS
         |--------------------------------------------------------------------------
         */
         $updateData = [];
