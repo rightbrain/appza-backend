@@ -3,13 +3,10 @@
 namespace App\Models;
 
 use App\Enums\BuildStatus;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class BuildOrder extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'package_name',
         'app_name',
@@ -41,8 +38,12 @@ class BuildOrder extends Model
         'is_build_dir_delete',
         'build_orders',
         'history_id',
-        'splash_screen'
+        'splash_screen',
+        'is_push_notification',
+        'android_push_notification_url',
+        'ios_push_notification_url'
     ];
+
 
     protected $casts = [
         'key_properties' => 'json',

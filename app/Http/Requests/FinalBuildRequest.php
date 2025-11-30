@@ -3,8 +3,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
-use Illuminate\Validation\Validator;
 
 class FinalBuildRequest extends FormRequest
 {
@@ -28,8 +26,16 @@ class FinalBuildRequest extends FormRequest
         $rules = [
             'site_url' => 'required|url',
             'license_key' => 'required',
+            'is_push_notification' => 'boolean',
         ];
 
         return $rules;
+    }
+
+    public function messages()
+    {
+        return [
+            'is_push_notification.boolean' => 'The push notification value must be true or false.',
+        ];
     }
 }

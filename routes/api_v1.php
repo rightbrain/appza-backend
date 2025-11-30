@@ -81,8 +81,7 @@ Route::prefix('/appza/v1')
             Route::get('history', [ApkBuildHistoryController::class,'apkBuildHistoryList'])->name('build_history_list');
 
             // for notification
-            Route::post('push-notification-resource', [ApkBuildResourceController::class,'notificationResource'])
-                ->name('create_notification_resource');
+            Route::post('push-notification-resource', [ApkBuildResourceController::class,'notificationResource'])->name('create_notification_resource');
 
 
             // build response by builder application

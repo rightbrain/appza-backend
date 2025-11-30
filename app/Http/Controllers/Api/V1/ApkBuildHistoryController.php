@@ -78,6 +78,8 @@ class ApkBuildHistoryController extends Controller
         }
 
         $input = $request->validated();
+        $isPushNotification = $input['is_push_notification'] ?? false;
+
         $siteUrl = $this->normalizeUrl($input['site_url']);
         $findSiteUrl = BuildDomain::where('site_url', $siteUrl)
             ->where('license_key', $input['license_key'])
@@ -135,7 +137,7 @@ class ApkBuildHistoryController extends Controller
             });
 
             // Dispatch job after transaction
-            $this->buildRequestProcessForJob($buildHistory, $findSiteUrl, $isBuilderON);
+            $this->buildRequestProcessForJob($buildHistory, $findSiteUrl, $isBuilderON, $isPushNotification);
 
             $findBuildOrder = BuildOrder::where('history_id', $buildHistory->id)->first();
 
@@ -185,7 +187,7 @@ class ApkBuildHistoryController extends Controller
             return $jsonResponse(Response::HTTP_INTERNAL_SERVER_ERROR, 'Failed to create build. Error: ' . $e->getMessage());
         }
     }
-    private function buildRequestProcessForJob($buildHistory, $findSiteUrl, $isBuilderON)
+    private function buildRequestProcessForJob($buildHistory, $findSiteUrl, $isBuilderON, $isPushNotification)
     {
         $data = [
             'build_plugin_slug' => $findSiteUrl->build_plugin_slug,
@@ -222,18 +224,19 @@ class ApkBuildHistoryController extends Controller
         ]);
 
         foreach ($platforms as $platform) {
-            $this->processBuildOrder($findSiteUrl, $buildHistory, $data, $platform, $isBuilderON);
+            $this->processBuildOrder($findSiteUrl, $buildHistory, $data, $platform, $isBuilderON, $isPushNotification);
         }
     }
 
     /**
      * @throws Exception
      */
-    private function processBuildOrder($findSiteUrl, $buildHistory, $data, $platform, $isBuilderON)
+    private function processBuildOrder($findSiteUrl, $buildHistory, $data, $platform, $isBuilderON, $isPushNotification)
     {
         $data['license_key'] = $findSiteUrl->license_key;
         $data['build_domain_id'] = $findSiteUrl->id;
         $data['build_target'] = $platform;
+        $data['is_push_notification'] = $isPushNotification;
         $data['build_number'] = $this->getNextBuildNumber($findSiteUrl->site_url, $findSiteUrl->package_name, $platform);
 
         // Specific fields for Android
@@ -248,6 +251,7 @@ class ApkBuildHistoryController extends Controller
             $data['jks_url'] = url('') . '/android/upload-keystore.jks';
             $data['key_properties_url'] = url('') . '/android/key.properties';
             $data['app_name'] = $buildHistory->app_name;
+            $data['android_push_notification_url'] = $isPushNotification ? $findSiteUrl->android_push_notification_url : null;
         }
         // Specific fields for iOS
         if ($platform === 'ios') {
@@ -260,6 +264,7 @@ class ApkBuildHistoryController extends Controller
             $data['team_id'] = $buildHistory->ios_team_id;
             $data['app_identifier'] = $findSiteUrl->package_name;
             $data['app_name'] = $buildHistory->ios_app_name;
+            $data['ios_push_notification_url'] = $isPushNotification ? $findSiteUrl->ios_push_notification_url : null;
         }
 
         try {
