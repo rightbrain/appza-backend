@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\BuildOrderController;
 use App\Http\Controllers\ComponentController;
 use App\Http\Controllers\ComponentGroupController;
+use App\Http\Controllers\ComponentMigrationController;
 use App\Http\Controllers\FreeTrialController;
 use App\Http\Controllers\GlobalConfigController;
 use App\Http\Controllers\HomeController;
@@ -264,6 +265,26 @@ Route::prefix('/appza')->middleware(['auth'])->group(function() {
         Route::get('lead-wise-graph', [ReportController::class, 'leadWiseGraph'])->name('report_lead_wise_graph');
     });
     /* request log route end */
+
+
+    /* COMPONENT MIGRATION route START */
+// DEV routes (protect with auth middleware)
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/components/migration', [ComponentMigrationController::class, 'index'])->name('components.migration.index');
+        Route::get('/component/{id}/migrate/export', [ComponentMigrationController::class, 'downloadExport'])->name('component.migrate.export');
+        Route::post('/component/{id}/migrate/send-to-prod', [ComponentMigrationController::class, 'sendToProduction'])->name('component.migrate.send.to.prod');
+    });
+
+// PROD routes (protect with auth middleware)
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/component/migrate', [ComponentMigrationController::class, 'showImportForm'])->name('component.migrate.form');
+        Route::post('/component/migrate/import', [ComponentMigrationController::class, 'importFromFile'])->name('component.migrate.import.file');
+    });
+
+// PROD API route for direct import
+    Route::post('/component/migrate/import', [ComponentMigrationController::class, 'importFromApi']);
+    /* COMPONENT MIGRATION route END */
+
 
 });
 

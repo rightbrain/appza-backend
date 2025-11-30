@@ -267,6 +267,8 @@ class ApkBuildHistoryController extends Controller
             $data['ios_push_notification_url'] = $isPushNotification ? $findSiteUrl->ios_push_notification_url : null;
         }
 
+        $data['app_license_check_url'] = config('app.app_license_check_url', null);
+
         try {
             $order = BuildOrder::create($data);
             if ($isBuilderON) {

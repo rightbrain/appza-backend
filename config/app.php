@@ -23,6 +23,7 @@ return [
     'is_image_update' => env('IS_IMAGE_UPDATE', false),
     'is_hash_authorization' => env('IS_HASH_AUTHORIZATION', true),
     'is_request_log' => env('IS_REQUEST_LOG', true),
+    'app_license_check_url' => env('APP_LICENSE_CHECK_URL', null),
 
     /*
     |--------------------------------------------------------------------------
