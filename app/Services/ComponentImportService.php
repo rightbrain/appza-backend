@@ -4,6 +4,7 @@ namespace App\Services;
 use App\Models\Component;
 use App\Models\ComponentStyleGroup;
 use App\Models\ComponentStyleGroupProperties;
+use App\Models\Page;
 use App\Models\StyleGroup;
 use App\Models\SupportsPlugin;
 use App\Models\LayoutType;
@@ -26,8 +27,11 @@ class ComponentImportService
         DB::beginTransaction();
         try {
             // Import reference data first
-            $this->importReferenceData($payload);
-//            dump('0k');
+            $referenceData = $this->importReferenceData($payload);
+
+            $payload['component']['layout_type_id'] = $referenceData['layout_type_id'] ?? null;
+            $payload['component']['component_type_id'] = $referenceData['component_type_id'] ?? null;
+            dump($payload['component']);
 
             // Import component
 //            $component = $this->importComponent($payload['component'], $overwrite);
@@ -67,7 +71,8 @@ class ComponentImportService
     /**
      * Import reference data (plugins, layout types, etc.)
      */
-    /*protected function importReferenceData(array $payload): void
+
+    protected function importReferenceData(array $payload): array
     {
         // Import plugin if not exists
         if (!empty($payload['plugin'])) {
@@ -79,7 +84,7 @@ class ComponentImportService
 
         // Import layout type if not exists
         if (!empty($payload['layout_type'])) {
-            LayoutType::updateOrCreate(
+            $layoutType = LayoutType::updateOrCreate(
                 ['slug' => $payload['layout_type']['slug']],
                 $payload['layout_type']
             );
@@ -87,72 +92,7 @@ class ComponentImportService
 
         // Import component type if not exists
         if (!empty($payload['component_type'])) {
-            ComponentType::updateOrCreate(
-                ['slug' => $payload['component_type']['slug']],
-                $payload['component_type']
-            );
-        }
-        // Import scopes if not exists
-        if (!empty($payload['scopes'])) {
-            foreach ($payload['scopes'] as $scope) {
-                Scope::updateOrCreate(
-                    ['slug' => $scope['slug'],'plugin_slug' => $payload['plugin']['slug']],
-                    $scope
-                );
-            }
-        }
-
-        // Import class types if not exists
-        if (!empty($payload['class_types'])) {
-            $pluginSlug = $payload['plugin']['slug'] ?? null;
-
-            foreach ($payload['class_types'] as $classType) {
-                // Check if class type exists
-                $existingClassType = ClassType::where('slug', $classType['slug'])->first();
-
-                if ($existingClassType) {
-                    // If exists, ensure plugin is in the JSON array
-                    $plugins = $existingClassType->plugin ?? [];
-                    if (!in_array($pluginSlug, $plugins)) {
-                        $plugins[] = $pluginSlug;
-                        $existingClassType->plugin = $plugins;
-                        $existingClassType->save();
-                    }
-                } else {
-                    // If new, create with plugin in JSON array
-                    ClassType::create([
-                        'name' => $classType['name'],
-                        'slug' => $classType['slug'],
-                        'plugin' => [$pluginSlug], // Create as JSON array
-                        'is_active' => $classType['is_active'] ?? 1,
-                        'created_at' => now()
-                    ]);
-                }
-            }
-        }
-    }*/
-
-    protected function importReferenceData(array $payload): void
-    {
-        // Import plugin if not exists
-        if (!empty($payload['plugin'])) {
-            SupportsPlugin::updateOrCreate(
-                ['slug' => $payload['plugin']['slug']],
-                $payload['plugin']
-            );
-        }
-
-        // Import layout type if not exists
-        if (!empty($payload['layout_type'])) {
-            LayoutType::updateOrCreate(
-                ['slug' => $payload['layout_type']['slug']],
-                $payload['layout_type']
-            );
-        }
-
-        // Import component type if not exists
-        if (!empty($payload['component_type'])) {
-            ComponentType::updateOrCreate(
+            $componentType = ComponentType::updateOrCreate(
                 ['slug' => $payload['component_type']['slug']],
                 $payload['component_type']
             );
@@ -224,12 +164,16 @@ class ComponentImportService
                 }
             }
         }
+        return [
+          'layout_type_id' => $layoutType?->id ?? null,
+          'component_type_id' => $componentType?->id ?? null
+        ];
     }
 
     /**
      * Import component
      */
-    protected function importComponent(array $componentData, bool $overwrite): Component
+    protected function importComponent(array $componentData, bool $overwrite)
     {
         // Check if component exists
         $existing = Component::where('slug', $componentData['slug'])->first();
@@ -241,10 +185,10 @@ class ComponentImportService
         // Prepare data for import
         $data = $this->prepareComponentData($componentData);
 
-        return Component::updateOrCreate(
+        /*return Component::updateOrCreate(
             ['slug' => $data['slug']],
             $data
-        );
+        );*/
     }
 
     /**
@@ -259,8 +203,9 @@ class ComponentImportService
                 $data[$field] = json_encode($data[$field]);
             }
         }
+        dump($data);
 
-        return $data;
+//        return $data;
     }
 
     /**
