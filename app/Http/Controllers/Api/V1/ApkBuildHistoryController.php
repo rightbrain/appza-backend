@@ -90,6 +90,16 @@ class ApkBuildHistoryController extends Controller
             #->where('package_name', $input['package_name'])
             ->first();
 
+        // CHECK ANDROID FILE FOR PUSH NOTIFICATION
+        if ($isPushNotification && $findSiteUrl->is_android && empty($findSiteUrl->android_push_notification_url)) {
+            return $jsonResponse(Response::HTTP_LOCKED, 'Android push notification json file missing. Please update file & try again later.');
+        }
+
+        // CHECK ANDROID FILE FOR PUSH NOTIFICATION
+        if ($isPushNotification && $findSiteUrl->is_ios && empty($findSiteUrl->ios_push_notification_url)) {
+            return $jsonResponse(Response::HTTP_LOCKED, 'ios push notification plist file missing. Please update file & try again later.');
+        }
+
         if (!$findSiteUrl) {
             return $jsonResponse(Response::HTTP_NOT_FOUND, 'Domain or license key wrong');
         }

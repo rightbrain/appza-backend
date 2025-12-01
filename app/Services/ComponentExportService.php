@@ -19,7 +19,7 @@ class ComponentExportService
      * @param int $id
      * @return array
      */
-    public function export(int $id): array
+    public function export(int $id)
     {
         $component = Component::findOrFail($id);
 
@@ -96,7 +96,7 @@ class ComponentExportService
             return [];
         }
 
-        return ClassType::where('plugin_slug', $component->plugin_slug)
+        return ClassType::whereJsonContains('plugin', $component->plugin_slug)
             ->get(['id', 'name', 'slug'])
             ->toArray();
     }
