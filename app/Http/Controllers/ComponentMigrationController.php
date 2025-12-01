@@ -55,9 +55,10 @@ class ComponentMigrationController extends Controller
     // DEV: Download component as JSON
     public function downloadExport($id)
     {
+        $findComponent = Component::find($id);
         $payload = $this->exportService->export((int)$id);
         $json = json_encode($payload, JSON_PRETTY_PRINT);
-        $filename = "component_{$id}_" . now()->format('Ymd_His') . '.json';
+        $filename = "{$findComponent->slug}_component_{$id}_" . now()->format('Ymd_His') . '.json';
 
         return response()->streamDownload(function () use ($json) {
             echo $json;
@@ -116,12 +117,13 @@ class ComponentMigrationController extends Controller
     // PROD: Show import form
     public function showImportForm()
     {
-        return view('components.migration.import');
+        return view('component.migration.import');
     }
 
     // PROD: Upload and import JSON file
     public function importFromFile(Request $request)
     {
+//        dump($request->file('file'));
         $request->validate([
             'file' => 'required|file|mimes:json,txt',
             'overwrite' => 'sometimes|boolean'
@@ -133,10 +135,12 @@ class ComponentMigrationController extends Controller
         if (!is_array($payload)) {
             return back()->with('error', 'Invalid JSON file');
         }
+//        dump($payload);
 
         $result = $this->importService->import($payload, $request->input('overwrite', false));
 
-        return back()->with($result['success'] ? 'success' : 'error', $result['message']);
+//        return back()->with($result['success'] ? 'success' : 'error', $result['message']);
+//        return back()->with('success','Created Okay');
     }
 
     // PROD: API endpoint for direct import

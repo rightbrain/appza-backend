@@ -110,9 +110,24 @@ Route::prefix('/appza')->middleware(['auth'])->group(function() {
         Route::get('properties/inline/update',[ComponentController::class, 'componentPropertiesInlineUpdate'])->name('component_properties_inline_update');
         Route::PATCH('update/{id}',[ComponentController::class, 'update'])->name('component_update');
         Route::POST('plugin-slug/update',[ComponentController::class, 'updatePluginSlug'])->name('plugin_slug_update_component');
+
+
+        /* COMPONENT MIGRATION route START */
+        // DEV routes
+        Route::get('/migration', [ComponentMigrationController::class, 'index'])->name('component_migration_index');
+        Route::get('{id}/migration/export', [ComponentMigrationController::class, 'downloadExport'])->name('component_migration_export');
+        Route::post('{id}/migration/send-to-prod', [ComponentMigrationController::class, 'sendToProduction'])->name('component_migration_send_to_prod');
+
+        // PROD routes
+        Route::get('migrate', [ComponentMigrationController::class, 'showImportForm'])->name('component_migrate_form');
+        Route::post('migrate/import', [ComponentMigrationController::class, 'importFromFile'])->name('component_migrate_import_file');
+
+        // PROD API route for direct import
+//        Route::post('migrate/import', [ComponentMigrationController::class, 'importFromApi']);
+        /* COMPONENT MIGRATION route END */
+
     });
     /* component route end */
-
 
     /* global config route start */
     Route::prefix('global-config')->group(function () {
@@ -265,26 +280,6 @@ Route::prefix('/appza')->middleware(['auth'])->group(function() {
         Route::get('lead-wise-graph', [ReportController::class, 'leadWiseGraph'])->name('report_lead_wise_graph');
     });
     /* request log route end */
-
-
-    /* COMPONENT MIGRATION route START */
-// DEV routes (protect with auth middleware)
-    Route::middleware(['auth'])->group(function () {
-        Route::get('/components/migration', [ComponentMigrationController::class, 'index'])->name('components.migration.index');
-        Route::get('/component/{id}/migrate/export', [ComponentMigrationController::class, 'downloadExport'])->name('component.migrate.export');
-        Route::post('/component/{id}/migrate/send-to-prod', [ComponentMigrationController::class, 'sendToProduction'])->name('component.migrate.send.to.prod');
-    });
-
-// PROD routes (protect with auth middleware)
-    Route::middleware(['auth'])->group(function () {
-        Route::get('/component/migrate', [ComponentMigrationController::class, 'showImportForm'])->name('component.migrate.form');
-        Route::post('/component/migrate/import', [ComponentMigrationController::class, 'importFromFile'])->name('component.migrate.import.file');
-    });
-
-// PROD API route for direct import
-    Route::post('/component/migrate/import', [ComponentMigrationController::class, 'importFromApi']);
-    /* COMPONENT MIGRATION route END */
-
 
 });
 

@@ -90,6 +90,7 @@ class ComponentExportService
     /**
      * Export class types related to component
      */
+
     protected function exportClassTypes(Component $component): array
     {
         if (!$component->plugin_slug) {
@@ -97,7 +98,7 @@ class ComponentExportService
         }
 
         return ClassType::whereJsonContains('plugin', $component->plugin_slug)
-            ->get(['id', 'name', 'slug'])
+            ->get(['id', 'name', 'slug', 'plugin']) // Include plugin field
             ->toArray();
     }
 

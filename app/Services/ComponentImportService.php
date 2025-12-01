@@ -23,6 +23,7 @@ class ComponentImportService
      */
     public function import(array $payload, bool $overwrite = false): array
     {
+//        dump($payload);
         DB::beginTransaction();
         try {
             // Import reference data first
@@ -79,7 +80,7 @@ class ComponentImportService
         // Import layout type if not exists
         if (!empty($payload['layout_type'])) {
             LayoutType::updateOrCreate(
-                ['id' => $payload['layout_type']['id']],
+                ['slug' => $payload['layout_type']['slug']],
                 $payload['layout_type']
             );
         }
@@ -87,16 +88,16 @@ class ComponentImportService
         // Import component type if not exists
         if (!empty($payload['component_type'])) {
             ComponentType::updateOrCreate(
-                ['id' => $payload['component_type']['id']],
+                ['slug' => $payload['component_type']['slug']],
                 $payload['component_type']
             );
         }
-
+//        dump($payload['scopes']);
         // Import scopes if not exists
         if (!empty($payload['scopes'])) {
             foreach ($payload['scopes'] as $scope) {
                 Scope::updateOrCreate(
-                    ['slug' => $scope['slug']],
+                    ['slug' => $scope['slug'],'plugin_slug' => $payload['plugin']['slug']],
                     $scope
                 );
             }
@@ -104,11 +105,29 @@ class ComponentImportService
 
         // Import class types if not exists
         if (!empty($payload['class_types'])) {
+            $pluginSlug = $payload['plugin']['slug'] ?? null;
+
             foreach ($payload['class_types'] as $classType) {
-                ClassType::updateOrCreate(
-                    ['slug' => $classType['slug']],
-                    $classType
-                );
+                // Check if class type exists
+                $existingClassType = ClassType::where('slug', $classType['slug'])->first();
+
+                if ($existingClassType) {
+                    // If exists, ensure plugin is in the JSON array
+                    $plugins = $existingClassType->plugin ?? [];
+                    if (!in_array($pluginSlug, $plugins)) {
+                        $plugins[] = $pluginSlug;
+                        $existingClassType->plugin = $plugins;
+                        $existingClassType->save();
+                    }
+                } else {
+                    // If new, create with plugin in JSON array
+                    ClassType::create([
+                        'name' => $classType['name'],
+                        'slug' => $classType['slug'],
+                        'plugin' => [$pluginSlug], // Create as JSON array
+                        'is_active' => $classType['is_active'] ?? 1
+                    ]);
+                }
             }
         }
     }

@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('content')
+@section('body')
     <div class="container">
         <h1>Import Component</h1>
 
@@ -18,7 +18,7 @@
 
         <div class="card">
             <div class="card-body">
-                <form action="{{ route('component.migrate.import.file') }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('component_migrate_import_file') }}" method="POST" enctype="multipart/form-data">
                     @csrf
 
                     <div class="mb-3">

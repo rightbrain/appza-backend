@@ -125,7 +125,8 @@
                                         <td>{{$component->scope ? implode(', ', json_decode($component->scope)) : null}}</td>
                                         <td>
                                             <div class="btn-group">
-                                                <a href="{{ route('component.migrate.export', $component->id) }}" class="btn btn-sm btn-outline-primary">
+{{--                                                <a href="{{ route('component.migrate.export', $component->id) }}" class="btn btn-sm btn-outline-primary">--}}
+                                                <a href="{{ route('component_migration_export', $component->id) }}" class="btn btn-sm btn-outline-primary">
                                                     Export JSON
                                                 </a>
 
