@@ -38,6 +38,11 @@ class StyleGroup extends Model
         return $this->hasMany(StyleGroupProperties::class,'style_group_id','id');
     }
 
+    public function componentStyleGroups()
+    {
+        return $this->hasMany(ComponentStyleGroup::class, 'style_group_id', 'id');
+    }
+
     public static function getPropertiesNameArray($id){
         $getAllProperties = StyleGroupProperties::where('appfiy_style_group_properties.style_group_id',$id)->join('appfiy_style_properties','appfiy_style_properties.id','=','appfiy_style_group_properties.style_property_id')->select(['appfiy_style_properties.name'])->get()->toArray();
         $data = '';

@@ -38,7 +38,7 @@ class ComponentImportService
             $component = $this->importComponent($payload['component'], $overwrite);
 
             // Import related data
-            $this->importComponentStyleGroups($component->id, $payload['style_groups'],$pluginSlug);
+            $this->importComponentStyleGroups($component->id, $payload['style_groups'], $payload['properties'], $pluginSlug);
 //            $this->importComponentProperties($component->id, $payload['properties']);
 //            $this->importComponentScopes($component, $payload['scopes']);
 
@@ -212,42 +212,18 @@ class ComponentImportService
     /**
      * Import component style groups
      */
-    /*protected function importComponentStyleGroups(int $componentId, array $styleGroups, string $pluginSlug): void
+
+    protected function importComponentStyleGroups(int $componentId, array $styleGroups, array $componentProperties, string $pluginSlug): void
     {
+        dump($styleGroups);
         foreach ($styleGroups as $group) {
-            // Find style group by slug
-            $styleGroup = StyleGroup::where('slug', $group['style_group']['slug'])->first();
 
-            if (!$styleGroup) {
-                $styleGroup = StyleGroup::create([
-                    'name' => $group['style_group']['name'],
-                    'slug' => $group['style_group']['slug'],
-                    'plugin_slug' => [$pluginSlug],
-                ]);
-            }else{
-                $pluginSlugArray = $styleGroup['plugin_slug'];
-                $pluginSlugExists = in_array($pluginSlug, $pluginSlugArray);
-                if (!$pluginSlugExists) {
-                    array_push($pluginSlugArray, $pluginSlug);
-                    $styleGroup->update(['plugin_slug' => $pluginSlugArray]);
-                }
-            }
+            /*$filtered = array_filter($properties, function ($item) use ($group) {
+                return $item['style_group_id'] == $group['style_group_id'];
+            });
 
-            ComponentStyleGroup::updateOrCreate(
-                [
-                    'component_id' => $componentId,
-                    'style_group_id' => $styleGroup->id,
-                ],
-                [
-                    'is_checked' => $group['is_checked'] ?? false,
-                ]
-            );
-        }
-    }*/
-
-    protected function importComponentStyleGroups(int $componentId, array $styleGroups, string $pluginSlug): void
-    {
-        foreach ($styleGroups as $group) {
+            $filteredProperties = array_values($filtered);*/
+//            dump($filteredProperties);
             // Validate required data
             if (empty($group['style_group']['slug']) || empty($group['style_group']['name'])) {
                 Log::warning("Skipping style group with missing required data", ['group' => $group]);
@@ -270,8 +246,11 @@ class ComponentImportService
                 $this->updateStyleGroupPlugins($styleGroup, $pluginSlug);
             }
 
+            // Update existing style group's properties
+//            $this->updateStyleGroupProperties($styleGroup, $filteredProperties);
+
             // Create or update component style group relationship
-            /*ComponentStyleGroup::updateOrCreate(
+            ComponentStyleGroup::updateOrCreate(
                 [
                     'component_id' => $componentId,
                     'style_group_id' => $styleGroup->id,
@@ -279,7 +258,7 @@ class ComponentImportService
                 [
                     'is_checked' => $group['is_checked'] ?? false,
                 ]
-            );*/
+            );
         }
     }
 
@@ -302,11 +281,63 @@ class ComponentImportService
         }
     }
 
+    protected function updateStyleGroupProperties(StyleGroup $styleGroup, array $filteredProperties): void
+    {
+        /*// Get current property IDs for this style group to avoid duplicates
+        $currentPropertyIds = StyleGroupProperty::where('style_group_id', $styleGroup->id)
+            ->pluck('style_property_id')
+            ->toArray();
+
+        foreach ($filteredProperties as $property) {
+            // Skip if required fields are missing
+            if (empty($property['name']) || empty($property['input_type'])) {
+                Log::warning("Skipping property with missing required data", ['property' => $property]);
+                continue;
+            }
+
+            // Find or create the style property
+            $styleProperty = StyleProperty::updateOrCreate(
+                ['name' => $property['name']],
+                [
+                    'input_type' => $property['input_type'],
+                    'value' => $property['value'] ?? null,
+                    'default_value' => $property['default_value'] ?? null,
+                    'is_active' => $property['is_active'] ?? true,
+                ]
+            );
+
+            // Create or update the relationship between style group and style property
+            StyleGroupProperty::updateOrCreate(
+                [
+                    'style_group_id' => $styleGroup->id,
+                    'style_property_id' => $styleProperty->id,
+                ],
+                []
+            );
+
+            // Remove from current IDs list to track which ones we've processed
+            if (($key = array_search($styleProperty->id, $currentPropertyIds)) !== false) {
+                unset($currentPropertyIds[$key]);
+            }
+        }
+
+        // Remove any properties that were in the style group but not in the import
+        if (!empty($currentPropertyIds)) {
+            StyleGroupProperty::where('style_group_id', $styleGroup->id)
+                ->whereIn('style_property_id', $currentPropertyIds)
+                ->delete();
+        }*/
+    }
+
+
+
+
     /**
      * Import component properties
      */
     protected function importComponentProperties(int $componentId, array $properties): void
     {
+//        dump($properties);
         foreach ($properties as $property) {
             // Find style group by component_id and style_group_id
             $componentStyleGroup = ComponentStyleGroup::where('component_id', $componentId)
@@ -318,7 +349,7 @@ class ComponentImportService
                 continue;
             }
 
-            ComponentStyleGroupProperties::updateOrCreate(
+            /*ComponentStyleGroupProperties::updateOrCreate(
                 [
                     'component_id' => $componentId,
                     'style_group_id' => $property['style_group_id'],
@@ -329,7 +360,7 @@ class ComponentImportService
                     'value' => $property['value'],
                     'default_value' => $property['default_value'],
                 ]
-            );
+            );*/
         }
     }
 

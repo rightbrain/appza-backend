@@ -54,7 +54,7 @@ class ComponentExportService
     /**
      * Export component style groups with related style groups
      */
-    protected function exportComponentStyleGroups(int $componentId): array
+    /*protected function exportComponentStyleGroups(int $componentId): array
     {
         $componentStyleGroups = ComponentStyleGroup::where('component_id', $componentId)
             ->with('styleGroup:id,name,slug')
@@ -62,6 +62,56 @@ class ComponentExportService
             ->toArray();
 
         return $componentStyleGroups;
+    }*/
+    protected function exportComponentStyleGroups(int $componentId): array
+    {
+        $componentStyleGroups = ComponentStyleGroup::where('component_id', $componentId)
+            ->with([
+                'styleGroup:id,name,slug',
+//                'styleGroup.styleGroupProperties.styleProperty:name,input_type,value,default_value,is_active'
+                'styleGroup.groupProperties.styleProperty'
+            ])
+            ->get()
+            ->toArray();
+//        dump($componentStyleGroups);
+
+        // Transform the data to include properties in a more usable format
+        return $this->transformStyleGroupData($componentStyleGroups);
+    }
+
+    /**
+     * Transform style group data to include properties in a flattened structure
+     */
+    protected function transformStyleGroupData(array $componentStyleGroups): array
+    {
+        return array_map(function ($componentStyleGroup) {
+            // Extract style group data
+            $styleGroup = $componentStyleGroup['style_group'];
+
+            // Extract properties
+            $properties = [];
+            if (!empty($styleGroup['group_properties'])) {
+                foreach ($styleGroup['group_properties'] as $property) {
+                    if (!empty($property['style_property'])) {
+                        $properties[] = $property['style_property'];
+                    }
+                }
+            }
+
+            // Return transformed data
+            return [
+                'id' => $componentStyleGroup['id'],
+                'component_id' => $componentStyleGroup['component_id'],
+                'style_group_id' => $componentStyleGroup['style_group_id'],
+                'is_checked' => $componentStyleGroup['is_checked'],
+                'style_group' => [
+                    'id' => $styleGroup['id'],
+                    'name' => $styleGroup['name'],
+                    'slug' => $styleGroup['slug'],
+                    'properties' => $properties
+                ]
+            ];
+        }, $componentStyleGroups);
     }
 
     /**

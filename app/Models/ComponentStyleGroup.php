@@ -11,7 +11,7 @@ class ComponentStyleGroup extends Model
     public $timestamps = true;
     protected $guarded = ['id'];
     protected $dates = ['created_at','updated_at'];
-    protected $fillable = ['component_id', 'style_group_id'];
+    protected $fillable = ['component_id', 'style_group_id','is_checked'];
 
     public function componentStyleGroup(){
         return $this->belongsTo(ComponentStyleGroup::class,'component_id','id');
