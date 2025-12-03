@@ -68,12 +68,10 @@ class ComponentExportService
         $componentStyleGroups = ComponentStyleGroup::where('component_id', $componentId)
             ->with([
                 'styleGroup:id,name,slug',
-//                'styleGroup.styleGroupProperties.styleProperty:name,input_type,value,default_value,is_active'
                 'styleGroup.groupProperties.styleProperty'
             ])
             ->get()
             ->toArray();
-//        dump($componentStyleGroups);
 
         // Transform the data to include properties in a more usable format
         return $this->transformStyleGroupData($componentStyleGroups);
@@ -119,7 +117,7 @@ class ComponentExportService
      */
     protected function exportComponentProperties(int $componentId): array
     {
-        return ComponentStyleGroupProperties::where('component_id', $componentId)
+        return ComponentStyleGroupProperties::with('styleGroup')->where('component_id', $componentId)
             ->get()
             ->toArray();
     }

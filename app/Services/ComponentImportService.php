@@ -6,6 +6,8 @@ use App\Models\ComponentStyleGroup;
 use App\Models\ComponentStyleGroupProperties;
 use App\Models\Page;
 use App\Models\StyleGroup;
+use App\Models\StyleGroupProperties;
+use App\Models\StyleProperties;
 use App\Models\SupportsPlugin;
 use App\Models\LayoutType;
 use App\Models\Scope;
@@ -215,8 +217,9 @@ class ComponentImportService
 
     protected function importComponentStyleGroups(int $componentId, array $styleGroups, array $componentProperties, string $pluginSlug): void
     {
-        dump($styleGroups);
+//        dump($styleGroups);
         foreach ($styleGroups as $group) {
+//            dump($group['style_group']['properties']);
 
             /*$filtered = array_filter($properties, function ($item) use ($group) {
                 return $item['style_group_id'] == $group['style_group_id'];
@@ -248,9 +251,10 @@ class ComponentImportService
 
             // Update existing style group's properties
 //            $this->updateStyleGroupProperties($styleGroup, $filteredProperties);
+            $this->updateStyleGroupProperties($styleGroup, $group['style_group']['properties']);
 
             // Create or update component style group relationship
-            ComponentStyleGroup::updateOrCreate(
+            $componentStyleGroup = ComponentStyleGroup::updateOrCreate(
                 [
                     'component_id' => $componentId,
                     'style_group_id' => $styleGroup->id,
@@ -259,6 +263,8 @@ class ComponentImportService
                     'is_checked' => $group['is_checked'] ?? false,
                 ]
             );
+//            importComponentProperties
+            dump($componentStyleGroup);
         }
     }
 
@@ -281,8 +287,37 @@ class ComponentImportService
         }
     }
 
-    protected function updateStyleGroupProperties(StyleGroup $styleGroup, array $filteredProperties): void
+    protected function updateStyleGroupProperties(StyleGroup $styleGroup, array $properties): void
     {
+        if (count($properties) >0 ) {
+            foreach ($properties as $property) {
+                // Skip if required fields are missing
+                if (empty($property['name']) || empty($property['input_type'])) {
+                    Log::warning("Skipping property with missing required data", ['property' => $property]);
+                    continue;
+                }
+
+                // Find or create the style property
+                $styleProperty = StyleProperties::updateOrCreate(
+                    ['name' => $property['name'],'input_type' => $property['input_type']],
+                    [
+                        'value' => $property['value'] ?? null,
+                        'default_value' => $property['default_value'] ?? null,
+                        'is_active' => $property['is_active'] ?? true,
+                        'updated_at' => now()
+                    ]
+                );
+
+                // Create or update the relationship between style group and style property
+                StyleGroupProperties::updateOrCreate(
+                    [
+                        'style_group_id' => $styleGroup->id,
+                        'style_property_id' => $styleProperty->id,
+                    ],
+                    []
+                );
+            }
+        }
         /*// Get current property IDs for this style group to avoid duplicates
         $currentPropertyIds = StyleGroupProperty::where('style_group_id', $styleGroup->id)
             ->pluck('style_property_id')
@@ -337,17 +372,32 @@ class ComponentImportService
      */
     protected function importComponentProperties(int $componentId, array $properties): void
     {
-//        dump($properties);
         foreach ($properties as $property) {
             // Find style group by component_id and style_group_id
             $componentStyleGroup = ComponentStyleGroup::where('component_id', $componentId)
                 ->where('style_group_id', $property['style_group_id'])
                 ->first();
+            dump($componentStyleGroup,$property);
+
 
             if (!$componentStyleGroup) {
                 Log::warning("Component style group not found for property: {$property['name']}");
                 continue;
             }
+
+            /*array:11 [▼ // app/Services/ComponentImportService.php:374
+  "id" => 73274
+  "component_id" => 367
+  "style_group_id" => 1
+  "name" => "padding_x"
+  "input_type" => "number"
+  "value" => "40000"
+  "default_value" => null
+  "is_active" => 1
+  "deleted_at" => null
+  "created_at" => "2025-12-01T10:34:55.000000Z"
+  "updated_at" => "2025-12-03T04:50:28.000000Z"
+]*/
 
             /*ComponentStyleGroupProperties::updateOrCreate(
                 [
