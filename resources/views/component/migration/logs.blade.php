@@ -17,7 +17,6 @@
                 <h5 class="mb-0">Filter Logs</h5>
             </div>
             <div class="card-body">
-
                 <form action="{{ route('component_migrate_logs') }}" method="GET">
                     <div class="row g-3">
 
@@ -64,17 +63,8 @@
 
                     </div>
                 </form>
-
             </div>
         </div>
-
-        <!-- Stats -->
-        {{--<div class="row mb-4">
-            <div class="col-md-3"><div class="card text-white bg-primary"><div class="card-body"><h5>Total Imports</h5><h2>{{ \App\Models\ComponentImportLog::count() }}</h2></div></div></div>
-            <div class="col-md-3"><div class="card text-white bg-success"><div class="card-body"><h5>Successful</h5><h2>{{ \App\Models\ComponentImportLog::where('success', true)->count() }}</h2></div></div></div>
-            <div class="col-md-3"><div class="card text-white bg-danger"><div class="card-body"><h5>Failed</h5><h2>{{ \App\Models\ComponentImportLog::where('success', false)->count() }}</h2></div></div></div>
-            <div class="col-md-3"><div class="card text-white bg-info"><div class="card-body"><h5>Success Rate</h5><h2>{{ round(\App\Models\ComponentImportLog::where('success', true)->count() / max(1, \App\Models\ComponentImportLog::count()) * 100) }}%</h2></div></div></div>
-        </div>--}}
 
         <!-- Logs Table -->
         <div class="card">
@@ -84,7 +74,6 @@
             </div>
 
             <div class="card-body p-0 pb-5">
-
                 <table class="table table-bordered text-center mb-0">
                     <thead class="thead-dark">
                     <tr>
@@ -101,9 +90,7 @@
                     @forelse($logs as $log)
                         <tr>
                             <td>{{ \Carbon\Carbon::parse($log->created_at)->format('M j, Y g:i:s A') }}</td>
-
                             <td><strong>{{ $log->component_name }}</strong></td>
-
                             <td>
                                 @if($log->success)
                                     <span class="badge bg-success">Success</span>
@@ -111,15 +98,12 @@
                                     <span class="badge bg-danger">Failed</span>
                                 @endif
                             </td>
-
                             <td>{{ $log->source }}</td>
-
                             <td>
                                 <div class="text-truncate" style="max-width: 300px;" title="{{ $log->message }}">
                                     {{ $log->message }}
                                 </div>
                             </td>
-
                             <td>
                                 <div class="btn-group">
                                     <button type="button"
@@ -148,39 +132,34 @@
                     </tbody>
                 </table>
 
-                <!-- Pagination (Always show when total > 0) -->
                 @if($logs->total() > 0)
                     <div class="mt-3 px-3 pb-3 d-flex justify-content-end">
                         {{ $logs->links('layouts.pagination') }}
                     </div>
                 @endif
-
-
             </div>
         </div>
 
     </div>
 
     <!-- Message Modal -->
+    <!-- Message Modal -->
     <div class="modal fade" id="messageModal" tabindex="-1" aria-labelledby="messageModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg">
+        <div class="modal-dialog modal-fullscreen"> <!-- Fullscreen modal -->
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="messageModalLabel">Import Log Message</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
+                <div class="modal-body d-flex flex-column">
                     <div class="mb-3">
                         <h6>Component: <span id="modalComponentName" class="fw-bold"></span></h6>
                         <h6>Status: <span id="modalStatus"></span></h6>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Raw Message:</label>
-                        <pre id="rawMessage" class="p-3 bg-light border rounded" style="white-space: pre-wrap; max-height: 200px; overflow-y: auto;"></pre>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Formatted JSON (if applicable):</label>
-                        <div id="jsonViewer" class="p-3 bg-light border rounded" style="max-height: 300px; overflow-y: auto;">
+
+                    <div class="mb-3 flex-grow-1"> <!-- Flexible height -->
+                        <label class="form-label">Formatted JSON (Import History):</label>
+                        <div id="jsonViewer" class="p-3 bg-light border rounded h-100 overflow-auto">
                             <pre id="formattedJson" class="mb-0"></pre>
                         </div>
                     </div>
@@ -195,10 +174,11 @@
         </div>
     </div>
 
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
-            // Handle modal show event
+            // Show modal with formatted JSON
             const messageModal = document.getElementById('messageModal');
             messageModal.addEventListener('show.bs.modal', function(event) {
                 const button = event.relatedTarget;
@@ -208,24 +188,63 @@
 
                 document.getElementById('modalComponentName').textContent = componentName;
                 document.getElementById('modalStatus').textContent = status;
-                document.getElementById('rawMessage').textContent = message;
 
-                const jsonViewer = document.getElementById('jsonViewer');
                 const formattedJson = document.getElementById('formattedJson');
+                formattedJson.innerHTML = ''; // clear previous content
 
                 try {
                     const jsonData = JSON.parse(message);
-                    formattedJson.textContent = JSON.stringify(jsonData, null, 2);
-                    jsonViewer.style.display = 'block';
+
+                    jsonData.forEach((step, index) => {
+                        const stepDiv = document.createElement('div');
+                        stepDiv.classList.add('mb-2', 'p-2', 'border', 'rounded');
+
+                        // Format date & time
+                        let stepTime = new Date(step.time);
+                        const options = {
+                            year: 'numeric', month: 'short', day: 'numeric',
+                            hour: 'numeric', minute: 'numeric', second: 'numeric',
+                            hour12: true
+                        };
+                        const formattedTime = stepTime.toLocaleString('en-US', options);
+
+                        const statusBadge = step.success
+                            ? '<span class="badge bg-success">Success</span>'
+                            : '<span class="badge bg-danger">Failed</span>';
+
+                        stepDiv.innerHTML = `
+                    <div><strong>Step ${index + 1}:</strong> ${step.step} ${statusBadge}</div>
+                    <div><strong>Time:</strong> ${formattedTime}</div>
+                    <div><strong>Data:</strong> <pre style="white-space: pre-wrap;">${JSON.stringify(step.data, null, 2)}</pre></div>
+                `;
+
+                        formattedJson.appendChild(stepDiv);
+                    });
                 } catch {
-                    jsonViewer.style.display = 'none';
+                    formattedJson.textContent = message; // fallback if not JSON
                 }
             });
 
+            // Copy formatted JSON
             document.getElementById('copyMessageBtn').addEventListener('click', function() {
-                const message = document.getElementById('rawMessage').textContent;
-                navigator.clipboard.writeText(message);
+                const formattedContent = document.getElementById('formattedJson').textContent;
+                navigator.clipboard.writeText(formattedContent);
             });
+
+            // Copy single message from table
+            document.querySelectorAll('.copy-message-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    navigator.clipboard.writeText(this.getAttribute('data-message'));
+                });
+            });
+
         });
     </script>
+    <style>
+        #jsonViewer pre {
+            font-size: 0.9rem;
+            line-height: 1.3;
+        }
+
+    </style>
 @endsection
