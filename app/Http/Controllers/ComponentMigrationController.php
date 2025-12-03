@@ -123,11 +123,12 @@ class ComponentMigrationController extends Controller
     // PROD: Upload and import JSON file
     public function importFromFile(Request $request)
     {
-//        dump($request->file('file'));
-        /*$request->validate([
+        $request->validate([
             'file' => 'required|file|mimes:json,txt',
-            'overwrite' => 'sometimes|boolean'
-        ]);*/
+            'overwrite' => 'sometimes|nullable'
+        ]);
+
+        $overwrite = $request->input('overwrite', false);
 
         $json = file_get_contents($request->file('file')->getRealPath());
         $payload = json_decode($json, true);
@@ -135,12 +136,9 @@ class ComponentMigrationController extends Controller
         if (!is_array($payload)) {
             return back()->with('error', 'Invalid JSON file');
         }
-//        dump($payload);
 
-        $result = $this->importService->import($payload, $request->input('overwrite', false));
-        dump($result);
-//        return back()->with($result['success'] ? 'success' : 'error', $result['message']);
-//        return back()->with('success','Created Okay');
+        $result = $this->importService->import($payload, $overwrite);
+        return back()->with($result['success'] ? 'success' : 'error', $result['message']);
     }
 
     // PROD: API endpoint for direct import
