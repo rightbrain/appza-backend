@@ -4,8 +4,6 @@ namespace App\Services;
 use App\Models\Component;
 use App\Models\ComponentStyleGroup;
 use App\Models\ComponentStyleGroupProperties;
-use App\Models\StyleGroup;
-use App\Models\StyleGroupProperties;
 use App\Models\SupportsPlugin;
 use App\Models\LayoutType;
 use App\Models\Scope;
@@ -50,19 +48,6 @@ class ComponentExportService
             'class_types' => $classTypes,
         ];
     }
-
-    /**
-     * Export component style groups with related style groups
-     */
-    /*protected function exportComponentStyleGroups(int $componentId): array
-    {
-        $componentStyleGroups = ComponentStyleGroup::where('component_id', $componentId)
-            ->with('styleGroup:id,name,slug')
-            ->get()
-            ->toArray();
-
-        return $componentStyleGroups;
-    }*/
     protected function exportComponentStyleGroups(int $componentId): array
     {
         $componentStyleGroups = ComponentStyleGroup::where('component_id', $componentId)
@@ -168,6 +153,8 @@ class ComponentExportService
                 $data[$field] = json_decode($data[$field], true) ?? $data[$field];
             }
         }
+
+        $data['image'] = config('app.image_public_path') . $component->image;
 
         return $data;
     }

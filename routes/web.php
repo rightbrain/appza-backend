@@ -121,6 +121,8 @@ Route::prefix('/appza')->middleware(['auth'])->group(function() {
         // PROD routes
         Route::get('migrate', [ComponentMigrationController::class, 'showImportForm'])->name('component_migrate_form');
         Route::post('migrate/import', [ComponentMigrationController::class, 'importFromFile'])->name('component_migrate_import_file');
+        Route::get('/component/migrate/logs', [ComponentMigrationController::class, 'showImportLogs'])->name('component_migrate_logs');
+
 
         // PROD API route for direct import
 //        Route::post('migrate/import', [ComponentMigrationController::class, 'importFromApi']);

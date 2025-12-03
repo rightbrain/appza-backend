@@ -2,10 +2,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Component;
+use App\Models\ComponentImportLog;
 use App\Services\ComponentExportService;
 use App\Services\ComponentImportService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Http;
 
 class ComponentMigrationController extends Controller
@@ -65,6 +65,54 @@ class ComponentMigrationController extends Controller
         }, $filename, [
             'Content-Type' => 'application/json'
         ]);
+    }
+
+    /**
+     * Show import logs page
+     */
+    public function showImportLogs(Request $request)
+    {
+        $query = ComponentImportLog::query();
+
+        // Apply filters
+        if ($request->filled('component_name')) {
+            $query->where('component_name', 'like', '%' . $request->component_name . '%');
+        }
+
+        if ($request->filled('success') && $request->success !== '') {
+            $query->where('success', $request->success);
+        }
+
+        if ($request->filled('source')) {
+            $query->where('source', 'like', '%' . $request->source . '%');
+        }
+
+        if ($request->filled('date_from')) {
+            $query->whereDate('created_at', '>=', $request->date_from);
+        }
+
+        if ($request->filled('date_to')) {
+            $query->whereDate('created_at', '<=', $request->date_to);
+        }
+
+        // Get logs with pagination
+        $logs = $query->latest()->paginate(20);
+        $logs->appends($request->query());
+
+
+        // Get unique component names for filter dropdown
+        $componentNames = ComponentImportLog::distinct()
+            ->pluck('component_name')
+            ->sort()
+            ->values();
+
+        // Get unique sources for filter dropdown
+        $sources = ComponentImportLog::distinct()
+            ->pluck('source')
+            ->sort()
+            ->values();
+
+        return view('component.migration.logs', compact('logs', 'componentNames', 'sources'));
     }
 
     // DEV: Send directly to production via API
