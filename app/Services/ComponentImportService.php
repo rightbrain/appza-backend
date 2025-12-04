@@ -67,10 +67,10 @@ class ComponentImportService
             $this->addLog('Importing component properties', true, ['count' => count($componentProperties)]);
             $this->importComponentProperties($component->id, $componentProperties);
 
-            // --- Import component scopes ---
+            /*// --- Import component scopes ---
             $scopes = $payload['scopes'] ?? [];
             $this->addLog('Importing component scopes', true, ['count' => count($scopes)]);
-            $this->importComponentScopes($component, $scopes);
+            $this->importComponentScopes($component, $scopes);*/
 
             DB::commit();
             $this->addLog('Import completed successfully', true);
