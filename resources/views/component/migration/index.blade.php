@@ -47,7 +47,7 @@
                                 <th>{{__('messages.SL')}}</th>
                                 <th>Plugin Name</th>
                                 <th>Component Name</th>
-{{--                                <th>{{__('messages.slug')}}</th>--}}
+                                <th>{{__('messages.slug')}}</th>
 {{--                                <th>{{__('messages.label')}}</th>--}}
                                 <th>{{__('messages.scope')}}</th>
                                 <th scope="col text-center" class="sorting_disabled" rowspan="1" colspan="1">
@@ -68,7 +68,7 @@
                                         <td>{{$serial++}}</td>
                                         <td>{{$component->plugin_name}}</td>
                                         <td>{{$component->name}}</td>
-{{--                                        <td>{{$component->slug}}</td>--}}
+                                        <td>{{$component->slug}}</td>
 {{--                                        <td>{{$component->label}}</td>--}}
                                         <td>{{$component->scope ? implode(', ', json_decode($component->scope)) : null}}</td>
                                         <td>
