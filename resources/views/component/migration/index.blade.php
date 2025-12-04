@@ -8,15 +8,15 @@
 
                     <div class="card-header">
                         <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center">
-                            <h6>{{__('messages.componentList')}}</h6>
+                            <h6>Migration List</h6>
                             <div class="btn-toolbar mb-2 mb-md-0">
-                                <div class="btn-group me-2">
+                                {{--<div class="btn-group me-2">
                                     <a href="{{route('component_add')}}" title="" class="module_button_header">
                                         <button type="button" class="btn btn-sm btn-outline-secondary">
                                             <i class="fas fa-plus-circle"></i> {{__('messages.createNew')}}
                                         </button>
                                     </a>
-                                </div>
+                                </div>--}}
                             </div>
                         </div>
                     </div>
