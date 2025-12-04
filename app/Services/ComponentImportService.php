@@ -171,14 +171,16 @@ class ComponentImportService
                     $pageId = $page->id;
                 }
 
-                Scope::updateOrCreate(
-                    ['slug' => $scope['slug'], 'plugin_slug' => $payload['plugin']['slug']],
-                    [
-                        'name' => $scope['name'],
-                        'is_global' => $scope['is_global'],
-                        'page_id' => $pageId,
-                    ]
-                );
+                if ($scope['slug'] != 'appbar' && $scope['slug'] != 'navbar' && $scope['slug'] != 'drawer') {
+                    Scope::updateOrCreate(
+                        ['slug' => $scope['slug'], 'plugin_slug' => $payload['plugin']['slug']],
+                        [
+                            'name' => $scope['name'],
+                            'is_global' => $scope['is_global'],
+                            'page_id' => $pageId,
+                        ]
+                    );
+                }
             }
             $this->addLog('Scopes imported', true, ['count' => count($payload['scopes'])]);
         }
