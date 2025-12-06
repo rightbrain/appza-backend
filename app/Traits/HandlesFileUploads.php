@@ -12,14 +12,13 @@ trait HandlesFileUploads
      * Handle file upload and storage for a given model and attribute.
      *
      * @param Request $request
-     * @param mixed $model
      * @param string $attribute
      * @param string $directory
      * @param string|null $disk
      * @return string|null
      */
 
-    public function handleFileUpload(Request $request, object $model, string $attribute, string $directory = 'uploads', ?string $disk = 'r2'): ?string
+    public function handleFileUpload(Request $request, $model, string $attribute, string $directory = 'uploads', ?string $disk = 'r2'): ?string
     {
         if ($request->hasFile($attribute)) {
             if ($model && !empty($model->$attribute)) {
