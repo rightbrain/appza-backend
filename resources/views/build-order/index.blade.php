@@ -31,6 +31,7 @@
                                     <th>{{__('messages.Status')}}</th>
                                     <th width="13%">{{__('messages.AllFile')}}</th>
                                     <th width="14%">{{__('messages.BuildLog')}}</th>
+                                    <th width="14%">Build Folder Download</th>
 {{--                                    <th>Delete</th>--}}
                                 </tr>
                                 </thead>
@@ -142,6 +143,12 @@
                                                         <button type="button" class="btn btn-secondary" onclick="openFileInModal('{{ $buildOrder->runner_url }}')">
                                                             📄 Runner
                                                         </button>
+                                                    @endif
+                                                </td>
+
+                                                <td>
+                                                    @if($buildOrder->build_zip_url)
+                                                        <a href="{{$buildOrder->build_zip_url}}" download class="badge bg-dark text-white shadow-sm fs-6 rounded-pill px-3 py-2 d-inline-flex align-items-center"><span class="me-1">⏳</span> Doenload</a>
                                                     @endif
                                                 </td>
                                                 {{--<td>
