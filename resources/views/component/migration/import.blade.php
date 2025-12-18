@@ -69,7 +69,7 @@
                             </thead>
                             <tbody>
                             @php
-                                $i = ($logs->currentPage() - 1) * $logs->perPage() + 1;
+                                $i = ($recentLogs->currentPage() - 1) * $recentLogs->perPage() + 1;
                             @endphp
                             @foreach($recentLogs as $log)
                                 <tr>
