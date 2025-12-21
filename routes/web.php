@@ -14,6 +14,7 @@ use App\Http\Controllers\LayoutTypeController;
 use App\Http\Controllers\LeadController;
 use App\Http\Controllers\LicenseLogicController;
 use App\Http\Controllers\LicenseMessageController;
+use App\Http\Controllers\MobileVersionController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PluginController;
 use App\Http\Controllers\ProductController;
@@ -54,7 +55,11 @@ Route::get('/api', function () {
     return view('welcome');
 });
 
-Auth::routes();
+//Auth::routes();
+Auth::routes([
+    'register' => false,
+]);
+
 
 Route::prefix('admin')
     ->middleware(['auth']) // Example: Apply authentication and admin-specific middleware
@@ -207,6 +212,18 @@ Route::prefix('/appza')->middleware(['auth'])->group(function() {
 
     });
     /* addon-version route start */
+
+
+
+    /* mobile-version route start */
+    Route::prefix('mobile-version')->group(function () {
+        Route::get('list',[MobileVersionController::class,'index'])->name('mobile_version_list');
+        Route::get('create',[MobileVersionController::class,'create'])->name('mobile_version_add');
+        Route::POST('store',[MobileVersionController::class,'store'])->name('mobile_version_store');
+        Route::get('edit/{id}',[MobileVersionController::class, 'edit'])->name('mobile_version_edit');
+        Route::PATCH('update/{id}',[MobileVersionController::class, 'update'])->name('mobile_version_update');
+    });
+    /* mobile-version route start */
 
     /* build-order start */
     Route::prefix('build-order')->group(function () {

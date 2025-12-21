@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\FreeTrialController;
 use App\Http\Controllers\Api\V1\GlobalConfigController;
 use App\Http\Controllers\Api\V1\LeadController;
 use App\Http\Controllers\Api\V1\LicenseController as LicenseControllerV1;
+use App\Http\Controllers\Api\V1\MobileVersionCheckController;
 use App\Http\Controllers\Api\V2\LicenseController as LicenseControllerV2;
 use App\Http\Controllers\Api\V1\PageComponentController;
 use App\Http\Controllers\Api\V1\PluginController;
@@ -70,6 +71,7 @@ Route::prefix('/appza/v2')
         // for app api
         Route::prefix('app')->name('v2_')->group(function () {
             Route::get('license-check', [LicenseControllerV2::class,'appLicenseCheck'])->name('app_license_check');
+            Route::get('/version-check', [MobileVersionCheckController::class, 'check'])->name('mobile_version_check');
         });
 
         // build api
