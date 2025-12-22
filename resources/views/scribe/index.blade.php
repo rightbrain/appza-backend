@@ -176,11 +176,17 @@
                                                                                 <li class="tocify-item level-2" data-unique="endpoints-GETapi-appza-v1-app-license-check">
                                 <a href="#endpoints-GETapi-appza-v1-app-license-check">GET api/appza/v1/app/license-check</a>
                             </li>
+                                                                                <li class="tocify-item level-2" data-unique="endpoints-GETapi-appza-v1-app-version-check">
+                                <a href="#endpoints-GETapi-appza-v1-app-version-check">Check version compatibility</a>
+                            </li>
                                                                                 <li class="tocify-item level-2" data-unique="endpoints-POSTapi-appza-v1-build-resource">
                                 <a href="#endpoints-POSTapi-appza-v1-build-resource">POST api/appza/v1/build/resource</a>
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="endpoints-POSTapi-appza-v1-build-ios-keys-verify">
                                 <a href="#endpoints-POSTapi-appza-v1-build-ios-keys-verify">POST api/appza/v1/build/ios-keys-verify</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="endpoints-POSTapi-appza-v1-build-ios-check-app-name">
+                                <a href="#endpoints-POSTapi-appza-v1-build-ios-check-app-name">POST api/appza/v1/build/ios-check-app-name</a>
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="endpoints-POSTapi-appza-v1-build">
                                 <a href="#endpoints-POSTapi-appza-v1-build">POST api/appza/v1/build</a>
@@ -188,8 +194,8 @@
                                                                                 <li class="tocify-item level-2" data-unique="endpoints-GETapi-appza-v1-build-history">
                                 <a href="#endpoints-GETapi-appza-v1-build-history">GET api/appza/v1/build/history</a>
                             </li>
-                                                                                <li class="tocify-item level-2" data-unique="endpoints-POSTapi-appza-v1-build-ios-check-app-name">
-                                <a href="#endpoints-POSTapi-appza-v1-build-ios-check-app-name">POST api/appza/v1/build/ios-check-app-name</a>
+                                                                                <li class="tocify-item level-2" data-unique="endpoints-POSTapi-appza-v1-build-push-notification-resource">
+                                <a href="#endpoints-POSTapi-appza-v1-build-push-notification-resource">POST api/appza/v1/build/push-notification-resource</a>
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="endpoints-POSTapi-appza-v1-build-response--id-">
                                 <a href="#endpoints-POSTapi-appza-v1-build-response--id-">POST api/appza/v1/build/response/{id}</a>
@@ -245,6 +251,9 @@
                                                                                 <li class="tocify-item level-2" data-unique="endpoints-GETapi-appza-v2-app-license-check">
                                 <a href="#endpoints-GETapi-appza-v2-app-license-check">Mobile (app) check (params: site_url + product)</a>
                             </li>
+                                                                                <li class="tocify-item level-2" data-unique="endpoints-GETapi-appza-v2-app-version-check">
+                                <a href="#endpoints-GETapi-appza-v2-app-version-check">Check version compatibility</a>
+                            </li>
                                                                                 <li class="tocify-item level-2" data-unique="endpoints-POSTapi-appza-v2-build">
                                 <a href="#endpoints-POSTapi-appza-v2-build">POST api/appza/v2/build</a>
                             </li>
@@ -259,6 +268,9 @@
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="endpoints-POSTapi-appza-v2-build-ios-check-app-name">
                                 <a href="#endpoints-POSTapi-appza-v2-build-ios-check-app-name">POST api/appza/v2/build/ios-check-app-name</a>
+                            </li>
+                                                                                <li class="tocify-item level-2" data-unique="endpoints-POSTapi-appza-v2-build-push-notification-resource">
+                                <a href="#endpoints-POSTapi-appza-v2-build-push-notification-resource">POST api/appza/v2/build/push-notification-resource</a>
                             </li>
                                                                                 <li class="tocify-item level-2" data-unique="endpoints-POSTapi-appza-v2-build-response--id-">
                                 <a href="#endpoints-POSTapi-appza-v2-build-response--id-">POST api/appza/v2/build/response/{id}</a>
@@ -292,7 +304,7 @@
     </ul>
 
     <ul class="toc-footer" id="last-updated">
-        <li>Last updated: November 16, 2025</li>
+        <li>Last updated: December 22, 2025</li>
     </ul>
 </div>
 
@@ -1819,8 +1831,8 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --header "Accept: application/json" \
     --data "{
     \"site_url\": \"http:\\/\\/kunze.biz\\/iste-laborum-eius-est-dolor.html\",
-    \"product\": \"appza\",
-    \"appza_action\": \"plugin_delete\",
+    \"product\": \"fcom_mobile\",
+    \"appza_action\": \"license_deactivate\",
     \"license_key\": \"consequatur\"
 }"
 </code></pre></div>
@@ -1838,8 +1850,8 @@ const headers = {
 
 let body = {
     "site_url": "http:\/\/kunze.biz\/iste-laborum-eius-est-dolor.html",
-    "product": "appza",
-    "appza_action": "plugin_delete",
+    "product": "fcom_mobile",
+    "appza_action": "license_deactivate",
     "license_key": "consequatur"
 };
 
@@ -1962,10 +1974,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="product"                data-endpoint="GETapi-appza-v0-license-deactivate"
-               value="appza"
+               value="fcom_mobile"
                data-component="body">
     <br>
-<p>Example: <code>appza</code></p>
+<p>Example: <code>fcom_mobile</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>appza</code></li> <li><code>lazy_task</code></li> <li><code>fcom_mobile</code></li></ul>
         </div>
@@ -1976,10 +1988,10 @@ Must be one of:
  &nbsp;
                 <input type="text" style="display: none"
                               name="appza_action"                data-endpoint="GETapi-appza-v0-license-deactivate"
-               value="plugin_delete"
+               value="license_deactivate"
                data-component="body">
     <br>
-<p>Example: <code>plugin_delete</code></p>
+<p>Example: <code>license_deactivate</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>license_deactivate</code></li> <li><code>plugin_delete</code></li></ul>
         </div>
@@ -2147,7 +2159,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --header "Accept: application/json" \
     --data "{
     \"site_url\": \"http:\\/\\/kunze.biz\\/iste-laborum-eius-est-dolor.html\",
-    \"product\": \"appza\"
+    \"product\": \"lazy_task\"
 }"
 </code></pre></div>
 
@@ -2164,7 +2176,7 @@ const headers = {
 
 let body = {
     "site_url": "http:\/\/kunze.biz\/iste-laborum-eius-est-dolor.html",
-    "product": "appza"
+    "product": "lazy_task"
 };
 
 fetch(url, {
@@ -2286,10 +2298,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="product"                data-endpoint="GETapi-appza-v0-app-license-check"
-               value="appza"
+               value="lazy_task"
                data-component="body">
     <br>
-<p>Example: <code>appza</code></p>
+<p>Example: <code>lazy_task</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>appza</code></li> <li><code>lazy_task</code></li> <li><code>fcom_mobile</code></li></ul>
         </div>
@@ -2313,7 +2325,8 @@ Must be one of:
     --header "Accept: application/json" \
     --data "{
     \"site_url\": \"http:\\/\\/kunze.biz\\/iste-laborum-eius-est-dolor.html\",
-    \"license_key\": \"consequatur\"
+    \"license_key\": \"consequatur\",
+    \"is_push_notification\": true
 }"
 </code></pre></div>
 
@@ -2330,7 +2343,8 @@ const headers = {
 
 let body = {
     "site_url": "http:\/\/kunze.biz\/iste-laborum-eius-est-dolor.html",
-    "license_key": "consequatur"
+    "license_key": "consequatur",
+    "is_push_notification": true
 };
 
 fetch(url, {
@@ -2438,6 +2452,28 @@ You can check the Dev Tools console for debugging information.</code></pre>
                data-component="body">
     <br>
 <p>Example: <code>consequatur</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>is_push_notification</code></b>&nbsp;&nbsp;
+<small>boolean</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <label data-endpoint="POSTapi-appza-v0-build" style="display: none">
+            <input type="radio" name="is_push_notification"
+                   value="true"
+                   data-endpoint="POSTapi-appza-v0-build"
+                   data-component="body"             >
+            <code>true</code>
+        </label>
+        <label data-endpoint="POSTapi-appza-v0-build" style="display: none">
+            <input type="radio" name="is_push_notification"
+                   value="false"
+                   data-endpoint="POSTapi-appza-v0-build"
+                   data-component="body"             >
+            <code>false</code>
+        </label>
+    <br>
+<p>Example: <code>true</code></p>
         </div>
         </form>
 
@@ -5787,6 +5823,145 @@ Must be one of:
         </div>
         </form>
 
+                    <h2 id="endpoints-GETapi-appza-v1-app-version-check">Check version compatibility</h2>
+
+<p>
+</p>
+
+
+
+<span id="example-requests-GETapi-appza-v1-app-version-check">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "http://localhost/api/appza/v1/app/version-check" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost/api/appza/v1/app/version-check"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+fetch(url, {
+    method: "GET",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-appza-v1-app-version-check">
+            <blockquote>
+            <p>Example response (422):</p>
+        </blockquote>
+                <details class="annotation">
+            <summary style="cursor: pointer;">
+                <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
+            </summary>
+            <pre><code class="language-http">cache-control: no-cache, private
+content-type: application/json
+x-api-version: v1
+access-control-allow-origin: *
+ </code></pre></details>         <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: &quot;error&quot;,
+    &quot;message&quot;: &quot;Validation failed.&quot;,
+    &quot;errors&quot;: {
+        &quot;app_name&quot;: [
+            &quot;The app name field is required.&quot;
+        ],
+        &quot;mobile_version&quot;: [
+            &quot;The mobile version field is required.&quot;
+        ],
+        &quot;plugin_version&quot;: [
+            &quot;The plugin version field is required.&quot;
+        ]
+    }
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-appza-v1-app-version-check" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-appza-v1-app-version-check"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-appza-v1-app-version-check"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-appza-v1-app-version-check" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-appza-v1-app-version-check">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-appza-v1-app-version-check" data-method="GET"
+      data-path="api/appza/v1/app/version-check"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-appza-v1-app-version-check', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-appza-v1-app-version-check"
+                    onclick="tryItOut('GETapi-appza-v1-app-version-check');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-appza-v1-app-version-check"
+                    onclick="cancelTryOut('GETapi-appza-v1-app-version-check');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-appza-v1-app-version-check"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/appza/v1/app/version-check</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-appza-v1-app-version-check"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-appza-v1-app-version-check"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        </form>
+
                     <h2 id="endpoints-POSTapi-appza-v1-build-resource">POST api/appza/v1/build/resource</h2>
 
 <p>
@@ -6267,280 +6442,6 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </div>
         </form>
 
-                    <h2 id="endpoints-POSTapi-appza-v1-build">POST api/appza/v1/build</h2>
-
-<p>
-</p>
-
-
-
-<span id="example-requests-POSTapi-appza-v1-build">
-<blockquote>Example request:</blockquote>
-
-
-<div class="bash-example">
-    <pre><code class="language-bash">curl --request POST \
-    "http://localhost/api/appza/v1/build" \
-    --header "Content-Type: application/json" \
-    --header "Accept: application/json" \
-    --data "{
-    \"site_url\": \"http:\\/\\/kunze.biz\\/iste-laborum-eius-est-dolor.html\",
-    \"license_key\": \"consequatur\"
-}"
-</code></pre></div>
-
-
-<div class="javascript-example">
-    <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/appza/v1/build"
-);
-
-const headers = {
-    "Content-Type": "application/json",
-    "Accept": "application/json",
-};
-
-let body = {
-    "site_url": "http:\/\/kunze.biz\/iste-laborum-eius-est-dolor.html",
-    "license_key": "consequatur"
-};
-
-fetch(url, {
-    method: "POST",
-    headers,
-    body: JSON.stringify(body),
-}).then(response =&gt; response.json());</code></pre></div>
-
-</span>
-
-<span id="example-responses-POSTapi-appza-v1-build">
-</span>
-<span id="execution-results-POSTapi-appza-v1-build" hidden>
-    <blockquote>Received response<span
-                id="execution-response-status-POSTapi-appza-v1-build"></span>:
-    </blockquote>
-    <pre class="json"><code id="execution-response-content-POSTapi-appza-v1-build"
-      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
-</span>
-<span id="execution-error-POSTapi-appza-v1-build" hidden>
-    <blockquote>Request failed with error:</blockquote>
-    <pre><code id="execution-error-message-POSTapi-appza-v1-build">
-
-Tip: Check that you&#039;re properly connected to the network.
-If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
-You can check the Dev Tools console for debugging information.</code></pre>
-</span>
-<form id="form-POSTapi-appza-v1-build" data-method="POST"
-      data-path="api/appza/v1/build"
-      data-authed="0"
-      data-hasfiles="0"
-      data-isarraybody="0"
-      autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('POSTapi-appza-v1-build', this);">
-    <h3>
-        Request&nbsp;&nbsp;&nbsp;
-                    <button type="button"
-                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-tryout-POSTapi-appza-v1-build"
-                    onclick="tryItOut('POSTapi-appza-v1-build');">Try it out ⚡
-            </button>
-            <button type="button"
-                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-canceltryout-POSTapi-appza-v1-build"
-                    onclick="cancelTryOut('POSTapi-appza-v1-build');" hidden>Cancel 🛑
-            </button>&nbsp;&nbsp;
-            <button type="submit"
-                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-executetryout-POSTapi-appza-v1-build"
-                    data-initial-text="Send Request 💥"
-                    data-loading-text="⏱ Sending..."
-                    hidden>Send Request 💥
-            </button>
-            </h3>
-            <p>
-            <small class="badge badge-black">POST</small>
-            <b><code>api/appza/v1/build</code></b>
-        </p>
-                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
-                                <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
-&nbsp;
- &nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="Content-Type"                data-endpoint="POSTapi-appza-v1-build"
-               value="application/json"
-               data-component="header">
-    <br>
-<p>Example: <code>application/json</code></p>
-            </div>
-                                <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
-&nbsp;
- &nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="Accept"                data-endpoint="POSTapi-appza-v1-build"
-               value="application/json"
-               data-component="header">
-    <br>
-<p>Example: <code>application/json</code></p>
-            </div>
-                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
-        <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>site_url</code></b>&nbsp;&nbsp;
-<small>string</small>&nbsp;
- &nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="site_url"                data-endpoint="POSTapi-appza-v1-build"
-               value="http://kunze.biz/iste-laborum-eius-est-dolor.html"
-               data-component="body">
-    <br>
-<p>Must be a valid URL. Example: <code>http://kunze.biz/iste-laborum-eius-est-dolor.html</code></p>
-        </div>
-                <div style=" padding-left: 28px;  clear: unset;">
-            <b style="line-height: 2;"><code>license_key</code></b>&nbsp;&nbsp;
-<small>string</small>&nbsp;
- &nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="license_key"                data-endpoint="POSTapi-appza-v1-build"
-               value="consequatur"
-               data-component="body">
-    <br>
-<p>Example: <code>consequatur</code></p>
-        </div>
-        </form>
-
-                    <h2 id="endpoints-GETapi-appza-v1-build-history">GET api/appza/v1/build/history</h2>
-
-<p>
-</p>
-
-
-
-<span id="example-requests-GETapi-appza-v1-build-history">
-<blockquote>Example request:</blockquote>
-
-
-<div class="bash-example">
-    <pre><code class="language-bash">curl --request GET \
-    --get "http://localhost/api/appza/v1/build/history" \
-    --header "Content-Type: application/json" \
-    --header "Accept: application/json"</code></pre></div>
-
-
-<div class="javascript-example">
-    <pre><code class="language-javascript">const url = new URL(
-    "http://localhost/api/appza/v1/build/history"
-);
-
-const headers = {
-    "Content-Type": "application/json",
-    "Accept": "application/json",
-};
-
-fetch(url, {
-    method: "GET",
-    headers,
-}).then(response =&gt; response.json());</code></pre></div>
-
-</span>
-
-<span id="example-responses-GETapi-appza-v1-build-history">
-            <blockquote>
-            <p>Example response (401):</p>
-        </blockquote>
-                <details class="annotation">
-            <summary style="cursor: pointer;">
-                <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
-            </summary>
-            <pre><code class="language-http">content-type: application/json
-cache-control: no-cache, private
-x-api-version: v1
-access-control-allow-origin: *
- </code></pre></details>         <pre>
-
-<code class="language-json" style="max-height: 300px;">{
-    &quot;status&quot;: 401,
-    &quot;message&quot;: &quot;Unauthorized&quot;
-}</code>
- </pre>
-    </span>
-<span id="execution-results-GETapi-appza-v1-build-history" hidden>
-    <blockquote>Received response<span
-                id="execution-response-status-GETapi-appza-v1-build-history"></span>:
-    </blockquote>
-    <pre class="json"><code id="execution-response-content-GETapi-appza-v1-build-history"
-      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
-</span>
-<span id="execution-error-GETapi-appza-v1-build-history" hidden>
-    <blockquote>Request failed with error:</blockquote>
-    <pre><code id="execution-error-message-GETapi-appza-v1-build-history">
-
-Tip: Check that you&#039;re properly connected to the network.
-If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
-You can check the Dev Tools console for debugging information.</code></pre>
-</span>
-<form id="form-GETapi-appza-v1-build-history" data-method="GET"
-      data-path="api/appza/v1/build/history"
-      data-authed="0"
-      data-hasfiles="0"
-      data-isarraybody="0"
-      autocomplete="off"
-      onsubmit="event.preventDefault(); executeTryOut('GETapi-appza-v1-build-history', this);">
-    <h3>
-        Request&nbsp;&nbsp;&nbsp;
-                    <button type="button"
-                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-tryout-GETapi-appza-v1-build-history"
-                    onclick="tryItOut('GETapi-appza-v1-build-history');">Try it out ⚡
-            </button>
-            <button type="button"
-                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-canceltryout-GETapi-appza-v1-build-history"
-                    onclick="cancelTryOut('GETapi-appza-v1-build-history');" hidden>Cancel 🛑
-            </button>&nbsp;&nbsp;
-            <button type="submit"
-                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
-                    id="btn-executetryout-GETapi-appza-v1-build-history"
-                    data-initial-text="Send Request 💥"
-                    data-loading-text="⏱ Sending..."
-                    hidden>Send Request 💥
-            </button>
-            </h3>
-            <p>
-            <small class="badge badge-green">GET</small>
-            <b><code>api/appza/v1/build/history</code></b>
-        </p>
-                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
-                                <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
-&nbsp;
- &nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="Content-Type"                data-endpoint="GETapi-appza-v1-build-history"
-               value="application/json"
-               data-component="header">
-    <br>
-<p>Example: <code>application/json</code></p>
-            </div>
-                                <div style="padding-left: 28px; clear: unset;">
-                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
-&nbsp;
- &nbsp;
- &nbsp;
-                <input type="text" style="display: none"
-                              name="Accept"                data-endpoint="GETapi-appza-v1-build-history"
-               value="application/json"
-               data-component="header">
-    <br>
-<p>Example: <code>application/json</code></p>
-            </div>
-                        </form>
-
                     <h2 id="endpoints-POSTapi-appza-v1-build-ios-check-app-name">POST api/appza/v1/build/ios-check-app-name</h2>
 
 <p>
@@ -6684,6 +6585,474 @@ You can check the Dev Tools console for debugging information.</code></pre>
                data-component="body">
     <br>
 <p>Example: <code>consequatur</code></p>
+        </div>
+        </form>
+
+                    <h2 id="endpoints-POSTapi-appza-v1-build">POST api/appza/v1/build</h2>
+
+<p>
+</p>
+
+
+
+<span id="example-requests-POSTapi-appza-v1-build">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request POST \
+    "http://localhost/api/appza/v1/build" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json" \
+    --data "{
+    \"site_url\": \"http:\\/\\/kunze.biz\\/iste-laborum-eius-est-dolor.html\",
+    \"license_key\": \"consequatur\",
+    \"is_push_notification\": true
+}"
+</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost/api/appza/v1/build"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+let body = {
+    "site_url": "http:\/\/kunze.biz\/iste-laborum-eius-est-dolor.html",
+    "license_key": "consequatur",
+    "is_push_notification": true
+};
+
+fetch(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-POSTapi-appza-v1-build">
+</span>
+<span id="execution-results-POSTapi-appza-v1-build" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-POSTapi-appza-v1-build"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-POSTapi-appza-v1-build"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-POSTapi-appza-v1-build" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-POSTapi-appza-v1-build">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-POSTapi-appza-v1-build" data-method="POST"
+      data-path="api/appza/v1/build"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-appza-v1-build', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-POSTapi-appza-v1-build"
+                    onclick="tryItOut('POSTapi-appza-v1-build');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-POSTapi-appza-v1-build"
+                    onclick="cancelTryOut('POSTapi-appza-v1-build');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-POSTapi-appza-v1-build"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-black">POST</small>
+            <b><code>api/appza/v1/build</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="POSTapi-appza-v1-build"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="POSTapi-appza-v1-build"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>site_url</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="site_url"                data-endpoint="POSTapi-appza-v1-build"
+               value="http://kunze.biz/iste-laborum-eius-est-dolor.html"
+               data-component="body">
+    <br>
+<p>Must be a valid URL. Example: <code>http://kunze.biz/iste-laborum-eius-est-dolor.html</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>license_key</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="license_key"                data-endpoint="POSTapi-appza-v1-build"
+               value="consequatur"
+               data-component="body">
+    <br>
+<p>Example: <code>consequatur</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>is_push_notification</code></b>&nbsp;&nbsp;
+<small>boolean</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <label data-endpoint="POSTapi-appza-v1-build" style="display: none">
+            <input type="radio" name="is_push_notification"
+                   value="true"
+                   data-endpoint="POSTapi-appza-v1-build"
+                   data-component="body"             >
+            <code>true</code>
+        </label>
+        <label data-endpoint="POSTapi-appza-v1-build" style="display: none">
+            <input type="radio" name="is_push_notification"
+                   value="false"
+                   data-endpoint="POSTapi-appza-v1-build"
+                   data-component="body"             >
+            <code>false</code>
+        </label>
+    <br>
+<p>Example: <code>true</code></p>
+        </div>
+        </form>
+
+                    <h2 id="endpoints-GETapi-appza-v1-build-history">GET api/appza/v1/build/history</h2>
+
+<p>
+</p>
+
+
+
+<span id="example-requests-GETapi-appza-v1-build-history">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "http://localhost/api/appza/v1/build/history" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost/api/appza/v1/build/history"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+fetch(url, {
+    method: "GET",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-appza-v1-build-history">
+            <blockquote>
+            <p>Example response (401):</p>
+        </blockquote>
+                <details class="annotation">
+            <summary style="cursor: pointer;">
+                <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
+            </summary>
+            <pre><code class="language-http">content-type: application/json
+cache-control: no-cache, private
+x-api-version: v1
+access-control-allow-origin: *
+ </code></pre></details>         <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: 401,
+    &quot;message&quot;: &quot;Unauthorized&quot;
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-appza-v1-build-history" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-appza-v1-build-history"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-appza-v1-build-history"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-appza-v1-build-history" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-appza-v1-build-history">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-appza-v1-build-history" data-method="GET"
+      data-path="api/appza/v1/build/history"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-appza-v1-build-history', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-appza-v1-build-history"
+                    onclick="tryItOut('GETapi-appza-v1-build-history');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-appza-v1-build-history"
+                    onclick="cancelTryOut('GETapi-appza-v1-build-history');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-appza-v1-build-history"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/appza/v1/build/history</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-appza-v1-build-history"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-appza-v1-build-history"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        </form>
+
+                    <h2 id="endpoints-POSTapi-appza-v1-build-push-notification-resource">POST api/appza/v1/build/push-notification-resource</h2>
+
+<p>
+</p>
+
+
+
+<span id="example-requests-POSTapi-appza-v1-build-push-notification-resource">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request POST \
+    "http://localhost/api/appza/v1/build/push-notification-resource" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json" \
+    --data "{
+    \"site_url\": \"http:\\/\\/kunze.biz\\/iste-laborum-eius-est-dolor.html\",
+    \"license_key\": \"consequatur\"
+}"
+</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost/api/appza/v1/build/push-notification-resource"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+let body = {
+    "site_url": "http:\/\/kunze.biz\/iste-laborum-eius-est-dolor.html",
+    "license_key": "consequatur"
+};
+
+fetch(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-POSTapi-appza-v1-build-push-notification-resource">
+</span>
+<span id="execution-results-POSTapi-appza-v1-build-push-notification-resource" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-POSTapi-appza-v1-build-push-notification-resource"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-POSTapi-appza-v1-build-push-notification-resource"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-POSTapi-appza-v1-build-push-notification-resource" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-POSTapi-appza-v1-build-push-notification-resource">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-POSTapi-appza-v1-build-push-notification-resource" data-method="POST"
+      data-path="api/appza/v1/build/push-notification-resource"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-appza-v1-build-push-notification-resource', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-POSTapi-appza-v1-build-push-notification-resource"
+                    onclick="tryItOut('POSTapi-appza-v1-build-push-notification-resource');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-POSTapi-appza-v1-build-push-notification-resource"
+                    onclick="cancelTryOut('POSTapi-appza-v1-build-push-notification-resource');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-POSTapi-appza-v1-build-push-notification-resource"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-black">POST</small>
+            <b><code>api/appza/v1/build/push-notification-resource</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="POSTapi-appza-v1-build-push-notification-resource"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="POSTapi-appza-v1-build-push-notification-resource"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>site_url</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="site_url"                data-endpoint="POSTapi-appza-v1-build-push-notification-resource"
+               value="http://kunze.biz/iste-laborum-eius-est-dolor.html"
+               data-component="body">
+    <br>
+<p>Must be a valid URL. Example: <code>http://kunze.biz/iste-laborum-eius-est-dolor.html</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>license_key</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="license_key"                data-endpoint="POSTapi-appza-v1-build-push-notification-resource"
+               value="consequatur"
+               data-component="body">
+    <br>
+<p>Example: <code>consequatur</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>android_notification_content</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="android_notification_content"                data-endpoint="POSTapi-appza-v1-build-push-notification-resource"
+               value=""
+               data-component="body">
+    <br>
+<p>This field is required when <code>ios_notification_content</code> is not present.</p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>ios_notification_content</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="ios_notification_content"                data-endpoint="POSTapi-appza-v1-build-push-notification-resource"
+               value=""
+               data-component="body">
+    <br>
+<p>This field is required when <code>android_notification_content</code> is not present.</p>
         </div>
         </form>
 
@@ -9017,7 +9386,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --header "Accept: application/json" \
     --data "{
     \"site_url\": \"http:\\/\\/kunze.biz\\/iste-laborum-eius-est-dolor.html\",
-    \"product\": \"appza\",
+    \"product\": \"fcom_mobile\",
     \"appza_action\": \"plugin_delete\",
     \"license_key\": \"consequatur\"
 }"
@@ -9036,7 +9405,7 @@ const headers = {
 
 let body = {
     "site_url": "http:\/\/kunze.biz\/iste-laborum-eius-est-dolor.html",
-    "product": "appza",
+    "product": "fcom_mobile",
     "appza_action": "plugin_delete",
     "license_key": "consequatur"
 };
@@ -9160,10 +9529,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="product"                data-endpoint="GETapi-appza-v2-license-deactivate"
-               value="appza"
+               value="fcom_mobile"
                data-component="body">
     <br>
-<p>Example: <code>appza</code></p>
+<p>Example: <code>fcom_mobile</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>appza</code></li> <li><code>lazy_task</code></li> <li><code>fcom_mobile</code></li></ul>
         </div>
@@ -9490,6 +9859,145 @@ You can check the Dev Tools console for debugging information.</code></pre>
         </div>
         </form>
 
+                    <h2 id="endpoints-GETapi-appza-v2-app-version-check">Check version compatibility</h2>
+
+<p>
+</p>
+
+
+
+<span id="example-requests-GETapi-appza-v2-app-version-check">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request GET \
+    --get "http://localhost/api/appza/v2/app/version-check" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json"</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost/api/appza/v2/app/version-check"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+fetch(url, {
+    method: "GET",
+    headers,
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-GETapi-appza-v2-app-version-check">
+            <blockquote>
+            <p>Example response (422):</p>
+        </blockquote>
+                <details class="annotation">
+            <summary style="cursor: pointer;">
+                <small onclick="textContent = parentElement.parentElement.open ? 'Show headers' : 'Hide headers'">Show headers</small>
+            </summary>
+            <pre><code class="language-http">cache-control: no-cache, private
+content-type: application/json
+x-api-version: v2
+access-control-allow-origin: *
+ </code></pre></details>         <pre>
+
+<code class="language-json" style="max-height: 300px;">{
+    &quot;status&quot;: &quot;error&quot;,
+    &quot;message&quot;: &quot;Validation failed.&quot;,
+    &quot;errors&quot;: {
+        &quot;app_name&quot;: [
+            &quot;The app name field is required.&quot;
+        ],
+        &quot;mobile_version&quot;: [
+            &quot;The mobile version field is required.&quot;
+        ],
+        &quot;plugin_version&quot;: [
+            &quot;The plugin version field is required.&quot;
+        ]
+    }
+}</code>
+ </pre>
+    </span>
+<span id="execution-results-GETapi-appza-v2-app-version-check" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-GETapi-appza-v2-app-version-check"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-GETapi-appza-v2-app-version-check"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-GETapi-appza-v2-app-version-check" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-GETapi-appza-v2-app-version-check">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-GETapi-appza-v2-app-version-check" data-method="GET"
+      data-path="api/appza/v2/app/version-check"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('GETapi-appza-v2-app-version-check', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-GETapi-appza-v2-app-version-check"
+                    onclick="tryItOut('GETapi-appza-v2-app-version-check');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-GETapi-appza-v2-app-version-check"
+                    onclick="cancelTryOut('GETapi-appza-v2-app-version-check');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-GETapi-appza-v2-app-version-check"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-green">GET</small>
+            <b><code>api/appza/v2/app/version-check</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="GETapi-appza-v2-app-version-check"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="GETapi-appza-v2-app-version-check"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                        </form>
+
                     <h2 id="endpoints-POSTapi-appza-v2-build">POST api/appza/v2/build</h2>
 
 <p>
@@ -9508,7 +10016,8 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --header "Accept: application/json" \
     --data "{
     \"site_url\": \"http:\\/\\/kunze.biz\\/iste-laborum-eius-est-dolor.html\",
-    \"license_key\": \"consequatur\"
+    \"license_key\": \"consequatur\",
+    \"is_push_notification\": false
 }"
 </code></pre></div>
 
@@ -9525,7 +10034,8 @@ const headers = {
 
 let body = {
     "site_url": "http:\/\/kunze.biz\/iste-laborum-eius-est-dolor.html",
-    "license_key": "consequatur"
+    "license_key": "consequatur",
+    "is_push_notification": false
 };
 
 fetch(url, {
@@ -9633,6 +10143,28 @@ You can check the Dev Tools console for debugging information.</code></pre>
                data-component="body">
     <br>
 <p>Example: <code>consequatur</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>is_push_notification</code></b>&nbsp;&nbsp;
+<small>boolean</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <label data-endpoint="POSTapi-appza-v2-build" style="display: none">
+            <input type="radio" name="is_push_notification"
+                   value="true"
+                   data-endpoint="POSTapi-appza-v2-build"
+                   data-component="body"             >
+            <code>true</code>
+        </label>
+        <label data-endpoint="POSTapi-appza-v2-build" style="display: none">
+            <input type="radio" name="is_push_notification"
+                   value="false"
+                   data-endpoint="POSTapi-appza-v2-build"
+                   data-component="body"             >
+            <code>false</code>
+        </label>
+    <br>
+<p>Example: <code>false</code></p>
         </div>
         </form>
 
@@ -10387,6 +10919,176 @@ You can check the Dev Tools console for debugging information.</code></pre>
                data-component="body">
     <br>
 <p>Example: <code>consequatur</code></p>
+        </div>
+        </form>
+
+                    <h2 id="endpoints-POSTapi-appza-v2-build-push-notification-resource">POST api/appza/v2/build/push-notification-resource</h2>
+
+<p>
+</p>
+
+
+
+<span id="example-requests-POSTapi-appza-v2-build-push-notification-resource">
+<blockquote>Example request:</blockquote>
+
+
+<div class="bash-example">
+    <pre><code class="language-bash">curl --request POST \
+    "http://localhost/api/appza/v2/build/push-notification-resource" \
+    --header "Content-Type: application/json" \
+    --header "Accept: application/json" \
+    --data "{
+    \"site_url\": \"http:\\/\\/kunze.biz\\/iste-laborum-eius-est-dolor.html\",
+    \"license_key\": \"consequatur\"
+}"
+</code></pre></div>
+
+
+<div class="javascript-example">
+    <pre><code class="language-javascript">const url = new URL(
+    "http://localhost/api/appza/v2/build/push-notification-resource"
+);
+
+const headers = {
+    "Content-Type": "application/json",
+    "Accept": "application/json",
+};
+
+let body = {
+    "site_url": "http:\/\/kunze.biz\/iste-laborum-eius-est-dolor.html",
+    "license_key": "consequatur"
+};
+
+fetch(url, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(body),
+}).then(response =&gt; response.json());</code></pre></div>
+
+</span>
+
+<span id="example-responses-POSTapi-appza-v2-build-push-notification-resource">
+</span>
+<span id="execution-results-POSTapi-appza-v2-build-push-notification-resource" hidden>
+    <blockquote>Received response<span
+                id="execution-response-status-POSTapi-appza-v2-build-push-notification-resource"></span>:
+    </blockquote>
+    <pre class="json"><code id="execution-response-content-POSTapi-appza-v2-build-push-notification-resource"
+      data-empty-response-text="<Empty response>" style="max-height: 400px;"></code></pre>
+</span>
+<span id="execution-error-POSTapi-appza-v2-build-push-notification-resource" hidden>
+    <blockquote>Request failed with error:</blockquote>
+    <pre><code id="execution-error-message-POSTapi-appza-v2-build-push-notification-resource">
+
+Tip: Check that you&#039;re properly connected to the network.
+If you&#039;re a maintainer of ths API, verify that your API is running and you&#039;ve enabled CORS.
+You can check the Dev Tools console for debugging information.</code></pre>
+</span>
+<form id="form-POSTapi-appza-v2-build-push-notification-resource" data-method="POST"
+      data-path="api/appza/v2/build/push-notification-resource"
+      data-authed="0"
+      data-hasfiles="0"
+      data-isarraybody="0"
+      autocomplete="off"
+      onsubmit="event.preventDefault(); executeTryOut('POSTapi-appza-v2-build-push-notification-resource', this);">
+    <h3>
+        Request&nbsp;&nbsp;&nbsp;
+                    <button type="button"
+                    style="background-color: #8fbcd4; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-tryout-POSTapi-appza-v2-build-push-notification-resource"
+                    onclick="tryItOut('POSTapi-appza-v2-build-push-notification-resource');">Try it out ⚡
+            </button>
+            <button type="button"
+                    style="background-color: #c97a7e; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-canceltryout-POSTapi-appza-v2-build-push-notification-resource"
+                    onclick="cancelTryOut('POSTapi-appza-v2-build-push-notification-resource');" hidden>Cancel 🛑
+            </button>&nbsp;&nbsp;
+            <button type="submit"
+                    style="background-color: #6ac174; padding: 5px 10px; border-radius: 5px; border-width: thin;"
+                    id="btn-executetryout-POSTapi-appza-v2-build-push-notification-resource"
+                    data-initial-text="Send Request 💥"
+                    data-loading-text="⏱ Sending..."
+                    hidden>Send Request 💥
+            </button>
+            </h3>
+            <p>
+            <small class="badge badge-black">POST</small>
+            <b><code>api/appza/v2/build/push-notification-resource</code></b>
+        </p>
+                <h4 class="fancy-heading-panel"><b>Headers</b></h4>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Content-Type</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Content-Type"                data-endpoint="POSTapi-appza-v2-build-push-notification-resource"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <div style="padding-left: 28px; clear: unset;">
+                <b style="line-height: 2;"><code>Accept</code></b>&nbsp;&nbsp;
+&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="Accept"                data-endpoint="POSTapi-appza-v2-build-push-notification-resource"
+               value="application/json"
+               data-component="header">
+    <br>
+<p>Example: <code>application/json</code></p>
+            </div>
+                                <h4 class="fancy-heading-panel"><b>Body Parameters</b></h4>
+        <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>site_url</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="site_url"                data-endpoint="POSTapi-appza-v2-build-push-notification-resource"
+               value="http://kunze.biz/iste-laborum-eius-est-dolor.html"
+               data-component="body">
+    <br>
+<p>Must be a valid URL. Example: <code>http://kunze.biz/iste-laborum-eius-est-dolor.html</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>license_key</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+ &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="license_key"                data-endpoint="POSTapi-appza-v2-build-push-notification-resource"
+               value="consequatur"
+               data-component="body">
+    <br>
+<p>Example: <code>consequatur</code></p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>android_notification_content</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="android_notification_content"                data-endpoint="POSTapi-appza-v2-build-push-notification-resource"
+               value=""
+               data-component="body">
+    <br>
+<p>This field is required when <code>ios_notification_content</code> is not present.</p>
+        </div>
+                <div style=" padding-left: 28px;  clear: unset;">
+            <b style="line-height: 2;"><code>ios_notification_content</code></b>&nbsp;&nbsp;
+<small>string</small>&nbsp;
+<i>optional</i> &nbsp;
+ &nbsp;
+                <input type="text" style="display: none"
+                              name="ios_notification_content"                data-endpoint="POSTapi-appza-v2-build-push-notification-resource"
+               value=""
+               data-component="body">
+    <br>
+<p>This field is required when <code>android_notification_content</code> is not present.</p>
         </div>
         </form>
 

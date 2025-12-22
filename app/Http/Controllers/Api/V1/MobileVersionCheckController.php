@@ -4,113 +4,167 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\MobileVersionMapping;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class MobileVersionCheckController extends Controller
 {
     /**
      * Check version compatibility
-     *
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
+
     public function check(Request $request)
     {
         try {
-            // Validate request - plugin_version is nullable
             $validated = $request->validate([
-                'app_name' => 'required|string',
-                'mobile_version' => 'required|regex:/^\d+\.\d+\.\d+$/',
-                'plugin_version' => 'nullable|regex:/^\d+\.\d+\.\d+$/'
+                'app_name'        => 'required|string',
+                'mobile_version'  => 'required|regex:/^\d+\.\d+\.\d+$/',
+                'plugin_version'  => 'required|regex:/^\d+\.\d+\.\d+$/',
             ]);
 
-            // Cache version mapping for 1 hour
-            $cacheKey = 'version_mapping_' . $validated['app_name'];
-            $versionMapping = Cache::remember($cacheKey, 3600, function () use ($validated) {
-                return MobileVersionMapping::where('app_name', $validated['app_name'])
-                    ->where('is_active', 1)
-                    ->first();
-            });
-
-            if (!$versionMapping) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'No version mapping found for this app.',
-                ], 404);
-            }
-
-            // Extract versions
+            $appName       = $validated['app_name'];
             $mobileVersion = $validated['mobile_version'];
-            $pluginVersion = $validated['plugin_version'] ?? null;
-            $minimumMobile = $versionMapping->mobile_version;
-            $minimumPlugin = $versionMapping->minimum_plugin_version;
-            $latestPlugin = $versionMapping->latest_plugin_version;
-            $forceUpdate = $versionMapping->force_update;
-            $customMessage = $versionMapping->optional_message;
+            $pluginVersion = $validated['plugin_version'];
 
-            // Check if force update is enabled
-            if ($forceUpdate) {
-                return $this->forceUpdateResponse($minimumMobile, $latestPlugin, $customMessage);
+            /**
+             * Exact mobile version mapping
+             */
+            $mapping = MobileVersionMapping::where('app_name', $appName)
+                ->where('is_active', 1)
+                ->where('mobile_version', $mobileVersion)
+                ->first();
+
+            /**
+             * Mobile version not found
+             */
+            if (!$mapping) {
+                return $this->buildResponse(
+                    'force_update',
+                    'Please update your app to continue.',
+                    $this->latestMobileForPlugin($appName, $pluginVersion),
+                    $pluginVersion
+                );
             }
 
-            // Check mobile version compatibility
-            if (version_compare($mobileVersion, $minimumMobile, '<')) {
-                return $this->forceUpdateResponse($minimumMobile, $latestPlugin, $customMessage);
+            /**
+             * Force update flag
+             */
+            if ($mapping->force_update) {
+                return $this->buildResponse(
+                    'force_update',
+                    $mapping->optional_message ?? 'Please update your app to continue.',
+                    $mapping->mobile_version,
+                    $mapping->latest_plugin_version
+                );
             }
 
-            // Check plugin version only if provided
-            if ($pluginVersion) {
-                // Check if plugin version is below minimum
-                if (version_compare($pluginVersion, $minimumPlugin, '<')) {
-                    return $this->forceUpdateResponse($minimumMobile, $latestPlugin, $customMessage);
+            /**
+             * Plugin compatible?
+             */
+            $pluginCompatible =
+                version_compare($pluginVersion, $mapping->minimum_plugin_version, '>=') &&
+                version_compare($pluginVersion, $mapping->latest_plugin_version, '<=');
+
+            if ($pluginCompatible) {
+
+                // Is there a newer mobile version that also supports this plugin?
+                $latestMobileForPlugin = $this->latestMobileForPlugin($appName, $pluginVersion);
+
+                if ($latestMobileForPlugin &&
+                    version_compare($latestMobileForPlugin, $mobileVersion, '>')
+                ) {
+                    return $this->buildResponse(
+                        'optional_update',
+                        'A newer version is available for better compatibility.',
+                        $latestMobileForPlugin,
+                        $pluginVersion
+                    );
                 }
 
-                // Check if plugin version is below latest
-                if (version_compare($pluginVersion, $latestPlugin, '<')) {
-                    return response()->json([
-                        'status' => 'optional_update',
-                        'message' => $customMessage ?? 'A new plugin version is available.',
-                        'latest_plugin' => $latestPlugin,
-                    ]);
-                }
+                return $this->buildResponse(
+                    'ok',
+                    'Application is compatible.'
+                );
             }
 
-            // All checks passed
-            return response()->json([
-                'status' => 'ok',
-                'message' => 'Application is compatible.',
-            ]);
+            /**
+             * Plugin not supported by this mobile → FORCE UPDATE
+             */
+            $latestMobileForPlugin = $this->latestMobileForPlugin($appName, $pluginVersion);
+
+            $message = $latestMobileForPlugin
+                ? 'Please update your app to continue.'
+                : 'This plugin version is no longer supported.';
+
+            return $this->buildResponse(
+                'force_update',
+                $message,
+                $latestMobileForPlugin,
+                $pluginVersion
+            );
 
         } catch (\Illuminate\Validation\ValidationException $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Validation failed.',
-                'errors' => $e->errors(),
-            ], 422);
+            return $this->buildResponse(
+                'error',
+                'Validation failed.',
+                null,
+                null,
+                422,
+                $e->errors()
+            );
         } catch (\Exception $e) {
-            Log::error('Version check error: ' . $e->getMessage(), [
+            Log::error('App version check failed', [
+                'error'   => $e->getMessage(),
                 'request' => $request->all(),
-                'trace' => $e->getTraceAsString(),
             ]);
 
-            return response()->json([
-                'status' => 'error',
-                'message' => 'An error occurred while checking version compatibility.',
-            ], 500);
+            return $this->buildResponse(
+                'error',
+                'An internal server error occurred.',
+                null,
+                null,
+                500
+            );
         }
     }
 
-    /**
-     * Return a force update response
-     */
-    private function forceUpdateResponse($latestMobile, $latestPlugin, $customMessage)
+
+
+    private function buildResponse(
+        string $status,
+        string $message,
+        ?string $latestMobile = null,
+        ?string $latestPlugin = null,
+        int $httpCode = 200,
+        $errors = null
+    ) {
+        $response = [
+            'status'  => $status,
+            'message' => $message,
+        ];
+
+        if ($latestMobile) {
+            $response['latest_mobile'] = $latestMobile;
+        }
+
+        if ($errors) {
+            $response['errors'] = $errors;
+        }
+
+        return response()->json($response, $httpCode);
+    }
+
+
+    private function latestMobileForPlugin(string $appName, string $pluginVersion): ?string
     {
-        return response()->json([
-            'status' => 'force_update',
-            'message' => $customMessage ?? 'Please update your app to continue.',
-            'latest_mobile' => $latestMobile,
-            'latest_plugin' => $latestPlugin,
-        ]);
-    }}
+        return MobileVersionMapping::where('app_name', $appName)
+            ->where('is_active', 1)
+            ->where('minimum_plugin_version', '<=', $pluginVersion)
+            ->where('latest_plugin_version', '>=', $pluginVersion)
+            ->orderByDesc('mobile_version')
+            ->value('mobile_version');
+    }
+}
