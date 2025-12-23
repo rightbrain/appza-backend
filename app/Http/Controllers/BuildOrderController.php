@@ -31,10 +31,25 @@ class BuildOrderController extends Controller
      */
     public function index(Request $request): Renderable
     {
-        // Retrieve active plugin entries
-        $buildOrders = BuildOrder::orderByDesc('id')->paginate(20);
+        $search = $request->input('search');
 
-        return view('build-order.index',compact('buildOrders'));
+        // Retrieve active plugin entries
+        $buildOrders = BuildOrder::orderByDesc('id')
+            ->when($search, function ($query, $search) {
+                $query->where('package_name', 'like', '%' . $search . '%')
+                    ->orWhere('app_name', 'like', '%' . $search . '%')
+                    ->orWhere('domain', 'like', '%' . $search . '%')
+                    ->orWhere('build_target', 'like', '%' . $search . '%')
+                    ->orWhere('status', 'like', '%' . $search . '%')
+                    ->orWhere('build_plugin_slug', 'like', '%' . $search . '%')
+                    ->orWhere('license_key', 'like', '%' . $search . '%')
+                    ->orWhere('build_zip_url', 'like', '%' . $search . '%');
+            })
+            ->paginate(20);
+        $buildOrders->appends(['search' => $search]);
+
+
+        return view('build-order.index',compact('buildOrders','search'));
     }
 
     public function destroy($id)

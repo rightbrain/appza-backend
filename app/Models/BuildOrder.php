@@ -42,7 +42,8 @@ class BuildOrder extends Model
         'is_push_notification',
         'android_push_notification_url',
         'ios_push_notification_url',
-        'app_license_check_url'
+        'app_license_check_url',
+        'build_zip_url'
     ];
 
 

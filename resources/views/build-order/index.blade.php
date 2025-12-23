@@ -15,7 +15,24 @@
 
                     <div class="card-body">
                         @include('layouts.message')
-{{--                        <form method="post" role="form" id="search-form">--}}
+
+                        <!-- Search Form -->
+                        <form method="GET" action="{{ route('build_order_list') }}" id="search-form" class="mb-4">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <input type="text" name="search" class="form-control" placeholder="Keyword" value="{{ request('search') }}">
+                                </div>
+                                <div class="col-md-4">
+                                    <button type="submit" class="btn btn-primary">
+                                        {{__('messages.search')}}
+                                    </button>
+                                    <a href="{{ route('build_order_list') }}" class="btn btn-secondary">
+                                        {{__('messages.clear')}}
+                                    </a>
+                                </div>
+                            </div>
+                        </form>
+
                             <table id="leave_settings" class="table table-bordered datatable table-responsive mainTable text-center">
 
                                 <thead class="thead-dark">
@@ -31,8 +48,7 @@
                                     <th>{{__('messages.Status')}}</th>
                                     <th width="13%">{{__('messages.AllFile')}}</th>
                                     <th width="14%">{{__('messages.BuildLog')}}</th>
-                                    <th></th>
-{{--                                    <th>Delete</th>--}}
+                                    <th>Dir. Download</th>
                                 </tr>
                                 </thead>
 
@@ -52,7 +68,7 @@
                                         @endphp
 
                                         @foreach($buildOrdersArray as $index => $buildOrder)
-                                            <tr>
+                                            <tr style="{{$buildOrder->status?->value == 'delete' ? 'background-color: #d0bf5b;color : red':''}}">
                                                 <td>
                                                     {{$serial++}}
                                                 </td>
@@ -86,11 +102,7 @@
                                                             'completed' => ['class' => 'bg-secondary text-white', 'icon' => '✅', 'label' => 'Completed'],
                                                             'processing' => ['class' => 'bg-secondary text-dark', 'icon' => '⏳', 'label' => 'Processing'],
                                                             'pending' => ['class' => 'bg-secondary text-dark', 'icon' => '🕒', 'label' => 'Pending'],
-                                                             /*'pending' => [
-                                                                'class' => ' text-dark',
-                                                                'icon' => '<img src="' . asset('1.gif') . '" alt="Processing" width="50">',
-                                                                'label' => 'Pending'
-                                                            ],*/
+                                                            'delete' => ['class' => 'bg-warning text-red', 'icon' => '❌', 'label' => 'Delete'],
                                                         ];
 
                                                         // Get status data or use a default
@@ -102,11 +114,11 @@
                                                 </td>
 
                                                 <td>
-                                                    @if($buildOrder->apk_url)
+                                                    @if($buildOrder->apk_url && $buildOrder->status?->value !== 'delete')
                                                         <a href="{{$buildOrder->apk_url}}" download class="badge bg-dark text-white shadow-sm fs-6 rounded-pill px-3 py-2 d-inline-flex align-items-center"><span class="me-1">⏳</span> APK</a>
                                                     @endif
 
-                                                    @if($buildOrder->aab_url)
+                                                    @if($buildOrder->aab_url && $buildOrder->status?->value !== 'delete')
                                                         <a href="{{$buildOrder->aab_url}}" download class="badge bg-dark text-white shadow-sm fs-6 rounded-pill px-3 py-2 d-inline-flex align-items-center"><span class="me-1">⏳</span> AAB</a>
                                                     @endif
                                                 </td>
@@ -127,19 +139,19 @@
                                                         $statusDataLog = $statusMapLog[$statusLog] ?? ['class' => 'bg-secondary text-white', 'icon' => '❓', 'label' => ucfirst($statusLog)];
                                                     @endphp
 
-                                                    @if($buildOrder->ios_output_url)
+                                                    @if($buildOrder->ios_output_url && $buildOrder->status?->value !== 'delete')
                                                         <button type="button" class="btn btn-primary" onclick="openFileInModal('{{ $buildOrder->ios_output_url }}')">
                                                             {!! $statusDataLog['icon'] !!} View
                                                         </button>
                                                     @endif
 
-                                                    @if($buildOrder->android_output_url)
+                                                    @if($buildOrder->android_output_url && $buildOrder->status?->value !== 'delete')
                                                         <button type="button" class="btn btn-primary" onclick="openFileInModal('{{ $buildOrder->android_output_url }}')">
                                                             📄 View
                                                         </button>
                                                     @endif
 
-                                                    @if($buildOrder->runner_url)
+                                                    @if($buildOrder->runner_url && $buildOrder->status?->value !== 'delete')
                                                         <button type="button" class="btn btn-secondary" onclick="openFileInModal('{{ $buildOrder->runner_url }}')">
                                                             📄 Runner
                                                         </button>
@@ -147,8 +159,11 @@
                                                 </td>
 
                                                 <td>
-                                                    @if($buildOrder->build_zip_url)
-                                                        <a href="{{$buildOrder->build_zip_url}}" download class="badge bg-dark text-white shadow-sm fs-6 rounded-pill px-3 py-2 d-inline-flex align-items-center"><span class="me-1"> 📥 </span></a>
+                                                    @if($buildOrder->build_zip_url && $buildOrder->status?->value !== 'delete')
+                                                        <a href="{{$buildOrder->build_zip_url}}" download class="badge bg-dark text-white shadow-sm fs-6 rounded-pill px-3 py-2 d-inline-flex align-items-center">
+{{--                                                            <span class="me-1"> 📥 </span>--}}
+                                                            <span class="me-1"> {{basename(parse_url($buildOrder->build_zip_url, PHP_URL_PATH))}} </span>
+                                                        </a>
                                                     @endif
                                                 </td>
                                                 {{--<td>

@@ -566,8 +566,8 @@ class ApkBuildHistoryController extends Controller
 //                $item['key_properties_url'] = $build->key_properties_url;
                 $item['apk_name'] = basename($build->apk_url);
                 $item['aab_name'] = basename($build->aab_url);
-                $item['apk_url'] = $build->apk_url;
-                $item['aab_url'] = $build->aab_url;
+                $item['apk_url'] = $build->status->value==='delete'? null :$build->apk_url;
+                $item['aab_url'] = $build->status->value==='delete'? null :$build->aab_url;
             } elseif ($build->build_target === 'ios') {
 //                $item['issuer_id'] = $build->issuer_id;
 //                $item['key_id'] = $build->key_id;
