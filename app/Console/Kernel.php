@@ -26,6 +26,9 @@ final class Kernel extends ConsoleKernel
 
         // Clean activity logs at 01:30 AM
         $schedule->command('activitylog:clean --days=10 --force')->dailyAt('01:30');
+
+        // Clean build directory at 01:40 AM
+//        $schedule->command('build-orders:cleanup')->dailyAt('01:40');
     }
 
     /**
