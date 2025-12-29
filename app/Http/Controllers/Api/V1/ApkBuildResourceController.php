@@ -301,15 +301,21 @@ class ApkBuildResourceController extends Controller
             Log::info("failed");
             return $jsonResponse(500,'failed');
         }*/
-        try {
+        /*try {
             $response = Http::get($getFluentInfo->api_url, $params);
         } catch (ConnectionException $e) {
             return $jsonResponse(
                 Response::HTTP_SERVICE_UNAVAILABLE,
                 'Could not connect to the license server.'
             );
-        }
+        }*/
 
+        $response = Http::get($getFluentInfo->api_url, $params);
+        
+        if ($request->failed()){
+            Log::info("failed");
+            return $jsonResponse(Response::HTTP_SERVICE_UNAVAILABLE,'Could not connect to the license server.');
+        }
 
 
         $data = $response->json();
