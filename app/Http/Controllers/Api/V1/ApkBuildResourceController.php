@@ -311,7 +311,7 @@ class ApkBuildResourceController extends Controller
         }*/
 
         $response = Http::get($getFluentInfo->api_url, $params);
-        
+
         if ($request->failed()){
             Log::info("failed");
             return $jsonResponse(Response::HTTP_SERVICE_UNAVAILABLE,'Could not connect to the license server.');
@@ -319,6 +319,8 @@ class ApkBuildResourceController extends Controller
 
 
         $data = $response->json();
+
+        Log::info($data['success']);
 
         if (
             !is_array($data) ||
@@ -330,12 +332,15 @@ class ApkBuildResourceController extends Controller
                 $error,
                 $data['message'] ?? 'License is not valid.'
             );
+            Log::info("error");
+
 
             return $jsonResponse(Response::HTTP_UNPROCESSABLE_ENTITY, $message);
         }
 
         $appLogo = null;
         $splashScreenImage = null;
+        Log::info("success");
 
         return $jsonResponse(200,'success',
             [
