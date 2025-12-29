@@ -12,6 +12,7 @@ use App\Models\FluentInfo;
 use App\Models\FluentLicenseInfo;
 use App\Models\Lead;
 use App\Services\IosBuildValidationService;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\File;
@@ -128,6 +129,11 @@ class ApkBuildResourceController extends Controller
 
         $fluentApiUrl = $getFluentInfo->api_url;
         $response = Http::timeout(10)->get($fluentApiUrl, $params);
+
+        $response->onError(function (ConnectionException $exception) use ($jsonResponse, $request) {
+            return $jsonResponse(Response::HTTP_SERVICE_UNAVAILABLE, 'Could not connect to the license server.');
+        });
+
         $data = $response->json();
 
         if (!is_array($data) || !($data['success'] ?? false) || ($data['status'] ?? 'invalid') !== 'valid') {
