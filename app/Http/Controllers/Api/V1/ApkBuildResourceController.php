@@ -285,16 +285,32 @@ class ApkBuildResourceController extends Controller
 
         /* ---------------- Call Fluent License Server ---------------- */
 
-        try {
+        $response = Http::get($getFluentInfo->api_url, $params);
+        if ($response->successful()){
+            Log::info("successful");
+            return $jsonResponse(200,'success',
+                [
+                    'data' => [
+                        'package_name' => $findSiteUrl->package_name,
+                        'bundle_name'  => $findSiteUrl->package_name,
+                    ]
+                ]
+            );
+        }
+        if ($request->failed()){
+            Log::info("failed");
+            return $jsonResponse(500,'failed');
+        }
+        /*try {
             $response = Http::get($getFluentInfo->api_url, $params);
         } catch (ConnectionException $e) {
             return $jsonResponse(
                 Response::HTTP_SERVICE_UNAVAILABLE,
                 'Could not connect to the license server.'
             );
-        }
+        }*/
 
-        $data = $response->json();
+        /*$data = $response->json();
 
         if (
             !is_array($data) ||
@@ -383,7 +399,7 @@ class ApkBuildResourceController extends Controller
                     'bundle_name'  => $findSiteUrl->package_name,
                 ]
             ]
-        );
+        );*/
     }
 
     private function uploadFromUrlToR2(string $url, string $directory, string $disk = 'r2')
