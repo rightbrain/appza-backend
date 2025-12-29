@@ -297,7 +297,7 @@ class ApkBuildResourceController extends Controller
                 ]
             );
         }
-        if ($request->failed()){
+        if ($response->failed()){
             Log::info("failed");
             return $jsonResponse(500,'failed');
         }*/
@@ -312,7 +312,7 @@ class ApkBuildResourceController extends Controller
 
         $response = Http::get($getFluentInfo->api_url, $params);
 
-        if ($request->failed()){
+        if ($response->failed()){
             Log::info("failed");
             return $jsonResponse(Response::HTTP_SERVICE_UNAVAILABLE,'Could not connect to the license server.');
         }
