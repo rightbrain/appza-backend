@@ -311,10 +311,7 @@ class ApkBuildResourceController extends Controller
         }*/
 
         $response = Http::get($getFluentInfo->api_url, $params);
-
-        if ($response->failed()){
-            return $jsonResponse(Response::HTTP_SERVICE_UNAVAILABLE,'Could not connect to the license server.');
-        }
+        
 
         $data = $response->json();
 
@@ -333,15 +330,6 @@ class ApkBuildResourceController extends Controller
 
         $appLogo = null;
         $splashScreenImage = null;
-
-        /*return $jsonResponse(200,'success',
-            [
-                'data' => [
-                    'package_name' => $findSiteUrl->package_name,
-                    'bundle_name'  => $findSiteUrl->package_name,
-                ]
-            ]
-        );*/
 
         DB::beginTransaction();
 
