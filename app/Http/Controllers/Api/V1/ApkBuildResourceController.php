@@ -15,6 +15,7 @@ use App\Services\IosBuildValidationService;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -75,7 +76,7 @@ class ApkBuildResourceController extends Controller
     }
 
 
-    public function buildResource(ApkBuildRequest $request){
+    public function buildResource_bk(ApkBuildRequest $request){
 
         $input = $request->validated();
 
@@ -215,6 +216,174 @@ class ApkBuildResourceController extends Controller
 //        Log::info('Build resource response:', ['status' => $status, 'response' => $payload,'payload' => $request->validated()]);
         // Return it
         return response()->json($payload, $status);
+    }
+
+    public function buildResource(ApkBuildRequest $request)
+    {
+        $input = $request->validated();
+
+        $jsonResponse = function ($statusCode, $message, $additionalData = []) use ($request) {
+            return new JsonResponse(array_merge([
+                'status'  => $statusCode,
+                'url'     => $request->fullUrl(),
+                'method'  => $request->method(),
+                'message' => $message,
+            ], $additionalData), $statusCode);
+        };
+
+
+        if (!$this->authorization) {
+            return $jsonResponse(Response::HTTP_UNAUTHORIZED, 'Unauthorized.');
+        }
+
+        if ($this->pluginName === 'lazy_task') {
+            return $jsonResponse(Response::HTTP_LOCKED, 'Build process off for lazy task.');
+        }
+
+
+        $siteUrl = $this->normalizeUrl($input['site_url']);
+
+        $findSiteUrl = BuildDomain::where('site_url', $siteUrl)
+            ->where('license_key', $input['license_key'])
+            ->first();
+
+        if (!$findSiteUrl) {
+            return $jsonResponse(Response::HTTP_NOT_FOUND, 'Domain not found.');
+        }
+
+        if (!$findSiteUrl->fluent_item_id) {
+            return $jsonResponse(Response::HTTP_NOT_FOUND, 'Item id not found.');
+        }
+
+        $activationHash = FluentLicenseInfo::where('license_key', $input['license_key'])
+            ->where('site_url', $siteUrl)
+            ->value('activation_hash');
+
+        if (!$activationHash) {
+            return $jsonResponse(Response::HTTP_NOT_FOUND, 'License record not found for this site.');
+        }
+
+
+        $getFluentInfo = FluentInfo::where('product_slug', $findSiteUrl->plugin_name)
+            ->where('is_active', true)
+            ->first();
+
+        if (!$getFluentInfo) {
+            return $jsonResponse(
+                Response::HTTP_UNPROCESSABLE_ENTITY,
+                'Fluent license configuration is missing.'
+            );
+        }
+
+        $params = [
+            'fluent-cart'     => 'check_license',
+            'license_key'     => $input['license_key'],
+            'activation_hash' => $activationHash,
+            'item_id'         => $findSiteUrl->fluent_item_id,
+            'site_url'        => $siteUrl,
+        ];
+
+        /* ---------------- Call Fluent License Server ---------------- */
+
+        try {
+            $response = Http::timeout(10)->get($getFluentInfo->api_url, $params);
+        } catch (ConnectionException $e) {
+            return $jsonResponse(
+                Response::HTTP_SERVICE_UNAVAILABLE,
+                'Could not connect to the license server.'
+            );
+        }
+
+        $data = $response->json();
+
+        if (
+            !is_array($data) ||
+            !($data['success'] ?? false) ||
+            ($data['status'] ?? 'invalid') !== 'valid'
+        ) {
+            $error = $data['error_type'] ?? $data['error'] ?? null;
+            $message = $this->getFluentErrorMessage(
+                $error,
+                $data['message'] ?? 'License is not valid.'
+            );
+
+            return $jsonResponse(Response::HTTP_UNPROCESSABLE_ENTITY, $message);
+        }
+
+        $appLogo = null;
+        $splashScreenImage = null;
+
+        DB::beginTransaction();
+
+        try {
+            if (!empty($input['app_logo'])) {
+                $path = $this->uploadFromUrlToR2(
+                    $input['app_logo'],
+                    'app-file/logo',
+                    'r2'
+                );
+
+                if (!$path) {
+                    throw new \Exception('App logo invalid or cannot be downloaded.');
+                }
+
+                $appLogo = config('app.image_public_path') . $path;
+            }
+
+            if (!empty($input['app_splash_screen_image'])) {
+                $path = $this->uploadFromUrlToR2(
+                    $input['app_splash_screen_image'],
+                    'app-file/splash',
+                    'r2'
+                );
+
+                if (!$path) {
+                    throw new \Exception('App splash image invalid or cannot be downloaded.');
+                }
+
+                $splashScreenImage = config('app.image_public_path') . $path;
+            }
+
+            $findAppVersion = AppVersion::where('is_active', 1)->latest()->first();
+
+            $platforms = $request->input('platform', []);
+            $isAndroid = in_array('android', $platforms, true);
+            $isIos     = in_array('ios', $platforms, true);
+
+            $findSiteUrl->update([
+                'plugin_name'               => $this->pluginName,
+                'version_id'                => $findAppVersion?->id,
+                'fluent_id'                 => $findSiteUrl->fluent_item_id,
+                'app_name'                  => $request->input('app_name'),
+                'app_logo'                  => $appLogo,
+                'app_splash_screen_image'   => $splashScreenImage,
+                'is_android'                => $isAndroid,
+                'is_ios'                    => $isIos,
+                'confirm_email'             => $request->input('email'),
+                'build_plugin_slug'         => $request->input('plugin_slug'),
+            ]);
+
+            DB::commit();
+        } catch (\Throwable $e) {
+            DB::rollBack();
+
+            return $jsonResponse(
+                Response::HTTP_BAD_REQUEST,
+                $e->getMessage()
+            );
+        }
+
+
+        return $jsonResponse(
+            Response::HTTP_OK,
+            'App selection for build requests is confirmed.',
+            [
+                'data' => [
+                    'package_name' => $findSiteUrl->package_name,
+                    'bundle_name'  => $findSiteUrl->package_name,
+                ]
+            ]
+        );
     }
 
     private function uploadFromUrlToR2(string $url, string $directory, string $disk = 'r2')
