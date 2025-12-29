@@ -286,6 +286,7 @@ class ApkBuildResourceController extends Controller
         /* ---------------- Call Fluent License Server ---------------- */
 
         try {
+            Log::info($getFluentInfo->api_url);
             $response = Http::get($getFluentInfo->api_url, $params);
         } catch (ConnectionException $e) {
             return $jsonResponse(
