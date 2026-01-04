@@ -304,7 +304,7 @@
     </ul>
 
     <ul class="toc-footer" id="last-updated">
-        <li>Last updated: December 22, 2025</li>
+        <li>Last updated: January 4, 2026</li>
     </ul>
 </div>
 
@@ -1831,8 +1831,8 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --header "Accept: application/json" \
     --data "{
     \"site_url\": \"http:\\/\\/kunze.biz\\/iste-laborum-eius-est-dolor.html\",
-    \"product\": \"fcom_mobile\",
-    \"appza_action\": \"license_deactivate\",
+    \"product\": \"lazy_task\",
+    \"appza_action\": \"plugin_delete\",
     \"license_key\": \"consequatur\"
 }"
 </code></pre></div>
@@ -1850,8 +1850,8 @@ const headers = {
 
 let body = {
     "site_url": "http:\/\/kunze.biz\/iste-laborum-eius-est-dolor.html",
-    "product": "fcom_mobile",
-    "appza_action": "license_deactivate",
+    "product": "lazy_task",
+    "appza_action": "plugin_delete",
     "license_key": "consequatur"
 };
 
@@ -1974,10 +1974,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="product"                data-endpoint="GETapi-appza-v0-license-deactivate"
-               value="fcom_mobile"
+               value="lazy_task"
                data-component="body">
     <br>
-<p>Example: <code>fcom_mobile</code></p>
+<p>Example: <code>lazy_task</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>appza</code></li> <li><code>lazy_task</code></li> <li><code>fcom_mobile</code></li></ul>
         </div>
@@ -1988,10 +1988,10 @@ Must be one of:
  &nbsp;
                 <input type="text" style="display: none"
                               name="appza_action"                data-endpoint="GETapi-appza-v0-license-deactivate"
-               value="license_deactivate"
+               value="plugin_delete"
                data-component="body">
     <br>
-<p>Example: <code>license_deactivate</code></p>
+<p>Example: <code>plugin_delete</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>license_deactivate</code></li> <li><code>plugin_delete</code></li></ul>
         </div>
@@ -2159,7 +2159,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --header "Accept: application/json" \
     --data "{
     \"site_url\": \"http:\\/\\/kunze.biz\\/iste-laborum-eius-est-dolor.html\",
-    \"product\": \"lazy_task\"
+    \"product\": \"appza\"
 }"
 </code></pre></div>
 
@@ -2176,7 +2176,7 @@ const headers = {
 
 let body = {
     "site_url": "http:\/\/kunze.biz\/iste-laborum-eius-est-dolor.html",
-    "product": "lazy_task"
+    "product": "appza"
 };
 
 fetch(url, {
@@ -2298,10 +2298,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="product"                data-endpoint="GETapi-appza-v0-app-license-check"
-               value="lazy_task"
+               value="appza"
                data-component="body">
     <br>
-<p>Example: <code>lazy_task</code></p>
+<p>Example: <code>appza</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>appza</code></li> <li><code>lazy_task</code></li> <li><code>fcom_mobile</code></li></ul>
         </div>
@@ -2326,7 +2326,7 @@ Must be one of:
     --data "{
     \"site_url\": \"http:\\/\\/kunze.biz\\/iste-laborum-eius-est-dolor.html\",
     \"license_key\": \"consequatur\",
-    \"is_push_notification\": true
+    \"is_push_notification\": false
 }"
 </code></pre></div>
 
@@ -2344,7 +2344,7 @@ const headers = {
 let body = {
     "site_url": "http:\/\/kunze.biz\/iste-laborum-eius-est-dolor.html",
     "license_key": "consequatur",
-    "is_push_notification": true
+    "is_push_notification": false
 };
 
 fetch(url, {
@@ -2473,7 +2473,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <code>false</code>
         </label>
     <br>
-<p>Example: <code>true</code></p>
+<p>Example: <code>false</code></p>
         </div>
         </form>
 
@@ -5303,7 +5303,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --header "Accept: application/json" \
     --data "{
     \"site_url\": \"http:\\/\\/kunze.biz\\/iste-laborum-eius-est-dolor.html\",
-    \"product\": \"appza\",
+    \"product\": \"fcom_mobile\",
     \"appza_action\": \"license_deactivate\",
     \"license_key\": \"consequatur\"
 }"
@@ -5322,7 +5322,7 @@ const headers = {
 
 let body = {
     "site_url": "http:\/\/kunze.biz\/iste-laborum-eius-est-dolor.html",
-    "product": "appza",
+    "product": "fcom_mobile",
     "appza_action": "license_deactivate",
     "license_key": "consequatur"
 };
@@ -5446,10 +5446,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="product"                data-endpoint="GETapi-appza-v1-license-deactivate"
-               value="appza"
+               value="fcom_mobile"
                data-component="body">
     <br>
-<p>Example: <code>appza</code></p>
+<p>Example: <code>fcom_mobile</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>appza</code></li> <li><code>lazy_task</code></li> <li><code>fcom_mobile</code></li></ul>
         </div>
@@ -5631,7 +5631,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --header "Accept: application/json" \
     --data "{
     \"site_url\": \"http:\\/\\/kunze.biz\\/iste-laborum-eius-est-dolor.html\",
-    \"product\": \"lazy_task\"
+    \"product\": \"fcom_mobile\"
 }"
 </code></pre></div>
 
@@ -5648,7 +5648,7 @@ const headers = {
 
 let body = {
     "site_url": "http:\/\/kunze.biz\/iste-laborum-eius-est-dolor.html",
-    "product": "lazy_task"
+    "product": "fcom_mobile"
 };
 
 fetch(url, {
@@ -5685,39 +5685,39 @@ access-control-allow-origin: *
         },
         {
             &quot;type&quot;: &quot;free_trial_grace_admin&quot;,
-            &quot;message&quot;: &quot;&lt;p&gt;Your Free Trial will end soon. You can get the full version of LazyTasks App here.&lt;/p&gt;\r\n&lt;div style=\&quot;text-align:center;\&quot;&gt;\r\n  &lt;a href=\&quot;https://lazycoders.co/lazytasks/?product_name=lazy_task\&quot; \r\n     style=\&quot;display:inline-block;\r\n            padding:10px 16px;\r\n            background-color:#1976d2;\r\n            color:#ffffff;\r\n            text-decoration:none;\r\n            border-radius:8px;\r\n            font-weight:bold;\&quot;&gt;\r\n   LazyTasks\r\n  &lt;/a&gt;\r\n&lt;/div&gt;&quot;
+            &quot;message&quot;: &quot;&lt;p&gt;Your Free Trial will end soon. You can get the full version of Fluent Community Mobile App here.&lt;/p&gt;\r\n&lt;div style=\&quot;text-align:center;\&quot;&gt;\r\n  &lt;a href=\&quot;https://lazycoders.co/fluentcommunitymobile/?product_name=fcom_mobile\&quot; \r\n     style=\&quot;display:inline-block;\r\n            padding:10px 16px;\r\n            background-color:#1976d2;\r\n            color:#ffffff;\r\n            text-decoration:none;\r\n            border-radius:8px;\r\n            font-weight:bold;\&quot;&gt;\r\n   Fluent Community Mobile\r\n  &lt;/a&gt;\r\n&lt;/div&gt;&quot;
         },
         {
             &quot;type&quot;: &quot;free_trial_grace_user&quot;,
-            &quot;message&quot;: &quot;&lt;p&gt;The Free Trial period of this app will end soon. Please contact your admin for mobile app access continuity.&lt;/p&gt;&quot;
+            &quot;message&quot;: &quot;&lt;p&gt;The Free Trial period of this app will end soon. Please contact your community admin for mobile app access continuity.&lt;/p&gt;&quot;
         },
         {
             &quot;type&quot;: &quot;free_trial_ended_admin&quot;,
-            &quot;message&quot;: &quot;&lt;p&gt;Your Free Trial has ended. You can get the full version of LazyTasks App here.&lt;/p&gt;\r\n&lt;div style=\&quot;text-align:center;\&quot;&gt;\r\n  &lt;a href=\&quot;https://lazycoders.co/lazytasks/?product_name=lazy_task\&quot; \r\n     style=\&quot;display:inline-block;\r\n            padding:10px 16px;\r\n            background-color:#1976d2;\r\n            color:#ffffff;\r\n            text-decoration:none;\r\n            border-radius:8px;\r\n            font-weight:bold;\&quot;&gt;\r\n LazyTasks\r\n  &lt;/a&gt;\r\n&lt;/div&gt;&quot;
+            &quot;message&quot;: &quot;&lt;p&gt;Your Free Trial has ended. You can get the full version of Fluent Community Mobile App here.&lt;/p&gt;\r\n&lt;div style=\&quot;text-align:center;\&quot;&gt;\r\n  &lt;a href=\&quot;https://lazycoders.co/fluentcommunitymobile/?product_name=fcom_mobile\&quot; \r\n     style=\&quot;display:inline-block;\r\n            padding:10px 16px;\r\n            background-color:#1976d2;\r\n            color:#ffffff;\r\n            text-decoration:none;\r\n            border-radius:8px;\r\n            font-weight:bold;\&quot;&gt;\r\n   Fluent Community Mobile\r\n  &lt;/a&gt;\r\n&lt;/div&gt;&quot;
         },
         {
             &quot;type&quot;: &quot;free_trial_ended_user&quot;,
-            &quot;message&quot;: &quot;&lt;p&gt;The Free Trial period of this app has ended. Please contact your  admin for mobile app access.&lt;/p&gt;&quot;
+            &quot;message&quot;: &quot;&lt;p&gt;The Free Trial period of this app has ended. Please contact your community admin for mobile app access.&lt;/p&gt;&quot;
         },
         {
             &quot;type&quot;: &quot;license_expiring_admin&quot;,
-            &quot;message&quot;: &quot;&lt;p&gt;Your License for LazyTasks Premium is expiring soon. Please extend your license from LazyCoders customer portal.&lt;/p&gt;\r\n&lt;div style=\&quot;text-align:center;\&quot;&gt;\r\n  &lt;a href=\&quot;https://lazycoders.co/customer-portal/\&quot; \r\n     style=\&quot;display:inline-block;\r\n            padding:10px 16px;\r\n            background-color:#1976d2;\r\n            color:#ffffff;\r\n            text-decoration:none;\r\n            border-radius:8px;\r\n            font-weight:bold;\&quot;&gt;\r\n Customer Portal\r\n  &lt;/a&gt;\r\n&lt;/div&gt;&quot;
+            &quot;message&quot;: &quot;&lt;p&gt;Your License for Fluent Community Mobile is expiring soon. Please extend your license from LazyCoders customer portal.&lt;/p&gt;\r\n&lt;div style=\&quot;text-align:center;\&quot;&gt;\r\n  &lt;a href=\&quot;https://lazycoders.co/customer-portal/\&quot; \r\n     style=\&quot;display:inline-block;\r\n            padding:10px 16px;\r\n            background-color:#1976d2;\r\n            color:#ffffff;\r\n            text-decoration:none;\r\n            border-radius:8px;\r\n            font-weight:bold;\&quot;&gt;\r\n Customer Portal\r\n  &lt;/a&gt;\r\n&lt;/div&gt;&quot;
         },
         {
             &quot;type&quot;: &quot;license_expired_grace_admin&quot;,
-            &quot;message&quot;: &quot;&lt;p&gt;Your License for LazyTasks  has expired. Please extend your license from LazyCoders customer portal.&lt;/p&gt;\r\n&lt;div style=\&quot;text-align:center;\&quot;&gt;\r\n  &lt;a href=\&quot;https://lazycoders.co/customer-portal/\&quot; \r\n     style=\&quot;display:inline-block;\r\n            padding:10px 16px;\r\n            background-color:#1976d2;\r\n            color:#ffffff;\r\n            text-decoration:none;\r\n            border-radius:8px;\r\n            font-weight:bold;\&quot;&gt;\r\n  Customer Portal\r\n  &lt;/a&gt;\r\n&lt;/div&gt;&quot;
+            &quot;message&quot;: &quot;&lt;p&gt;Your License for Fluent Community Mobile has expired. Please extend your license from LazyCoders customer portal.&lt;/p&gt;\r\n&lt;div style=\&quot;text-align:center;\&quot;&gt;\r\n  &lt;a href=\&quot;https://lazycoders.co/customer-portal/\&quot; \r\n     style=\&quot;display:inline-block;\r\n            padding:10px 16px;\r\n            background-color:#1976d2;\r\n            color:#ffffff;\r\n            text-decoration:none;\r\n            border-radius:8px;\r\n            font-weight:bold;\&quot;&gt;\r\n  Customer Portal\r\n  &lt;/a&gt;\r\n&lt;/div&gt;&quot;
         },
         {
             &quot;type&quot;: &quot;license_expired_grace_user&quot;,
-            &quot;message&quot;: &quot;&lt;p&gt;License has expired for LazyTasks Premium. App access will be revoked soon. Please contact your  admin.&lt;/p&gt;&quot;
+            &quot;message&quot;: &quot;&lt;p&gt;License has expired for this community. App access will be revoked soon. Please contact your community admin.&lt;/p&gt;&quot;
         },
         {
             &quot;type&quot;: &quot;license_expired_final_admin&quot;,
-            &quot;message&quot;: &quot;&lt;p&gt;Your License for LazyTasks Premium has expired. Please extend your license from LazyCoders customer portal.&lt;/p&gt;\r\n&lt;div style=\&quot;text-align:center;\&quot;&gt;\r\n  &lt;a href=\&quot;https://lazycoders.co/customer-portal/\&quot; \r\n     style=\&quot;display:inline-block;\r\n            padding:10px 16px;\r\n            background-color:#1976d2;\r\n            color:#ffffff;\r\n            text-decoration:none;\r\n            border-radius:8px;\r\n            font-weight:bold;\&quot;&gt;\r\n Customer Portal\r\n  &lt;/a&gt;\r\n&lt;/div&gt;&quot;
+            &quot;message&quot;: &quot;&lt;p&gt;Your License for Fluent Community Mobile has expired. Please extend your license from LazyCoders customer portal.&lt;/p&gt;\r\n&lt;div style=\&quot;text-align:center;\&quot;&gt;\r\n  &lt;a href=\&quot;https://lazycoders.co/customer-portal/\&quot; \r\n     style=\&quot;display:inline-block;\r\n            padding:10px 16px;\r\n            background-color:#1976d2;\r\n            color:#ffffff;\r\n            text-decoration:none;\r\n            border-radius:8px;\r\n            font-weight:bold;\&quot;&gt;\r\n Customer Portal\r\n  &lt;/a&gt;\r\n&lt;/div&gt;&quot;
         },
         {
             &quot;type&quot;: &quot;license_expired_final_user&quot;,
-            &quot;message&quot;: &quot;&lt;p&gt;Access restricted due to expired license. Please contact your  admin.&lt;/p&gt;&quot;
+            &quot;message&quot;: &quot;&lt;p&gt;Access restricted due to expired license. Please contact your community admin.&lt;/p&gt;&quot;
         }
     ]
 }</code>
@@ -5814,10 +5814,10 @@ You can check the Dev Tools console for debugging information.</code></pre>
  &nbsp;
                 <input type="text" style="display: none"
                               name="product"                data-endpoint="GETapi-appza-v1-app-license-check"
-               value="lazy_task"
+               value="fcom_mobile"
                data-component="body">
     <br>
-<p>Example: <code>lazy_task</code></p>
+<p>Example: <code>fcom_mobile</code></p>
 Must be one of:
 <ul style="list-style-type: square;"><li><code>appza</code></li> <li><code>lazy_task</code></li> <li><code>fcom_mobile</code></li></ul>
         </div>
@@ -7407,7 +7407,7 @@ access-control-allow-origin: *
             &quot;others&quot;: null,
             &quot;created&quot;: &quot;08-Dec-2024&quot;,
             &quot;is_disable&quot;: false,
-            &quot;image&quot;: &quot;https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/ddzuCEwl9MvmQzsSNEuW79kyodZx53fsjZ5WJ6ig.png&quot;
+            &quot;image&quot;: &quot;https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/RgOGXyEsPzgzpHb15TQtHjHkYFERJCdAeymOeh1L.png&quot;
         },
         {
             &quot;id&quot;: 2,
@@ -7419,7 +7419,7 @@ access-control-allow-origin: *
             &quot;others&quot;: null,
             &quot;created&quot;: &quot;08-Dec-2024&quot;,
             &quot;is_disable&quot;: false,
-            &quot;image&quot;: &quot;https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/NDeIlDIhqEwi2leoHFBsbiRfj1L4IME1pgpmScVo.png&quot;
+            &quot;image&quot;: &quot;https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/nPBFSvJmq2aqU5nMyvVuMkjKuvTaaxTQeKrYE477.png&quot;
         },
         {
             &quot;id&quot;: 3,
@@ -7430,8 +7430,8 @@ access-control-allow-origin: *
             &quot;description&quot;: null,
             &quot;others&quot;: null,
             &quot;created&quot;: &quot;08-Dec-2024&quot;,
-            &quot;is_disable&quot;: true,
-            &quot;image&quot;: &quot;https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/E6QoV7rguGrLydmlkp5cskNhYrQ6Z3zigZgf2sWk.png&quot;
+            &quot;is_disable&quot;: false,
+            &quot;image&quot;: &quot;https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/SJReGwryiRQDGbYqgXENPOoMtCXmDZZyPlNo9iuA.png&quot;
         },
         {
             &quot;id&quot;: 4,
@@ -7442,8 +7442,8 @@ access-control-allow-origin: *
             &quot;description&quot;: null,
             &quot;others&quot;: null,
             &quot;created&quot;: &quot;08-Dec-2024&quot;,
-            &quot;is_disable&quot;: true,
-            &quot;image&quot;: &quot;https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/j1r8UqnkWrYtbWw0rzepVxDOmi5Jm4L73I8S8I47.png&quot;
+            &quot;is_disable&quot;: false,
+            &quot;image&quot;: &quot;https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/5eqLnivGYKRhuBU298SSQRm63h3ZlgcjghnQPGau.png&quot;
         },
         {
             &quot;id&quot;: 7,
@@ -7455,7 +7455,7 @@ access-control-allow-origin: *
             &quot;others&quot;: null,
             &quot;created&quot;: &quot;08-Dec-2024&quot;,
             &quot;is_disable&quot;: true,
-            &quot;image&quot;: &quot;https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/FdFf6iG6jLEXg6WEcjDQ57cWurCUnGVyYQDyBOP7.png&quot;
+            &quot;image&quot;: &quot;https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/yx0p3nucda63uAUc6ckGaplJL1fnee4Uqizy8eeP.png&quot;
         },
         {
             &quot;id&quot;: 6,
@@ -7467,7 +7467,7 @@ access-control-allow-origin: *
             &quot;others&quot;: null,
             &quot;created&quot;: &quot;08-Dec-2024&quot;,
             &quot;is_disable&quot;: true,
-            &quot;image&quot;: &quot;https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/an8e0k8Pop1PhsYWlGrJvfmMeyMfcnedW3Ka1xSF.png&quot;
+            &quot;image&quot;: &quot;https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/Oxl6IsUHaHjOtSE04Yg0UgSdjmiL2RvY132bE0Rz.png&quot;
         },
         {
             &quot;id&quot;: 5,
@@ -7479,7 +7479,7 @@ access-control-allow-origin: *
             &quot;others&quot;: null,
             &quot;created&quot;: &quot;08-Dec-2024&quot;,
             &quot;is_disable&quot;: true,
-            &quot;image&quot;: &quot;https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/6581UcKX7vSqAAJzNrPro9CbdEBPZZvLauMAouu9.png&quot;
+            &quot;image&quot;: &quot;https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/mtLwbxSmOfo8aV2IXbMghUjmigPYRj12NlymNGp7.png&quot;
         }
     ],
     &quot;status&quot;: 200,
@@ -10017,7 +10017,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
     --data "{
     \"site_url\": \"http:\\/\\/kunze.biz\\/iste-laborum-eius-est-dolor.html\",
     \"license_key\": \"consequatur\",
-    \"is_push_notification\": false
+    \"is_push_notification\": true
 }"
 </code></pre></div>
 
@@ -10035,7 +10035,7 @@ const headers = {
 let body = {
     "site_url": "http:\/\/kunze.biz\/iste-laborum-eius-est-dolor.html",
     "license_key": "consequatur",
-    "is_push_notification": false
+    "is_push_notification": true
 };
 
 fetch(url, {
@@ -10164,7 +10164,7 @@ You can check the Dev Tools console for debugging information.</code></pre>
             <code>false</code>
         </label>
     <br>
-<p>Example: <code>false</code></p>
+<p>Example: <code>true</code></p>
         </div>
         </form>
 
@@ -11443,7 +11443,7 @@ access-control-allow-origin: *
             &quot;others&quot;: null,
             &quot;created&quot;: &quot;08-Dec-2024&quot;,
             &quot;is_disable&quot;: false,
-            &quot;image&quot;: &quot;https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/ddzuCEwl9MvmQzsSNEuW79kyodZx53fsjZ5WJ6ig.png&quot;
+            &quot;image&quot;: &quot;https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/RgOGXyEsPzgzpHb15TQtHjHkYFERJCdAeymOeh1L.png&quot;
         },
         {
             &quot;id&quot;: 2,
@@ -11455,7 +11455,7 @@ access-control-allow-origin: *
             &quot;others&quot;: null,
             &quot;created&quot;: &quot;08-Dec-2024&quot;,
             &quot;is_disable&quot;: false,
-            &quot;image&quot;: &quot;https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/NDeIlDIhqEwi2leoHFBsbiRfj1L4IME1pgpmScVo.png&quot;
+            &quot;image&quot;: &quot;https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/nPBFSvJmq2aqU5nMyvVuMkjKuvTaaxTQeKrYE477.png&quot;
         },
         {
             &quot;id&quot;: 3,
@@ -11466,8 +11466,8 @@ access-control-allow-origin: *
             &quot;description&quot;: null,
             &quot;others&quot;: null,
             &quot;created&quot;: &quot;08-Dec-2024&quot;,
-            &quot;is_disable&quot;: true,
-            &quot;image&quot;: &quot;https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/E6QoV7rguGrLydmlkp5cskNhYrQ6Z3zigZgf2sWk.png&quot;
+            &quot;is_disable&quot;: false,
+            &quot;image&quot;: &quot;https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/SJReGwryiRQDGbYqgXENPOoMtCXmDZZyPlNo9iuA.png&quot;
         },
         {
             &quot;id&quot;: 4,
@@ -11478,8 +11478,8 @@ access-control-allow-origin: *
             &quot;description&quot;: null,
             &quot;others&quot;: null,
             &quot;created&quot;: &quot;08-Dec-2024&quot;,
-            &quot;is_disable&quot;: true,
-            &quot;image&quot;: &quot;https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/j1r8UqnkWrYtbWw0rzepVxDOmi5Jm4L73I8S8I47.png&quot;
+            &quot;is_disable&quot;: false,
+            &quot;image&quot;: &quot;https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/5eqLnivGYKRhuBU298SSQRm63h3ZlgcjghnQPGau.png&quot;
         },
         {
             &quot;id&quot;: 7,
@@ -11491,7 +11491,7 @@ access-control-allow-origin: *
             &quot;others&quot;: null,
             &quot;created&quot;: &quot;08-Dec-2024&quot;,
             &quot;is_disable&quot;: true,
-            &quot;image&quot;: &quot;https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/FdFf6iG6jLEXg6WEcjDQ57cWurCUnGVyYQDyBOP7.png&quot;
+            &quot;image&quot;: &quot;https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/yx0p3nucda63uAUc6ckGaplJL1fnee4Uqizy8eeP.png&quot;
         },
         {
             &quot;id&quot;: 6,
@@ -11503,7 +11503,7 @@ access-control-allow-origin: *
             &quot;others&quot;: null,
             &quot;created&quot;: &quot;08-Dec-2024&quot;,
             &quot;is_disable&quot;: true,
-            &quot;image&quot;: &quot;https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/an8e0k8Pop1PhsYWlGrJvfmMeyMfcnedW3Ka1xSF.png&quot;
+            &quot;image&quot;: &quot;https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/Oxl6IsUHaHjOtSE04Yg0UgSdjmiL2RvY132bE0Rz.png&quot;
         },
         {
             &quot;id&quot;: 5,
@@ -11515,7 +11515,7 @@ access-control-allow-origin: *
             &quot;others&quot;: null,
             &quot;created&quot;: &quot;08-Dec-2024&quot;,
             &quot;is_disable&quot;: true,
-            &quot;image&quot;: &quot;https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/6581UcKX7vSqAAJzNrPro9CbdEBPZZvLauMAouu9.png&quot;
+            &quot;image&quot;: &quot;https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/mtLwbxSmOfo8aV2IXbMghUjmigPYRj12NlymNGp7.png&quot;
         }
     ],
     &quot;status&quot;: 200,

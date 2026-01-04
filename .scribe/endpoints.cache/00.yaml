@@ -595,7 +595,7 @@ endpoints:
         name: product
         description: ''
         required: true
-        example: fcom_mobile
+        example: lazy_task
         type: string
         enumValues:
           - appza
@@ -609,7 +609,7 @@ endpoints:
         name: appza_action
         description: ''
         required: true
-        example: license_deactivate
+        example: plugin_delete
         type: string
         enumValues:
           - license_deactivate
@@ -630,8 +630,8 @@ endpoints:
         deprecated: false
     cleanBodyParameters:
       site_url: 'http://kunze.biz/iste-laborum-eius-est-dolor.html'
-      product: fcom_mobile
-      appza_action: license_deactivate
+      product: lazy_task
+      appza_action: plugin_delete
       license_key: consequatur
     fileParameters: []
     responses:
@@ -731,7 +731,7 @@ endpoints:
         name: product
         description: ''
         required: true
-        example: lazy_task
+        example: appza
         type: string
         enumValues:
           - appza
@@ -742,7 +742,7 @@ endpoints:
         deprecated: false
     cleanBodyParameters:
       site_url: 'http://kunze.biz/iste-laborum-eius-est-dolor.html'
-      product: lazy_task
+      product: appza
     fileParameters: []
     responses:
       -
@@ -809,7 +809,7 @@ endpoints:
         name: is_push_notification
         description: ''
         required: false
-        example: true
+        example: false
         type: boolean
         enumValues: []
         exampleWasSpecified: false
@@ -818,7 +818,7 @@ endpoints:
     cleanBodyParameters:
       site_url: 'http://kunze.biz/iste-laborum-eius-est-dolor.html'
       license_key: consequatur
-      is_push_notification: true
+      is_push_notification: false
     fileParameters: []
     responses: []
     responseFields: []
@@ -2006,7 +2006,7 @@ endpoints:
         name: product
         description: ''
         required: true
-        example: appza
+        example: fcom_mobile
         type: string
         enumValues:
           - appza
@@ -2041,7 +2041,7 @@ endpoints:
         deprecated: false
     cleanBodyParameters:
       site_url: 'http://kunze.biz/iste-laborum-eius-est-dolor.html'
-      product: appza
+      product: fcom_mobile
       appza_action: license_deactivate
       license_key: consequatur
     fileParameters: []
@@ -2143,7 +2143,7 @@ endpoints:
         name: product
         description: ''
         required: true
-        example: lazy_task
+        example: fcom_mobile
         type: string
         enumValues:
           - appza
@@ -2154,13 +2154,13 @@ endpoints:
         deprecated: false
     cleanBodyParameters:
       site_url: 'http://kunze.biz/iste-laborum-eius-est-dolor.html'
-      product: lazy_task
+      product: fcom_mobile
     fileParameters: []
     responses:
       -
         custom: []
         status: 404
-        content: '{"status":404,"message":"Plugin not installed or no license found.","license_type":"invalid","data":[],"popup_message":[{"type":"no_license","message":"<p>You do not have a valid licence. Please provide a valid licence key<\/p>"},{"type":"free_trial_grace_admin","message":"<p>Your Free Trial will end soon. You can get the full version of LazyTasks App here.<\/p>\r\n<div style=\"text-align:center;\">\r\n  <a href=\"https:\/\/lazycoders.co\/lazytasks\/?product_name=lazy_task\" \r\n     style=\"display:inline-block;\r\n            padding:10px 16px;\r\n            background-color:#1976d2;\r\n            color:#ffffff;\r\n            text-decoration:none;\r\n            border-radius:8px;\r\n            font-weight:bold;\">\r\n   LazyTasks\r\n  <\/a>\r\n<\/div>"},{"type":"free_trial_grace_user","message":"<p>The Free Trial period of this app will end soon. Please contact your admin for mobile app access continuity.<\/p>"},{"type":"free_trial_ended_admin","message":"<p>Your Free Trial has ended. You can get the full version of LazyTasks App here.<\/p>\r\n<div style=\"text-align:center;\">\r\n  <a href=\"https:\/\/lazycoders.co\/lazytasks\/?product_name=lazy_task\" \r\n     style=\"display:inline-block;\r\n            padding:10px 16px;\r\n            background-color:#1976d2;\r\n            color:#ffffff;\r\n            text-decoration:none;\r\n            border-radius:8px;\r\n            font-weight:bold;\">\r\n LazyTasks\r\n  <\/a>\r\n<\/div>"},{"type":"free_trial_ended_user","message":"<p>The Free Trial period of this app has ended. Please contact your  admin for mobile app access.<\/p>"},{"type":"license_expiring_admin","message":"<p>Your License for LazyTasks Premium is expiring soon. Please extend your license from LazyCoders customer portal.<\/p>\r\n<div style=\"text-align:center;\">\r\n  <a href=\"https:\/\/lazycoders.co\/customer-portal\/\" \r\n     style=\"display:inline-block;\r\n            padding:10px 16px;\r\n            background-color:#1976d2;\r\n            color:#ffffff;\r\n            text-decoration:none;\r\n            border-radius:8px;\r\n            font-weight:bold;\">\r\n Customer Portal\r\n  <\/a>\r\n<\/div>"},{"type":"license_expired_grace_admin","message":"<p>Your License for LazyTasks  has expired. Please extend your license from LazyCoders customer portal.<\/p>\r\n<div style=\"text-align:center;\">\r\n  <a href=\"https:\/\/lazycoders.co\/customer-portal\/\" \r\n     style=\"display:inline-block;\r\n            padding:10px 16px;\r\n            background-color:#1976d2;\r\n            color:#ffffff;\r\n            text-decoration:none;\r\n            border-radius:8px;\r\n            font-weight:bold;\">\r\n  Customer Portal\r\n  <\/a>\r\n<\/div>"},{"type":"license_expired_grace_user","message":"<p>License has expired for LazyTasks Premium. App access will be revoked soon. Please contact your  admin.<\/p>"},{"type":"license_expired_final_admin","message":"<p>Your License for LazyTasks Premium has expired. Please extend your license from LazyCoders customer portal.<\/p>\r\n<div style=\"text-align:center;\">\r\n  <a href=\"https:\/\/lazycoders.co\/customer-portal\/\" \r\n     style=\"display:inline-block;\r\n            padding:10px 16px;\r\n            background-color:#1976d2;\r\n            color:#ffffff;\r\n            text-decoration:none;\r\n            border-radius:8px;\r\n            font-weight:bold;\">\r\n Customer Portal\r\n  <\/a>\r\n<\/div>"},{"type":"license_expired_final_user","message":"<p>Access restricted due to expired license. Please contact your  admin.<\/p>"}]}'
+        content: '{"status":404,"message":"Plugin not installed or no license found.","license_type":"invalid","data":[],"popup_message":[{"type":"no_license","message":"<p>You do not have a valid licence. Please provide a valid licence key<\/p>"},{"type":"free_trial_grace_admin","message":"<p>Your Free Trial will end soon. You can get the full version of Fluent Community Mobile App here.<\/p>\r\n<div style=\"text-align:center;\">\r\n  <a href=\"https:\/\/lazycoders.co\/fluentcommunitymobile\/?product_name=fcom_mobile\" \r\n     style=\"display:inline-block;\r\n            padding:10px 16px;\r\n            background-color:#1976d2;\r\n            color:#ffffff;\r\n            text-decoration:none;\r\n            border-radius:8px;\r\n            font-weight:bold;\">\r\n   Fluent Community Mobile\r\n  <\/a>\r\n<\/div>"},{"type":"free_trial_grace_user","message":"<p>The Free Trial period of this app will end soon. Please contact your community admin for mobile app access continuity.<\/p>"},{"type":"free_trial_ended_admin","message":"<p>Your Free Trial has ended. You can get the full version of Fluent Community Mobile App here.<\/p>\r\n<div style=\"text-align:center;\">\r\n  <a href=\"https:\/\/lazycoders.co\/fluentcommunitymobile\/?product_name=fcom_mobile\" \r\n     style=\"display:inline-block;\r\n            padding:10px 16px;\r\n            background-color:#1976d2;\r\n            color:#ffffff;\r\n            text-decoration:none;\r\n            border-radius:8px;\r\n            font-weight:bold;\">\r\n   Fluent Community Mobile\r\n  <\/a>\r\n<\/div>"},{"type":"free_trial_ended_user","message":"<p>The Free Trial period of this app has ended. Please contact your community admin for mobile app access.<\/p>"},{"type":"license_expiring_admin","message":"<p>Your License for Fluent Community Mobile is expiring soon. Please extend your license from LazyCoders customer portal.<\/p>\r\n<div style=\"text-align:center;\">\r\n  <a href=\"https:\/\/lazycoders.co\/customer-portal\/\" \r\n     style=\"display:inline-block;\r\n            padding:10px 16px;\r\n            background-color:#1976d2;\r\n            color:#ffffff;\r\n            text-decoration:none;\r\n            border-radius:8px;\r\n            font-weight:bold;\">\r\n Customer Portal\r\n  <\/a>\r\n<\/div>"},{"type":"license_expired_grace_admin","message":"<p>Your License for Fluent Community Mobile has expired. Please extend your license from LazyCoders customer portal.<\/p>\r\n<div style=\"text-align:center;\">\r\n  <a href=\"https:\/\/lazycoders.co\/customer-portal\/\" \r\n     style=\"display:inline-block;\r\n            padding:10px 16px;\r\n            background-color:#1976d2;\r\n            color:#ffffff;\r\n            text-decoration:none;\r\n            border-radius:8px;\r\n            font-weight:bold;\">\r\n  Customer Portal\r\n  <\/a>\r\n<\/div>"},{"type":"license_expired_grace_user","message":"<p>License has expired for this community. App access will be revoked soon. Please contact your community admin.<\/p>"},{"type":"license_expired_final_admin","message":"<p>Your License for Fluent Community Mobile has expired. Please extend your license from LazyCoders customer portal.<\/p>\r\n<div style=\"text-align:center;\">\r\n  <a href=\"https:\/\/lazycoders.co\/customer-portal\/\" \r\n     style=\"display:inline-block;\r\n            padding:10px 16px;\r\n            background-color:#1976d2;\r\n            color:#ffffff;\r\n            text-decoration:none;\r\n            border-radius:8px;\r\n            font-weight:bold;\">\r\n Customer Portal\r\n  <\/a>\r\n<\/div>"},{"type":"license_expired_final_user","message":"<p>Access restricted due to expired license. Please contact your community admin.<\/p>"}]}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
@@ -2866,7 +2866,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":1,"name":"Wordpress","slug":"wordpress","prefix":"WP_","title":null,"description":null,"others":null,"created":"08-Dec-2024","is_disable":false,"image":"https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/ddzuCEwl9MvmQzsSNEuW79kyodZx53fsjZ5WJ6ig.png"},{"id":2,"name":"Woocommerce","slug":"woocommerce","prefix":"Woo_","title":null,"description":null,"others":null,"created":"08-Dec-2024","is_disable":false,"image":"https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/NDeIlDIhqEwi2leoHFBsbiRfj1L4IME1pgpmScVo.png"},{"id":3,"name":"Tutor LMS","slug":"tutor-lms","prefix":"TLMS_","title":null,"description":null,"others":null,"created":"08-Dec-2024","is_disable":true,"image":"https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/E6QoV7rguGrLydmlkp5cskNhYrQ6Z3zigZgf2sWk.png"},{"id":4,"name":"Fluent Community","slug":"fluent-community","prefix":"FCommunity_","title":null,"description":null,"others":null,"created":"08-Dec-2024","is_disable":true,"image":"https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/j1r8UqnkWrYtbWw0rzepVxDOmi5Jm4L73I8S8I47.png"},{"id":7,"name":"Lazy Tasks","slug":"lazy-tasks","prefix":"LTasks_","title":null,"description":null,"others":null,"created":"08-Dec-2024","is_disable":true,"image":"https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/FdFf6iG6jLEXg6WEcjDQ57cWurCUnGVyYQDyBOP7.png"},{"id":6,"name":"Learn Dash","slug":"learn-dash","prefix":"LDash_","title":null,"description":null,"others":null,"created":"08-Dec-2024","is_disable":true,"image":"https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/an8e0k8Pop1PhsYWlGrJvfmMeyMfcnedW3Ka1xSF.png"},{"id":5,"name":"Lifter LMS","slug":"lifter-lms","prefix":"LLMS_","title":null,"description":null,"others":null,"created":"08-Dec-2024","is_disable":true,"image":"https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/6581UcKX7vSqAAJzNrPro9CbdEBPZZvLauMAouu9.png"}],"status":200,"url":"http://localhost/api/appza/v1/plugins","method":"GET","message":"Data Found"}'
+        content: '{"data":[{"id":1,"name":"Wordpress","slug":"wordpress","prefix":"WP_","title":null,"description":null,"others":null,"created":"08-Dec-2024","is_disable":false,"image":"https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/RgOGXyEsPzgzpHb15TQtHjHkYFERJCdAeymOeh1L.png"},{"id":2,"name":"Woocommerce","slug":"woocommerce","prefix":"Woo_","title":null,"description":null,"others":null,"created":"08-Dec-2024","is_disable":false,"image":"https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/nPBFSvJmq2aqU5nMyvVuMkjKuvTaaxTQeKrYE477.png"},{"id":3,"name":"Tutor LMS","slug":"tutor-lms","prefix":"TLMS_","title":null,"description":null,"others":null,"created":"08-Dec-2024","is_disable":false,"image":"https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/SJReGwryiRQDGbYqgXENPOoMtCXmDZZyPlNo9iuA.png"},{"id":4,"name":"Fluent Community","slug":"fluent-community","prefix":"FCommunity_","title":null,"description":null,"others":null,"created":"08-Dec-2024","is_disable":false,"image":"https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/5eqLnivGYKRhuBU298SSQRm63h3ZlgcjghnQPGau.png"},{"id":7,"name":"Lazy Tasks","slug":"lazy-tasks","prefix":"LTasks_","title":null,"description":null,"others":null,"created":"08-Dec-2024","is_disable":true,"image":"https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/yx0p3nucda63uAUc6ckGaplJL1fnee4Uqizy8eeP.png"},{"id":6,"name":"Learn Dash","slug":"learn-dash","prefix":"LDash_","title":null,"description":null,"others":null,"created":"08-Dec-2024","is_disable":true,"image":"https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/Oxl6IsUHaHjOtSE04Yg0UgSdjmiL2RvY132bE0Rz.png"},{"id":5,"name":"Lifter LMS","slug":"lifter-lms","prefix":"LLMS_","title":null,"description":null,"others":null,"created":"08-Dec-2024","is_disable":true,"image":"https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/mtLwbxSmOfo8aV2IXbMghUjmigPYRj12NlymNGp7.png"}],"status":200,"url":"http://localhost/api/appza/v1/plugins","method":"GET","message":"Data Found"}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
@@ -3866,7 +3866,7 @@ endpoints:
         name: is_push_notification
         description: ''
         required: false
-        example: false
+        example: true
         type: boolean
         enumValues: []
         exampleWasSpecified: false
@@ -3875,7 +3875,7 @@ endpoints:
     cleanBodyParameters:
       site_url: 'http://kunze.biz/iste-laborum-eius-est-dolor.html'
       license_key: consequatur
-      is_push_notification: false
+      is_push_notification: true
     fileParameters: []
     responses: []
     responseFields: []
@@ -4469,7 +4469,7 @@ endpoints:
       -
         custom: []
         status: 200
-        content: '{"data":[{"id":1,"name":"Wordpress","slug":"wordpress","prefix":"WP_","title":null,"description":null,"others":null,"created":"08-Dec-2024","is_disable":false,"image":"https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/ddzuCEwl9MvmQzsSNEuW79kyodZx53fsjZ5WJ6ig.png"},{"id":2,"name":"Woocommerce","slug":"woocommerce","prefix":"Woo_","title":null,"description":null,"others":null,"created":"08-Dec-2024","is_disable":false,"image":"https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/NDeIlDIhqEwi2leoHFBsbiRfj1L4IME1pgpmScVo.png"},{"id":3,"name":"Tutor LMS","slug":"tutor-lms","prefix":"TLMS_","title":null,"description":null,"others":null,"created":"08-Dec-2024","is_disable":true,"image":"https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/E6QoV7rguGrLydmlkp5cskNhYrQ6Z3zigZgf2sWk.png"},{"id":4,"name":"Fluent Community","slug":"fluent-community","prefix":"FCommunity_","title":null,"description":null,"others":null,"created":"08-Dec-2024","is_disable":true,"image":"https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/j1r8UqnkWrYtbWw0rzepVxDOmi5Jm4L73I8S8I47.png"},{"id":7,"name":"Lazy Tasks","slug":"lazy-tasks","prefix":"LTasks_","title":null,"description":null,"others":null,"created":"08-Dec-2024","is_disable":true,"image":"https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/FdFf6iG6jLEXg6WEcjDQ57cWurCUnGVyYQDyBOP7.png"},{"id":6,"name":"Learn Dash","slug":"learn-dash","prefix":"LDash_","title":null,"description":null,"others":null,"created":"08-Dec-2024","is_disable":true,"image":"https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/an8e0k8Pop1PhsYWlGrJvfmMeyMfcnedW3Ka1xSF.png"},{"id":5,"name":"Lifter LMS","slug":"lifter-lms","prefix":"LLMS_","title":null,"description":null,"others":null,"created":"08-Dec-2024","is_disable":true,"image":"https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/6581UcKX7vSqAAJzNrPro9CbdEBPZZvLauMAouu9.png"}],"status":200,"url":"http://localhost/api/appza/v2/plugins","method":"GET","message":"Data Found"}'
+        content: '{"data":[{"id":1,"name":"Wordpress","slug":"wordpress","prefix":"WP_","title":null,"description":null,"others":null,"created":"08-Dec-2024","is_disable":false,"image":"https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/RgOGXyEsPzgzpHb15TQtHjHkYFERJCdAeymOeh1L.png"},{"id":2,"name":"Woocommerce","slug":"woocommerce","prefix":"Woo_","title":null,"description":null,"others":null,"created":"08-Dec-2024","is_disable":false,"image":"https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/nPBFSvJmq2aqU5nMyvVuMkjKuvTaaxTQeKrYE477.png"},{"id":3,"name":"Tutor LMS","slug":"tutor-lms","prefix":"TLMS_","title":null,"description":null,"others":null,"created":"08-Dec-2024","is_disable":false,"image":"https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/SJReGwryiRQDGbYqgXENPOoMtCXmDZZyPlNo9iuA.png"},{"id":4,"name":"Fluent Community","slug":"fluent-community","prefix":"FCommunity_","title":null,"description":null,"others":null,"created":"08-Dec-2024","is_disable":false,"image":"https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/5eqLnivGYKRhuBU298SSQRm63h3ZlgcjghnQPGau.png"},{"id":7,"name":"Lazy Tasks","slug":"lazy-tasks","prefix":"LTasks_","title":null,"description":null,"others":null,"created":"08-Dec-2024","is_disable":true,"image":"https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/yx0p3nucda63uAUc6ckGaplJL1fnee4Uqizy8eeP.png"},{"id":6,"name":"Learn Dash","slug":"learn-dash","prefix":"LDash_","title":null,"description":null,"others":null,"created":"08-Dec-2024","is_disable":true,"image":"https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/Oxl6IsUHaHjOtSE04Yg0UgSdjmiL2RvY132bE0Rz.png"},{"id":5,"name":"Lifter LMS","slug":"lifter-lms","prefix":"LLMS_","title":null,"description":null,"others":null,"created":"08-Dec-2024","is_disable":true,"image":"https://pub-f696dec17da54dec9c83692c46cfb446.r2.dev/plugins/mtLwbxSmOfo8aV2IXbMghUjmigPYRj12NlymNGp7.png"}],"status":200,"url":"http://localhost/api/appza/v2/plugins","method":"GET","message":"Data Found"}'
         headers:
           cache-control: 'no-cache, private'
           content-type: application/json
