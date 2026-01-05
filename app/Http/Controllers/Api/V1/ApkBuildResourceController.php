@@ -410,31 +410,31 @@ class ApkBuildResourceController extends Controller
 
     private function uploadFromUrlToR2(string $url, string $directory, string $disk = 'r2')
     {
-        // Validate URL
         $fileHeaders = @get_headers($url);
         if (!$fileHeaders || strpos($fileHeaders[0], '404') !== false) {
             return false;
         }
 
-        // Download file
         $fileContent = @file_get_contents($url);
         if ($fileContent === false) {
             return false;
         }
 
-        // 🔥 IMPORTANT: Remove query string safely
+        // Remove query string
         $parsedUrl = parse_url($url);
-        $originalFileName = basename($parsedUrl['path']); // NO ?hmac
+        $originalFileName = basename($parsedUrl['path']);
 
-        // Generate clean unique filename
+        // Generate clean filename
         $fileName = bin2hex(random_bytes(5)) . '_' . $originalFileName;
-
         $path = $directory . '/' . $fileName;
 
-        // Upload
+        // Detect mime type from CONTENT (not filename)
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mimeType = $finfo->buffer($fileContent);
+
         Storage::disk($disk)->put($path, $fileContent, [
-            'visibility' => 'public',
-            'ContentType' => mime_content_type($originalFileName),
+            'visibility'  => 'public',
+            'ContentType' => $mimeType,
         ]);
 
         return $path;
