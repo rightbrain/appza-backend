@@ -381,33 +381,7 @@ class ApkBuildResourceController extends Controller
             ]
         );
     }
-
-    /*private function uploadFromUrlToR2(string $url, string $directory, string $disk = 'r2')
-    {
-        // Check URL valid or 404
-        $fileHeaders = @get_headers($url);
-        if (!$fileHeaders || strpos($fileHeaders[0], '404') !== false) {
-            return false;
-        }
-
-        // Download file content
-        $fileContent = @file_get_contents($url);
-        if ($fileContent === false) {
-            return false;
-        }
-
-        // Generate unique filename
-        $extension = pathinfo(parse_url($url, PHP_URL_PATH), PATHINFO_EXTENSION);
-        $fileName = bin2hex(random_bytes(5)) . '_' . basename($url);
-
-        $path = $directory . '/' . $fileName;
-
-        // Upload file to R2
-        Storage::disk($disk)->put($path, $fileContent);
-
-        return $path; // return path for DB
-    }*/
-
+    
     private function uploadFromUrlToR2(string $url, string $directory, string $disk = 'r2')
     {
         $fileHeaders = @get_headers($url);
