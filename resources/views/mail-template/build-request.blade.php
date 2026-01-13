@@ -9,8 +9,7 @@ Dear {{ $details['customer_name'] }},
     @elseif($details['is_ios'])
         iOS
     @endif
-    app, the development of <b>{{ $details['app_name'] }}</b>.
-    The app build process is now in progress and we are excited to bring your app to life!
+    app, the development of <b>{{ $details['app_name'] ?: 'the app' }}</b>. The app build process is now in progress and we are excited to bring your app to life!
 </p>
 
 <p style="color: black; text-align: justify">
