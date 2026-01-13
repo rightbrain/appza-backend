@@ -55,6 +55,7 @@ class RequestLogController extends Controller
                 // Full string exact match (case-insensitive substring match)
                 $query->where('request_text', 'like', "%{$filters}%")
                     ->orWhere('response_text', 'like', "%{$filters}%")
+                    ->orWhere('url', 'like', "%{$filters}%")
                     ->orWhere('ip_address', 'like', "%{$filters}%");
             });
         }

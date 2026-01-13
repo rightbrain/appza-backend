@@ -32,4 +32,5 @@ storage/framework/*
 boost.json
 CLAUDE.md
 .junie/
+.ai/
 
