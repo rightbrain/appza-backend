@@ -444,8 +444,8 @@ class ApkBuildHistoryController extends Controller
 
         if ($buildOrder->status->value === 'failed') {
             $details['subject'] = $isIos
-                ? 'Update on Your iOS App Build: Action Required'
-                : 'Update on Your Android App Build: Action Required';
+                ? 'Update on Your iOS App Build: Action Required ⚠️'
+                : 'Update on Your Android App Build: Action Required ⚠️';
             $details['mail_template'] = $isIos ? 'build_failed_ios' : 'build_failed_android';
         } else { // completed
             $details['subject'] = $isIos
