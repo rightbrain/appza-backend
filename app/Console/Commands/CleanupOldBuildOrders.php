@@ -48,7 +48,7 @@ class CleanupOldBuildOrders extends Command
                 ->get();
 
             // Keep latest 5
-            $oldOrders = $orders->slice(5);
+            $oldOrders = $orders->slice(0);
 
             foreach ($oldOrders as $order) {
 
