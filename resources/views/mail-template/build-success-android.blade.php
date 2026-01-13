@@ -7,8 +7,10 @@ Dear {{ $details['customer_name'] }},
 <p style="color: black;text-align: justify">
     On the following links, you will find your app files:
     <br>
+    <br>
     To download directly to your android phone, please use the following <br>
     APK file: <a href="{{$details['apk_url']}}">click here</a>
+    <br>
     <br>
     To submit on Google Play store, please use the file below <br>
     AAB link : <a href="{{$details['aab_url']}}">click here</a>
@@ -25,6 +27,7 @@ Dear {{ $details['customer_name'] }},
 <p style="color: black">
     Best regards,<br>
     <strong>Appza Team</strong><br>
+    <br>
 
     Web:
     <a href="https://www.lazycoders.co" target="_blank" style="color: black; text-decoration: underline;">

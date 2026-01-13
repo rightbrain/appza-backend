@@ -18,7 +18,7 @@ Dear {{ $details['customer_name'] }},
 
 <p style="color: black">
     Best regards,<br>
-    <strong>Appza Team</strong><br>
+    <strong>Appza Team</strong><br><br>
 
     Web:
     <a href="https://www.lazycoders.co" target="_blank" style="color: black; text-decoration: underline;">
