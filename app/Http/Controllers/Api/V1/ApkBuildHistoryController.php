@@ -433,7 +433,8 @@ class ApkBuildHistoryController extends Controller
         $isIos = $buildOrder->build_target == 'ios';
 
         // Configure email details based on build status and target platform
-        $customerName = $userInfo->first_name . ' ' . $userInfo->last_name;
+//        $customerName = $userInfo->first_name . ' ' . $userInfo->last_name;
+        $customerName = $userInfo->first_name;
         $appName = $isIos ? $buildDomain->ios_app_name : $buildDomain->app_name;
 
         $details = [
