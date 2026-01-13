@@ -207,7 +207,7 @@ class ApkBuildResourceController extends Controller
                 'plugin_name'               => $this->pluginName,
                 'version_id'                => $findAppVersion?->id,
                 'fluent_id'                 => $findSiteUrl->fluent_item_id,
-                'app_name'                  => $request->input('app_name'),
+                'app_name'                  => $isAndroid && $request->input('app_name') ? $request->input('app_name') : $findSiteUrl->app_name,
                 'app_logo'                  => $appLogo,
                 'app_splash_screen_image'   => $splashScreenImage,
                 'is_android'                => $isAndroid,
@@ -360,7 +360,7 @@ class ApkBuildResourceController extends Controller
             ]);
         }
 
-        $findSiteUrl->update(['ios_app_name' => $result['app_name']]);
+        $findSiteUrl->update(['ios_app_name' => $result['app_name']?:$findSiteUrl->ios_app_name]);
 
         return $jsonResponse(Response::HTTP_OK, $result['message'], [
             'data' => [

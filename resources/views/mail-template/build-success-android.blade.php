@@ -13,7 +13,7 @@ Dear {{ $details['customer_name'] }},
     <br>
     <br>
     To submit on Google Play store, please use the file below <br>
-    AAB link : <a href="{{$details['aab_url']}}">click here</a>
+    AAB file : <a href="{{$details['aab_url']}}">click here</a>
 </p>
 
 <p style="color: black;text-align: justify;">

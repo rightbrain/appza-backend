@@ -9,15 +9,12 @@ Dear {{ $details['customer_name'] }},
     @elseif($details['is_ios'])
         iOS
     @endif
-    app, <b>{{ $details['app_name'] }}</b>.
-    The app build process is now in progress, and we are excited to bring your app to life!
+    app, the development of <b>{{ $details['app_name'] }}</b>.
+    The app build process is now in progress and we are excited to bring your app to life!
 </p>
 
 <p style="color: black; text-align: justify">
-    Our fully automated build system is currently working to ensure that every detail of the app
-    aligns with your specifications and meets our high-quality standards.
-    The build process typically takes about 15–30 minutes.
-    You will receive a confirmation email once the process is complete.
+    Our fully automated build system is now working diligently to ensure that every detail of the app is aligned with your specifications and meets our high-quality standards. The build process will take approximately 15-30 minutes. You will receive a confirmation email after the process completes.
 </p>
 
 <p style="color: black; text-align: justify">
