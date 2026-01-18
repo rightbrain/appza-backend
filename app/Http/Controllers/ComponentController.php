@@ -116,7 +116,65 @@ class ComponentController extends Controller
         return redirect()->route('component_edit', $component->id);
     }
 
-    private function AddedComponentStylesWithProperties($styleGroups,$component)
+    private function AddedComponentStylesWithProperties($styleGroups, $component)
+    {
+        // Fetch existing relations in one query
+        $existingStyleGroupIds = ComponentStyleGroup::where('component_id', $component->id)
+            ->whereIn('style_group_id', $styleGroups->pluck('id'))
+            ->pluck('style_group_id')
+            ->toArray();
+
+        $styleGroups->each(function ($group) use ($component, $existingStyleGroupIds) {
+
+            if (in_array($group->id, $existingStyleGroupIds)) {
+                return; // already exists, skip
+            }
+
+            // ✅ Create ComponentStyleGroup
+            ComponentStyleGroup::create([
+                'component_id' => $component->id,
+                'style_group_id' => $group->id,
+            ]);
+
+            // Fetch properties for this style group
+            $properties = StyleGroupProperties::where('appfiy_style_group_properties.style_group_id', $group->id)
+                ->join(
+                    'appfiy_style_properties',
+                    'appfiy_style_properties.id',
+                    '=',
+                    'appfiy_style_group_properties.style_property_id'
+                )
+                ->where('appfiy_style_properties.is_active', 1)
+                ->select([
+                    'appfiy_style_properties.name',
+                    'appfiy_style_properties.input_type',
+                    'appfiy_style_properties.value',
+                    'appfiy_style_properties.default_value',
+                ])
+                ->get();
+
+            // Bulk insert properties
+            $insertData = $properties->map(function ($property) use ($component, $group) {
+                return [
+                    'component_id' => $component->id,
+                    'style_group_id' => $group->id,
+                    'name' => $property->name,
+                    'input_type' => $property->input_type,
+                    'value' => $property->value,
+                    'default_value' => $property->default_value,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
+            })->toArray();
+
+            if (!empty($insertData)) {
+                ComponentStyleGroupProperties::insert($insertData);
+            }
+        });
+    }
+
+
+    private function AddedComponentStylesWithPropertiesbk($styleGroups,$component)
     {
         $styleGroups->each(function ($group) use ($component) {
             $exists = ComponentStyleGroup::where('component_id', $component->id)->where('style_group_id', $group->id)->first();
