@@ -347,41 +347,39 @@
                                                 <br><span class="textRed">{!! $errors->first('style_group') !!}</span>
                                                 @if(sizeof($componentStyleGroup)>0)
                                                     @foreach($componentStyleGroup as $key => $styleGroup)
-                                                        <div class="accordion-item"
-                                                             @if($key!=0) style="margin-top: 10px" @endif>
-                                                            <h2 class="accordion-header" id="headingOne">
-                                                                <button class="accordion-button" type="button"
+                                                        <div class="accordion-item">
+                                                            <h2 class="accordion-header accordion-header-custom" id="headingOne{{$styleGroup['id']}}">
+                                                                <div class="form-check flex-grow-1">
+                                                                    <input class="form-check-input"
+                                                                           name="style_group[]" type="checkbox"
+                                                                           id="{{$styleGroup['style_group']['slug']}}"
+                                                                           value="{{$styleGroup['style_group_id']}}"
+                                                                    @if(count($componentStyleIdArray)>0)
+                                                                        {{in_array($styleGroup['style_group_id'],$componentStyleIdArray)?'checked':''}}
+                                                                        @endif
+                                                                    >
+                                                                    <label class="form-check-label" for="{{$styleGroup['style_group']['slug']}}">
+                                                                        <a data-href="{{route('component_style_group_inline_update')}}"
+                                                                           id="component_style_group_inline_update"></a>
+                                                                        {{
+                                                                            html()->text('value[]', $styleGroup['style_group_label'])
+                                                                            ->class('style-group-input style_group_label_inline_update')
+                                                                            ->attribute('component_style_group', $styleGroup['id']) }}
+                                                                        <span class="style-group-name">{{$styleGroup['style_group']['name']}}</span>
+                                                                    </label>
+                                                                </div>
+                                                                <button class="accordion-toggle-button collapsed flex-shrink-0" type="button"
                                                                         data-bs-toggle="collapse"
                                                                         data-bs-target="#collapseOne{{$styleGroup['id']}}"
-                                                                        aria-expanded="true"
+                                                                        aria-expanded="false"
                                                                         aria-controls="collapseOne{{$styleGroup['id']}}">
-                                                                    <div class="form-check form-check-inline">
-                                                                        <input style="margin-top: 0px"
-                                                                               class="form-check-input"
-                                                                               name="style_group[]" type="checkbox"
-                                                                               id="{{$styleGroup['style_group']['slug']}}"
-                                                                               value="{{$styleGroup['style_group_id']}}"
-                                                                        @if(count($componentStyleIdArray)>0)
-                                                                            {{in_array($styleGroup['style_group_id'],$componentStyleIdArray)?'checked':''}}
-                                                                            @endif
-                                                                        >
-                                                                        <label class="form-check-label" for="{{$styleGroup['style_group']['slug']}}">
-                                                                            <a data-href="{{route('component_style_group_inline_update')}}"
-                                                                               id="component_style_group_inline_update"></a>
-                                                                            {{
-                                                                                html()->text('value[]', $styleGroup['style_group_label'])
-                                                                                ->class('form-control style_group_label_inline_update')
-                                                                                ->attribute('component_style_group', $styleGroup['id']) }}
-                                                                            <span>{{$styleGroup['style_group']['name']}}</span>
-                                                                        </label>
-                                                                    </div>
                                                                 </button>
                                                             </h2>
                                                             <div id="collapseOne{{$styleGroup['id']}}"
                                                                  class="accordion-collapse collapse"
-                                                                 aria-labelledby="headingOne"
+                                                                 aria-labelledby="headingOne{{$styleGroup['id']}}"
                                                                  data-bs-parent="#accordionExample">
-                                                                <div class="accordion-body">
+                                                                <div class="accordion-body accordion-body-custom">
                                                                     @if(sizeof($styleGroup['properties'])>0)
                                                                         <table class="table table-striped">
                                                                             <a data-href="{{route('component_properties_inline_update')}}"
@@ -887,6 +885,130 @@
             display: none;
         }
 
+        /* Professional Accordion Styling */
+        .accordion-item {
+            border: 1px solid #dee2e6;
+            border-radius: 6px !important;
+            overflow: hidden;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            transition: all 0.2s ease-in-out;
+        }
+
+        .accordion-item:hover {
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-color: #ced4da;
+        }
+
+        .accordion-header-custom {
+            display: flex;
+            align-items: center;
+            background-color: #fcfcfc;
+            padding: 0;
+            margin-bottom: 0;
+            transition: background-color 0.2s;
+        }
+
+        .accordion-header-custom:hover {
+            background-color: #f8f9fa;
+        }
+
+        .accordion-header-custom .form-check {
+            padding-left: 2.5rem;
+            margin-bottom: 0;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .accordion-header-custom .form-check-input {
+            margin-top: 0;
+            cursor: pointer;
+            width: 1.2rem;
+            height: 1.2rem;
+        }
+
+        .accordion-header-custom .form-check-label {
+            width: 100%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            margin-left: 10px;
+        }
+
+        .style-group-input {
+            border: 1px solid transparent;
+            background: transparent;
+            font-weight: 500;
+            padding: 2px 8px;
+            border-radius: 4px;
+            transition: all 0.2s;
+            margin-right: 10px;
+            color: #495057;
+            width: 250px;
+        }
+
+        .style-group-input:hover {
+            background: #fff;
+            border-color: #dee2e6;
+        }
+
+        .style-group-input:focus {
+            background: #fff;
+            border-color: #80bdff;
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+        }
+
+        .style-group-name {
+            font-size: 0.85rem;
+            color: #6c757d;
+            background: #e9ecef;
+            padding: 2px 8px;
+            border-radius: 12px;
+        }
+
+        .accordion-toggle-button {
+            width: 50px;
+            height: 54px;
+            background: none;
+            border: none;
+            border-left: 1px solid #eee;
+            color: #adb5bd;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .accordion-toggle-button:hover {
+            background-color: #f1f3f5;
+            color: #495057;
+        }
+
+        .accordion-toggle-button::after {
+            content: '\f078';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            font-size: 0.8rem;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        .accordion-toggle-button:not(.collapsed)::after {
+            transform: rotate(180deg);
+        }
+
+        .accordion-toggle-button:focus {
+            box-shadow: none;
+            outline: none;
+        }
+
+        .accordion-body-custom {
+            padding: 20px;
+            background-color: #fff;
+        }
     </style>
 @endpush
 
@@ -1018,6 +1140,7 @@
             }
 
         });
+
     </script>
 
 @endsection

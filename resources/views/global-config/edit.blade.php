@@ -852,6 +852,36 @@
             display: none;
         }
 
+        /* Professional Accordion Styling */
+        .accordion-item {
+            border: 1px solid #dee2e6;
+            border-radius: 6px !important;
+            overflow: hidden;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            transition: all 0.2s ease-in-out;
+        }
+
+        .accordion-item:hover {
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-color: #ced4da;
+        }
+
+        .accordion-button:not(.collapsed) {
+            background-color: #f8f9fa;
+            color: #495057;
+            box-shadow: none;
+        }
+
+        .accordion-button:focus {
+            box-shadow: none;
+            border-color: rgba(0,0,0,.125);
+        }
+
+        .accordion-body {
+            padding: 20px;
+            background-color: #fff;
+        }
     </style>
 @endpush
 
