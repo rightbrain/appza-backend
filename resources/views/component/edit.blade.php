@@ -365,8 +365,15 @@
                                                                             {{in_array($styleGroup['style_group_id'],$componentStyleIdArray)?'checked':''}}
                                                                             @endif
                                                                         >
-                                                                        <label class="form-check-label"
-                                                                               for="{{$styleGroup['style_group']['slug']}}">{{$styleGroup['style_group']['name']}}</label>
+                                                                        <label class="form-check-label" for="{{$styleGroup['style_group']['slug']}}">
+                                                                            <a data-href="{{route('component_style_group_inline_update')}}"
+                                                                               id="component_style_group_inline_update"></a>
+                                                                            {{
+                                                                                html()->text('value[]', $styleGroup['style_group_label'])
+                                                                                ->class('form-control style_group_label_inline_update')
+                                                                                ->attribute('component_style_group', $styleGroup['id']) }}
+                                                                            <span>{{$styleGroup['style_group']['name']}}</span>
+                                                                        </label>
                                                                     </div>
                                                                 </button>
                                                             </h2>
@@ -945,6 +952,42 @@
                     method: "get",
                     dataType: "json",
                     data: {component_properties_id: component_properties_id, value: value},
+                    beforeSend: function (xhr) {
+
+                    }
+                }).done(function (response) {
+                    console.log(response)
+                    /*if(response.status=='ok') {
+                        isChecked == 1 ? $('.checked_id_' + id).prop('checked', true) : $('.checked_id_' + id).prop('checked', false)
+                    }*/
+                }).fail(function (jqXHR, textStatus) {
+
+                });
+                return false;
+            }else {
+                alert('Field value missing.')
+            }
+            /*let isChecked = 0
+            if($(this).is(':checked')){isChecked = 1}
+            let id = $(this).attr('value')
+            let route = $('#theme_component_update').attr('data-href');
+            */
+        });
+
+
+
+        $(document).delegate('.style_group_label_inline_update', 'blur', function () {
+            let value = $(this).val();
+            let component_style_group = $(this).attr('component_style_group');
+            let route = $('#component_style_group_inline_update').attr('data-href');
+            // console.log(value,component_properties_id,route)
+
+            if(value && component_style_group && route) {
+                $.ajax({
+                    url: route,
+                    method: "get",
+                    dataType: "json",
+                    data: {id: component_style_group, value: value},
                     beforeSend: function (xhr) {
 
                     }

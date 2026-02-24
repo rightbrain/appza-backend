@@ -264,6 +264,7 @@ class GlobalConfigController extends Controller
                 'appfiy_component_style_group_properties.name',
                 'appfiy_component_style_group_properties.input_type',
                 'appfiy_component_style_group_properties.value',
+                'appfiy_component_style_group_properties.style_group_id',
                 'appfiy_style_group.slug',
             ])
             ->where('appfiy_component_style_group_properties.component_id', $componentId)
@@ -274,6 +275,7 @@ class GlobalConfigController extends Controller
 
         $stylesGrouped = [];
         foreach ($styles as $style) {
+            $stylesGrouped[$style->slug]['group_label'] = ComponentStyleGroup::where('style_group_id', $style->style_group_id)->where('component_id', $componentId)->value('style_group_label');
             $stylesGrouped[$style->slug][$style->name] = $style->value;
         }
 

@@ -381,6 +381,7 @@ class ThemeController extends Controller
                                     // Format styles into key-value pairs
                                     $newStyle = [];
                                     foreach ($getComponentsStyle as $sty) {
+                                        $newStyle['group_label'] = ComponentStyleGroup::where('style_group_id', $group->style_group_id)->where('component_id', $component['id'])->value('style_group_label');
                                         $newStyle[$sty->name] = $sty->value;
                                     }
 
@@ -501,6 +502,7 @@ class ThemeController extends Controller
                             $newStyle = [];
                             foreach ($styleGroups as $sty) {
                                 $sty = (array)$sty;
+                                $newStyle[$sty['slug']]['group_label'] = ComponentStyleGroup::where('style_group_id', $sty['style_group_id'])->where('component_id', $pagesComponent['id'])->value('style_group_label');
                                 $newStyle[$sty['slug']][$sty['name']] = $sty['value'];
                             }
 
@@ -672,7 +674,7 @@ class ThemeController extends Controller
         return DB::table('appfiy_component_style_group_properties')
             ->join('appfiy_style_group', 'appfiy_style_group.id', '=', 'appfiy_component_style_group_properties.style_group_id')
             ->select(['appfiy_component_style_group_properties.id', 'appfiy_component_style_group_properties.name',
-                'appfiy_component_style_group_properties.input_type', 'appfiy_component_style_group_properties.value',
+                'appfiy_component_style_group_properties.input_type', 'appfiy_component_style_group_properties.value', 'appfiy_style_group.id as style_group_id',
                 'appfiy_style_group.slug'])
             ->where('appfiy_component_style_group_properties.component_id', $componentId)
             ->whereIn('appfiy_component_style_group_properties.style_group_id', $styleArrayId)

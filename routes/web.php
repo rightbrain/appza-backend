@@ -112,7 +112,10 @@ Route::prefix('/appza')->middleware(['auth'])->group(function() {
         Route::post('store',[ComponentController::class,'store'])->name('component_store');
         Route::get('delete/{id}',[ComponentController::class,'destroy'])->name('component_delete');
         Route::get('edit/{id}',[ComponentController::class, 'edit'])->name('component_edit');
-        Route::get('properties/inline/update',[ComponentController::class, 'componentPropertiesInlineUpdate'])->name('component_properties_inline_update');
+        Route::get('style-group/inline/update',[ComponentController::class, 'componentStyleGroupInlineUpdate'])
+            ->name('component_style_group_inline_update');
+        Route::get('properties/inline/update',[ComponentController::class, 'componentPropertiesInlineUpdate'])
+            ->name('component_properties_inline_update');
         Route::PATCH('update/{id}',[ComponentController::class, 'update'])->name('component_update');
         Route::POST('plugin-slug/update',[ComponentController::class, 'updatePluginSlug'])->name('plugin_slug_update_component');
 

@@ -130,10 +130,13 @@ class ComponentController extends Controller
                 return; // already exists, skip
             }
 
-            // ✅ Create ComponentStyleGroup
+            // Create ComponentStyleGroup
             ComponentStyleGroup::create([
                 'component_id' => $component->id,
                 'style_group_id' => $group->id,
+                'style_group_label' => trim(
+                    str_ireplace('decoration', '', $group->name)
+                ),
             ]);
 
             // Fetch properties for this style group
@@ -169,45 +172,6 @@ class ComponentController extends Controller
 
             if (!empty($insertData)) {
                 ComponentStyleGroupProperties::insert($insertData);
-            }
-        });
-    }
-
-
-    private function AddedComponentStylesWithPropertiesbk($styleGroups,$component)
-    {
-        $styleGroups->each(function ($group) use ($component) {
-            $exists = ComponentStyleGroup::where('component_id', $component->id)->where('style_group_id', $group->id)->first();
-            if (!$exists) {
-                // Create ComponentStyleGroup
-                ComponentStyleGroup::create([
-                    'component_id' => $component->id,
-                    'style_group_id' => $group->id,
-                ]);
-
-                // Fetch properties linked to the style group
-                $properties = StyleGroupProperties::where('appfiy_style_group_properties.style_group_id', $group->id)
-                    ->where('appfiy_style_properties.is_active', 1)
-                    ->join('appfiy_style_properties', 'appfiy_style_properties.id', '=', 'appfiy_style_group_properties.style_property_id')
-                    ->select([
-                        'appfiy_style_properties.name',
-                        'appfiy_style_properties.input_type',
-                        'appfiy_style_properties.value',
-                        'appfiy_style_properties.default_value',
-                    ])
-                    ->get();
-
-                // Create ComponentStyleGroupProperties for each property
-                $properties->each(function ($property) use ($component, $group) {
-                    ComponentStyleGroupProperties::create([
-                        'component_id' => $component->id,
-                        'style_group_id' => $group->id,
-                        'name' => $property->name,
-                        'input_type' => $property->input_type,
-                        'value' => $property->value,
-                        'default_value' => $property->default_value,
-                    ]);
-                });
             }
         });
     }
@@ -579,6 +543,18 @@ class ComponentController extends Controller
         $property = ComponentStyleGroupProperties::findOrFail($componentPropertiesId);
 
         $property->update(['value' => $value]);
+
+        return response()->json(['status' => 'ok'], 200);
+    }
+
+    public function componentStyleGroupInlineUpdate(Request $request)
+    {
+        $id = $request->query('id');
+        $value = $request->query('value');
+
+        $styleGroup = ComponentStyleGroup::findOrFail($id);
+
+        $styleGroup->update(['style_group_label' => $value]);
 
         return response()->json(['status' => 'ok'], 200);
     }

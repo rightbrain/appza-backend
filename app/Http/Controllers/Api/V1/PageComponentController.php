@@ -159,6 +159,7 @@ class PageComponentController extends Controller
                 $newStyle = [];
                 foreach ($componentStyleProperties as $sty) {
                     $sty = (array)$sty;
+                    $newStyle[$sty['slug']]['group_label'] = ComponentStyleGroup::where('style_group_id', $sty['style_group_id'])->where('component_id', $sty['component_id'])->value('style_group_label');
                     $newStyle[$sty['slug']][$sty['name']] = $sty['value'];
                 }
 
