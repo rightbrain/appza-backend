@@ -4,6 +4,7 @@ namespace App\Services;
 use Carbon\Carbon;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
 use Firebase\JWT\JWT;
@@ -63,7 +64,8 @@ class IosBuildValidationService
 
         if ($appName) {
             if ($cert = $this->getDistributionCertificate($token['token'])) {
-                $this->apiRequest('DELETE', "certificates/$cert", $token['token']);
+                $result = $this->apiRequest('DELETE', "certificates/$cert", $token['token']);
+                Log::info($result);
             }
 
             $profileName = "match AppStore " . $findSiteUrl->package_name;
