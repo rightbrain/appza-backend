@@ -64,6 +64,7 @@ class IosBuildValidationService
 
         if ($appName) {
             if ($cert = $this->getDistributionCertificate($token['token'])) {
+                Log::info($cert);
                 $result = $this->apiRequest('DELETE', "certificates/$cert", $token['token']);
                 Log::info($result);
             }
@@ -229,6 +230,7 @@ class IosBuildValidationService
 
             if (count($valid) >= 2) {
                 $random = array_rand($valid);
+                Log::info($valid[$random]['id']);
                 return $valid[$random]['id'];
             }
         }
