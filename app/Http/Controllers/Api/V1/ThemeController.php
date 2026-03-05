@@ -19,7 +19,9 @@ use Symfony\Component\HttpFoundation\Response;
 class ThemeController extends Controller
 {
     protected $authorization;
+
     protected $domain;
+
     protected $pluginName;
 
     public function __construct(Request $request)
@@ -33,12 +35,11 @@ class ThemeController extends Controller
     /**
      * Display a listing of the resource.
      */
-
     public function index(Request $request)
     {
         $isHashAuthorization = config('app.is_hash_authorization');
         // Check if the user is authorized
-        if ($isHashAuthorization && !$this->authorization) {
+        if ($isHashAuthorization && ! $this->authorization) {
             return response()->json([
                 'status' => Response::HTTP_UNAUTHORIZED,
                 'url' => $request->getUri(),
@@ -49,7 +50,7 @@ class ThemeController extends Controller
 
         $plugin_slug = $request->query('plugin_slug');
 
-        if (!$plugin_slug || !is_array($plugin_slug)) {
+        if (! $plugin_slug || ! is_array($plugin_slug)) {
             return response()->json([
                 'status' => Response::HTTP_NOT_FOUND,
                 'url' => $request->getUri(),
@@ -58,12 +59,11 @@ class ThemeController extends Controller
             ], Response::HTTP_NOT_FOUND);
         }
 
-
         try {
             // Fetch active themes with their photo gallery
             $themes = Theme::active()
                 ->whereNull('deleted_at')
-                ->whereIn('plugin_slug', (array)$plugin_slug)
+                ->whereIn('plugin_slug', (array) $plugin_slug)
                 ->with('photoGallery')
                 ->orderBy('sort_order')
                 ->get();
@@ -75,7 +75,7 @@ class ThemeController extends Controller
                     'url' => $request->getUri(),
                     'method' => $request->getMethod(),
                     'message' => 'Data Not Found',
-                    'data' => []
+                    'data' => [],
                 ], Response::HTTP_OK);
             }
 
@@ -99,11 +99,10 @@ class ThemeController extends Controller
         }
     }
 
-
     public function getTheme(Request $request)
     {
         $isHashAuthorization = config('app.is_hash_authorization');
-        if ($isHashAuthorization && !$this->authorization) {
+        if ($isHashAuthorization && ! $this->authorization) {
             $response = new JsonResponse([
                 'status' => Response::HTTP_UNAUTHORIZED,
                 'url' => $request->getUri(),
@@ -111,6 +110,7 @@ class ThemeController extends Controller
                 'message' => 'Unauthorized',
             ], Response::HTTP_UNAUTHORIZED);
             $response->headers->set('Content-Type', 'application/json');
+
             return $response;
         }
         try {
@@ -120,7 +120,7 @@ class ThemeController extends Controller
             ];
 
             foreach ($requiredParams as $param => $message) {
-                if (!$request->query($param)) {
+                if (! $request->query($param)) {
                     return response()->json([
                         'status' => Response::HTTP_BAD_REQUEST,
                         'url' => $request->getUri(),
@@ -135,7 +135,7 @@ class ThemeController extends Controller
 
             $theme = Theme::where('slug', $themeSlug)->where('plugin_slug', $pluginSlug)->first();
 
-            if (!$theme) {
+            if (! $theme) {
                 return response()->json([
                     'status' => Response::HTTP_NOT_FOUND,
                     'url' => $request->getUri(),
@@ -196,7 +196,7 @@ class ThemeController extends Controller
                 ->first();
 
             // Check if the theme data is available
-            if (!$data) {
+            if (! $data) {
                 return response()->json(['error' => 'Theme not found or inactive'], 404);
             }
 
@@ -211,7 +211,7 @@ class ThemeController extends Controller
                 'text_color' => $data->text_color ?? '#000000',
                 'font_size' => $data->font_size ?? 14,
                 'is_transparent_background' => $data->transparent === 'True',
-                'image_url' => $data->image ? rtrim(config('app.image_public_path'), '/') . '/' . $data->image : null,
+                'image_url' => $data->image ? rtrim(config('app.image_public_path'), '/').'/'.$data->image : null,
                 'dashboard_page' => $data->dashboard_page ?? null,
                 'login_page' => $data->login_page ?? null,
                 'login_modal' => $data->login_modal ?? null,
@@ -219,27 +219,228 @@ class ThemeController extends Controller
                 'theme_status' => 'active',
             ];
 
+            // === Pre-fetch all data to avoid N+1 queries ===
+
+            // Cache plugin prefix (called repeatedly with same slug)
+            $pluginPrefix = SupportsPlugin::getPluginPrefix($pluginSlug);
+
+            // 1. Collect global config IDs that have a mode
+            $activeGlobalConfigs = collect($data->globalConfig)->filter(fn ($c) => ! empty($c->mode));
+            $globalConfigIds = $activeGlobalConfigs->pluck('global_config_id')->unique()->values();
+
+            // 2. Batch fetch global config rows and currencies
+            $globalConfigRowMap = collect();
+            $currencyMap = collect();
+
+            if ($globalConfigIds->isNotEmpty()) {
+                $globalConfigRowMap = DB::table('appfiy_global_config')->select([
+                    'text_properties_color', 'id', 'mode', 'name', 'slug', 'selected_color',
+                    'unselected_color', 'background_color', 'layout', 'icon_theme_size',
+                    'icon_theme_color', 'shadow', 'icon', 'automatically_imply_leading',
+                    'center_title', 'flexible_space', 'bottom', 'shape_type',
+                    'shape_border_radius', 'toolbar_opacity', 'actions_icon_theme_color',
+                    'is_transparent_background', 'actions_icon_theme_size', 'title_spacing',
+                    'image', 'icon_properties_size', 'icon_properties_color',
+                    'icon_properties_shape_radius', 'icon_properties_background_color',
+                    'margin_x', 'margin_y', 'padding_x', 'padding_y',
+                    'image_properties_height', 'image_properties_width',
+                    'image_properties_shape_radius', 'image_properties_padding_x',
+                    'image_properties_padding_y', 'image_properties_margin_x',
+                    'image_properties_margin_y', 'icon_properties_padding_x',
+                    'icon_properties_padding_y', 'icon_properties_margin_x',
+                    'icon_properties_margin_y', 'float', 'currency_id',
+                ])->whereIn('id', $globalConfigIds)->get()->keyBy('id');
+
+                $currencyIds = $globalConfigRowMap->pluck('currency_id')->unique()->filter();
+                if ($currencyIds->isNotEmpty()) {
+                    $currencyMap = Currency::whereIn('id', $currencyIds)->get()->keyBy('id');
+                }
+            }
+
+            // 3. Batch fetch all global config components
+            $globalComponentsByConfig = collect();
+            $gcComponentIds = collect();
+
+            if ($globalConfigIds->isNotEmpty()) {
+                $globalComponentsRaw = DB::table('appfiy_global_config_component')
+                    ->join('appfiy_component', 'appfiy_component.id', '=', 'appfiy_global_config_component.component_id')
+                    ->join('appfiy_layout_type', 'appfiy_layout_type.id', '=', 'appfiy_component.layout_type_id')
+                    ->join('appfiy_component_type', 'appfiy_component_type.id', '=', 'appfiy_component.component_type_id')
+                    ->select([
+                        'appfiy_global_config_component.global_config_id',
+                        'appfiy_global_config_component.component_id',
+                        'appfiy_global_config_component.component_position',
+                        'appfiy_component.id',
+                        'appfiy_component.name',
+                        'appfiy_component.slug',
+                        'appfiy_component.label',
+                        'appfiy_component.layout_type_id',
+                        'appfiy_layout_type.slug as layout_type',
+                        'appfiy_component.icon_code',
+                        'appfiy_component.event',
+                        'appfiy_component.scope',
+                        'appfiy_component.is_active',
+                        'appfiy_component.class_type',
+                        'appfiy_component.product_type',
+                        'appfiy_component.web_icon',
+                        'appfiy_component.image',
+                        'appfiy_component.is_multiple',
+                        'appfiy_component.selected_design',
+                        'appfiy_component.details_page',
+                        'appfiy_component.transparent',
+                        'appfiy_component.plugin_slug',
+                        'appfiy_component_type.name as group_name',
+                    ])
+                    ->whereIn('appfiy_global_config_component.global_config_id', $globalConfigIds)
+                    ->where('appfiy_component.plugin_slug', $pluginSlug)
+                    ->whereNull('appfiy_component.deleted_at')
+                    ->get();
+
+                $globalComponentsByConfig = $globalComponentsRaw->groupBy('global_config_id');
+                $gcComponentIds = $globalComponentsRaw->pluck('id')->unique();
+            }
+
+            // 4. Batch fetch all page components
+            $pageIds = collect($data->page)->pluck('id');
+            $pageComponentsByPage = collect();
+            $pgComponentIds = collect();
+
+            if ($pageIds->isNotEmpty()) {
+                $pageComponentsRaw = DB::table('appfiy_theme_component')
+                    ->select([
+                        'appfiy_theme_component.theme_page_id',
+                        'appfiy_theme_component.id as theme_component_id',
+                        'appfiy_component.id',
+                        'appfiy_component.name',
+                        'appfiy_component.web_icon',
+                        'appfiy_component.slug',
+                        'appfiy_component.label',
+                        'appfiy_component.layout_type_id',
+                        'appfiy_layout_type.slug as layout_type',
+                        'appfiy_component.icon_code',
+                        'appfiy_component.event',
+                        'appfiy_component.scope',
+                        'appfiy_component.class_type',
+                        'appfiy_component.is_active',
+                        'appfiy_component.product_type',
+                        'appfiy_component.selected_design',
+                        'appfiy_component.details_page',
+                        'appfiy_component.transparent',
+                        'appfiy_theme_component.display_name',
+                        'appfiy_theme_component.clone_component',
+                        'appfiy_theme_component.selected_id',
+                        'appfiy_theme_component.sort_ordering',
+                        'appfiy_component.image',
+                        'image_url',
+                        'appfiy_component.is_multiple',
+                        'appfiy_component.plugin_slug',
+                        'appfiy_component_type.name as group_name',
+                        'appfiy_component.items',
+                        'appfiy_component.dev_data',
+                        'appfiy_component.filters',
+                        'appfiy_component.pagination',
+                        'appfiy_component.show_no_data_view',
+                    ])
+                    ->join('appfiy_component', 'appfiy_component.id', '=', 'appfiy_theme_component.component_id')
+                    ->join('appfiy_component_type', 'appfiy_component_type.id', '=', 'appfiy_component.component_type_id')
+                    ->join('appfiy_layout_type', 'appfiy_layout_type.id', '=', 'appfiy_component.layout_type_id')
+                    ->where('appfiy_theme_component.theme_id', $themeID)
+                    ->whereIn('appfiy_component.plugin_slug', [$pluginSlug, 'wordpress'])
+                    ->whereIn('appfiy_theme_component.theme_page_id', $pageIds)
+                    ->where('appfiy_theme_component.selected_id', 1)
+                    ->orderBy('sort_ordering')
+                    ->get();
+
+                $pageComponentsByPage = $pageComponentsRaw->groupBy('theme_page_id');
+                $pgComponentIds = $pageComponentsRaw->pluck('id')->unique();
+            }
+
+            // 5. Batch fetch all style data for all component IDs (both sections)
+            $allComponentIds = $gcComponentIds->merge($pgComponentIds)->unique();
+
+            $styleGroupsByComponent = collect();
+            $styleGroupNameMap = collect();
+            $styleGroupLabelMap = collect();
+            $gcStylePropsMap = collect();
+            $pgStylePropsMap = collect();
+
+            if ($allComponentIds->isNotEmpty()) {
+                // Checked style groups for all components
+                $allCheckedStyleGroups = DB::table('appfiy_component_style_group')
+                    ->where('is_checked', 1)
+                    ->whereIn('component_id', $allComponentIds)
+                    ->get();
+
+                $styleGroupsByComponent = $allCheckedStyleGroups->groupBy('component_id');
+                $allCheckedStyleGroupIds = $allCheckedStyleGroups->pluck('style_group_id')->unique();
+
+                if ($allCheckedStyleGroupIds->isNotEmpty()) {
+                    // Style group names/slugs
+                    $styleGroupNameMap = DB::table('appfiy_style_group')
+                        ->whereIn('id', $allCheckedStyleGroupIds)
+                        ->get()
+                        ->keyBy('id');
+
+                    // Style group labels
+                    $styleGroupLabelMap = ComponentStyleGroup::whereIn('component_id', $allComponentIds)
+                        ->whereIn('style_group_id', $allCheckedStyleGroupIds)
+                        ->where('is_checked', 1)
+                        ->get()
+                        ->keyBy(fn ($item) => $item->component_id.'_'.$item->style_group_id);
+                }
+
+                // Global config component style properties (no is_active/deleted_at filter)
+                if ($gcComponentIds->isNotEmpty() && $allCheckedStyleGroupIds->isNotEmpty()) {
+                    $gcProps = DB::table('appfiy_component_style_group_properties')
+                        ->select(['name', 'input_type', 'value', 'default_value', 'component_id', 'style_group_id'])
+                        ->whereIn('component_id', $gcComponentIds)
+                        ->whereIn('style_group_id', $allCheckedStyleGroupIds)
+                        ->get();
+                    $gcStylePropsMap = $gcProps->groupBy(fn ($item) => $item->component_id.'_'.$item->style_group_id);
+                }
+
+                // Page component style properties (with is_active=1, deleted_at IS NULL, joined with style_group for slug)
+                if ($pgComponentIds->isNotEmpty() && $allCheckedStyleGroupIds->isNotEmpty()) {
+                    $pgProps = DB::table('appfiy_component_style_group_properties')
+                        ->join('appfiy_style_group', 'appfiy_style_group.id', '=', 'appfiy_component_style_group_properties.style_group_id')
+                        ->select([
+                            'appfiy_component_style_group_properties.id',
+                            'appfiy_component_style_group_properties.name',
+                            'appfiy_component_style_group_properties.input_type',
+                            'appfiy_component_style_group_properties.value',
+                            'appfiy_style_group.id as style_group_id',
+                            'appfiy_style_group.slug',
+                            'appfiy_component_style_group_properties.component_id',
+                        ])
+                        ->whereIn('appfiy_component_style_group_properties.component_id', $pgComponentIds)
+                        ->whereIn('appfiy_component_style_group_properties.style_group_id', $allCheckedStyleGroupIds)
+                        ->where('appfiy_component_style_group_properties.is_active', 1)
+                        ->whereNull('appfiy_component_style_group_properties.deleted_at')
+                        ->get();
+                    $pgStylePropsMap = $pgProps->groupBy('component_id');
+                }
+            }
+
+            // === Process global config using pre-fetched data ===
 
             $globalConfigData = [];
 
             if (count($data['globalConfig']) > 0) {
 
                 foreach ($data['globalConfig'] as $config) {
-                    if (!empty($config['mode'] ?? null)) {
+                    if (! empty($config['mode'] ?? null)) {
 
-                        $configData = DB::table('appfiy_global_config')->select([
-                            'text_properties_color', 'id', 'mode', 'name', 'slug', 'selected_color', 'unselected_color', 'background_color', 'layout', 'icon_theme_size', 'icon_theme_color', 'shadow', 'icon', 'automatically_imply_leading', 'center_title', 'flexible_space', 'bottom', 'shape_type', 'shape_border_radius', 'toolbar_opacity', 'actions_icon_theme_color', 'is_transparent_background', 'actions_icon_theme_size', 'title_spacing', 'image', 'icon_properties_size', 'icon_properties_color', 'icon_properties_shape_radius', 'icon_properties_background_color', 'margin_x', 'margin_y', 'padding_x', 'padding_y', 'image_properties_height', 'image_properties_width', 'image_properties_shape_radius', 'image_properties_padding_x', 'image_properties_padding_y', 'image_properties_margin_x', 'image_properties_margin_y', 'icon_properties_padding_x', 'icon_properties_padding_y', 'icon_properties_margin_x', 'icon_properties_margin_y', 'float', 'currency_id'
-                        ])->find($config['global_config_id']);
+                        $configData = $globalConfigRowMap->get($config['global_config_id']);
 
-                        $getCurrency = Currency::find($configData->currency_id);
+                        $getCurrency = $currencyMap->get($configData->currency_id);
 
                         $dataArray = [];
-                        if (isset($configData) && !empty($configData)) {
+                        if (isset($configData) && ! empty($configData)) {
                             $finalCon = [
                                 'mode' => $configData->mode,
                                 'name' => $configData->name,
                                 'slug' => $configData->slug,
-                                'image_url' => $configData->image ? config('app.image_public_path') . $configData->image : null,
+                                'image_url' => $configData->image ? config('app.image_public_path').$configData->image : null,
                                 'is_active' => 'yes',
                                 'properties' => [
                                     'selected_color' => $configData->selected_color,
@@ -266,7 +467,7 @@ class ThemeController extends Controller
                                         'padding_y' => $configData->padding_y,
                                         'shadow' => $configData->shadow,
                                         'border_color' => $configData->background_color,
-                                        'border_width' => "0",
+                                        'border_width' => '0',
                                         'shape_radius' => $configData->shape_border_radius,
                                         'background_color' => $configData->background_color,
                                         'float' => $configData->float == 1,
@@ -278,14 +479,14 @@ class ThemeController extends Controller
                                     'text_properties' => [
                                         'color' => $configData->text_properties_color,
                                         'font_style' => 'normal',
-                                        'font_weight' => "700",
+                                        'font_weight' => '700',
                                         'text' => null,
                                         'text_decoration' => 'none',
                                     ],
                                     'icon_properties' => [
                                         'size' => number_format($configData->icon_properties_size, 1),
                                         'color' => $configData->icon_properties_color,
-                                        'weight' => "2.0",
+                                        'weight' => '2.0',
                                         'shape_radius' => $configData->icon_properties_shape_radius,
                                         'background_color' => $configData->icon_properties_background_color,
                                         'is_transparent_background' => $configData->is_transparent_background == 1,
@@ -313,83 +514,43 @@ class ThemeController extends Controller
                             $finalCon['styles'] = $finalCon['properties'];
                             $finalCon['customize_styles'] = $finalCon['properties'];
 
-                            // get global config component
-                            $getComponents = DB::table('appfiy_global_config_component')
-                                ->join('appfiy_component', 'appfiy_component.id', '=', 'appfiy_global_config_component.component_id')
-                                ->select(['appfiy_global_config_component.component_id', 'appfiy_global_config_component.component_position',
-                                    'appfiy_component.id',
-                                    'appfiy_component.name',
-                                    'appfiy_component.slug',
-                                    'appfiy_component.label',
-                                    'appfiy_component.layout_type_id',
-                                    'appfiy_layout_type.slug as layout_type',
-                                    'appfiy_component.icon_code',
-                                    'appfiy_component.event',
-                                    'appfiy_component.scope',
-                                    'appfiy_component.is_active',
-                                    'appfiy_component.class_type',
-                                    'appfiy_component.product_type',
-                                    'appfiy_component.web_icon',
-                                    'appfiy_component.image',
-                                    'appfiy_component.is_multiple',
-                                    'appfiy_component.selected_design',
-                                    'appfiy_component.details_page',
-                                    'appfiy_component.transparent',
-                                    'appfiy_component.plugin_slug',
-                                    'appfiy_component_type.name as group_name',
-                                ])
-                                ->join('appfiy_layout_type', 'appfiy_layout_type.id', '=', 'appfiy_component.layout_type_id')
-                                ->join('appfiy_component_type', 'appfiy_component_type.id', '=', 'appfiy_component.component_type_id')
-                                ->where('appfiy_global_config_component.global_config_id', $configData->id)
-                                ->where('appfiy_component.plugin_slug', $pluginSlug)
-                                ->whereNull('appfiy_component.deleted_at');
+                            // Get pre-fetched components for this config
+                            $getComponents = $globalComponentsByConfig->get($configData->id, collect());
 
+                            // Sort based on mode
                             if ($configData->mode === 'navbar') {
-                                $getComponents = $getComponents->orderBy('appfiy_global_config_component.component_position', 'asc');
+                                $getComponents = $getComponents->sortBy('component_position')->values();
                             }
-
                             if ($configData->mode === 'drawer') {
-                                $getComponents = $getComponents->orderByRaw('CAST(appfiy_global_config_component.component_position AS UNSIGNED) ASC');
+                                $getComponents = $getComponents->sortBy(fn ($c) => (int) $c->component_position)->values();
                             }
-
-                            $getComponents = $getComponents->get()->toArray();
 
                             $componentWithStyle = [];
                             foreach ($getComponents as $component) {
-                                $component = (array)$component;
+                                $component = (array) $component;
 
-                                // Fetch component style groups
-                                $styleGroups = DB::table('appfiy_component_style_group')
-                                    ->where('component_id', $component['id'])
-                                    ->where('is_checked', 1)
-                                    ->get();
-
-                                // Initialize final style array
+                                // Build styles from pre-fetched data
+                                $componentStyleGroups = $styleGroupsByComponent->get($component['id'], collect());
                                 $finalNewStyle = [];
 
-                                foreach ($styleGroups as $group) {
-                                    // Get style group details
-                                    $groupName = DB::table('appfiy_style_group')->find($group->style_group_id);
+                                foreach ($componentStyleGroups as $group) {
+                                    $groupName = $styleGroupNameMap->get($group->style_group_id);
 
-                                    // Get component styles for this group
-                                    $getComponentsStyle = DB::table('appfiy_component_style_group_properties')
-                                        ->select(['name', 'input_type', 'value', 'default_value'])
-                                        ->where('component_id', $component['id'])
-                                        ->where('style_group_id', $group->style_group_id)
-                                        ->get();
+                                    $propsKey = $component['id'].'_'.$group->style_group_id;
+                                    $getComponentsStyle = $gcStylePropsMap->get($propsKey, collect());
 
-                                    // Format styles into key-value pairs
+                                    $labelKey = $component['id'].'_'.$group->style_group_id;
+                                    $labelRecord = $styleGroupLabelMap->get($labelKey);
+
                                     $newStyle = [];
                                     foreach ($getComponentsStyle as $sty) {
-                                        $newStyle['group_label'] = ComponentStyleGroup::where('style_group_id', $group->style_group_id)->where('component_id', $component['id'])->value('style_group_label');
+                                        $newStyle['group_label'] = $labelRecord->style_group_label ?? null;
                                         $newStyle[$sty->name] = $sty->value;
                                     }
 
-                                    // Add the styles to finalNewStyle, grouping by style group slug
                                     $finalNewStyle[$groupName->slug] = $newStyle;
                                 }
 
-                                $getPluginPrefix = SupportsPlugin::getPluginPrefix($pluginSlug);
                                 // Define common properties in an array
                                 $commonProperties = [
                                     'label' => $component['label'],
@@ -398,7 +559,7 @@ class ThemeController extends Controller
                                     'icon_code' => $component['icon_code'],
                                     'event' => $component['event'],
                                     'scope' => json_decode($component['scope']),
-                                    'class_type' => $component['product_type'] ? $getPluginPrefix . $component['product_type'] : null,
+                                    'class_type' => $component['product_type'] ? $pluginPrefix.$component['product_type'] : null,
                                     'web_icon' => $component['web_icon'],
                                     'is_multiple' => $component['is_multiple'],
                                     'selected_design' => $component['selected_design'],
@@ -413,12 +574,12 @@ class ThemeController extends Controller
                                     'slug' => $component['slug'],
                                     'support_extension' => $component['plugin_slug'],
                                     'corresponding_page_slug' => $component['slug'],
-                                    'image_url' => config('app.image_public_path') . $component['image'],
+                                    'image_url' => config('app.image_public_path').$component['image'],
                                     'is_active' => 'true',
                                     'properties' => $commonProperties,
                                     'customize_properties' => $commonProperties, // Reuse common properties
-                                    'styles' => $finalNewStyle ?: new stdClass(),
-                                    'customize_styles' => $finalNewStyle ?: new stdClass(),
+                                    'styles' => $finalNewStyle ?: new stdClass,
+                                    'customize_styles' => $finalNewStyle ?: new stdClass,
                                 ];
 
                                 // Special handling for 'Category' or 'CategoryProduct' product type
@@ -444,73 +605,40 @@ class ThemeController extends Controller
                 }
             }
 
+            // === Process pages using pre-fetched data ===
+
             $pages = [];
             if (count($data['page']) > 0) {
                 foreach ($data['page'] as $page) {
-                    $getPagesComponents = DB::table('appfiy_theme_component')
-                        ->select([
-                            'appfiy_theme_component.id as theme_component_id',
-                            'appfiy_component.id',
-                            'appfiy_component.name',
-                            'appfiy_component.web_icon',
-                            'appfiy_component.slug',
-                            'appfiy_component.label',
-                            'appfiy_component.layout_type_id',
-                            'appfiy_layout_type.slug as layout_type',
-                            'appfiy_component.icon_code',
-                            'appfiy_component.event',
-                            'appfiy_component.scope',
-                            'appfiy_component.class_type',
-                            'appfiy_component.is_active',
-                            'appfiy_component.product_type',
-                            'appfiy_component.selected_design',
-                            'appfiy_component.details_page',
-                            'appfiy_component.transparent',
-                            'appfiy_theme_component.display_name',
-                            'appfiy_theme_component.clone_component',
-                            'appfiy_theme_component.selected_id',
-                            'appfiy_theme_component.sort_ordering',
-                            'appfiy_component.image',
-                            'image_url',
-                            'appfiy_component.is_multiple',
-                            'appfiy_component.plugin_slug',
-                            'appfiy_component_type.name as group_name',
-                            'appfiy_component.items',
-                            'appfiy_component.dev_data',
-                            'appfiy_component.filters',
-                            'appfiy_component.pagination',
-                            'appfiy_component.show_no_data_view'
-                        ])
-                        ->join('appfiy_component', 'appfiy_component.id', '=', 'appfiy_theme_component.component_id')
-                        ->join('appfiy_component_type', 'appfiy_component_type.id', '=', 'appfiy_component.component_type_id')
-                        ->join('appfiy_layout_type', 'appfiy_layout_type.id', '=', 'appfiy_component.layout_type_id')
-                        ->where('appfiy_theme_component.theme_id', $themeID)
-                        ->whereIn('appfiy_component.plugin_slug', [$pluginSlug, 'wordpress'])
-                        ->where('appfiy_theme_component.theme_page_id', $page['id'])
-                        ->where('appfiy_theme_component.selected_id', 1)
-                        ->orderBy('sort_ordering')
-                        ->get()->toArray();
+                    $getPagesComponents = $pageComponentsByPage->get($page['id'], collect())->toArray();
 
                     // Fetch the components and build them
                     $final = [];
                     if (count($getPagesComponents) > 0) {
                         foreach ($getPagesComponents as $pagesComponent) {
-                            $pagesComponent = (array)$pagesComponent;
+                            $pagesComponent = (array) $pagesComponent;
 
-                            // Fetch active styles for the component
-                            $styleGroups = $this->getPageComponentStyles($pagesComponent['id']);
+                            // Build styles from pre-fetched data
+                            $componentCheckedGroups = $styleGroupsByComponent->get($pagesComponent['id'], collect());
+                            $checkedGroupIds = $componentCheckedGroups->pluck('style_group_id')->unique();
+
+                            $componentStyleRows = $pgStylePropsMap->get($pagesComponent['id'], collect())
+                                ->whereIn('style_group_id', $checkedGroupIds);
+
                             $newStyle = [];
-                            foreach ($styleGroups as $sty) {
-                                $sty = (array)$sty;
-                                $newStyle[$sty['slug']]['group_label'] = ComponentStyleGroup::where('style_group_id', $sty['style_group_id'])->where('component_id', $pagesComponent['id'])->value('style_group_label');
+                            foreach ($componentStyleRows as $sty) {
+                                $sty = (array) $sty;
+                                $labelKey = $pagesComponent['id'].'_'.$sty['style_group_id'];
+                                $labelRecord = $styleGroupLabelMap->get($labelKey);
+                                $newStyle[$sty['slug']]['group_label'] = $labelRecord->style_group_label ?? null;
                                 $newStyle[$sty['slug']][$sty['name']] = $sty['value'];
                             }
 
                             // Build component structure
-                            $componentGeneral = $this->buildPageComponentStructure($pagesComponent, $newStyle, $pluginSlug);
+                            $componentGeneral = $this->buildPageComponentStructure($pagesComponent, $newStyle, $pluginSlug, $pluginPrefix);
 
                             if ($pagesComponent['layout_type'] == 'ListViewVertical') {
-                                /*IF EMPTY OBJECT NOT REPLACE TO ARRAY & SAME OBJECT SEND API FROM DB BY REQ BY SAIFUL START*/
+                                /* IF EMPTY OBJECT NOT REPLACE TO ARRAY & SAME OBJECT SEND API FROM DB BY REQ BY SAIFUL START */
                                 foreach (['items', 'dev_data', 'filters', 'pagination'] as $key) {
                                     if (empty($pagesComponent[$key])) {
                                         continue;
@@ -541,10 +669,9 @@ class ThemeController extends Controller
                                         $componentGeneral['customize_properties'][$key] = $decoded;
                                     }
                                 }
-                                /*IF EMPTY OBJECT NOT REPLACE TO ARRAY & SAME OBJECT SEND API FROM DB BY REQ BY SAIFUL END*/
+                                /* IF EMPTY OBJECT NOT REPLACE TO ARRAY & SAME OBJECT SEND API FROM DB BY REQ BY SAIFUL END */
 
-
-                                /*IF EMPTY OBJECT REPLACE TO NULL BY REQ BY SOHEL VI START*/
+                                /* IF EMPTY OBJECT REPLACE TO NULL BY REQ BY SOHEL VI START */
                                 /*$replaceEmptyObjectsWithNull = function (mixed $data) use (&$replaceEmptyObjectsWithNull): mixed {
                                     if ($data instanceof stdClass) {
                                         $vars = get_object_vars($data);
@@ -604,7 +731,7 @@ class ThemeController extends Controller
                                         $componentGeneral['customize_properties'][$key] = $decoded;
                                     }
                                 }*/
-                                /*IF EMPTY OBJECT REPLACE TO NULL BY REQ BY SOHEL VI END*/
+                                /* IF EMPTY OBJECT REPLACE TO NULL BY REQ BY SOHEL VI END */
 
                             }
 
@@ -618,7 +745,7 @@ class ThemeController extends Controller
                         'static_screen_message' => $page->static_screen_message,
                     ];
 
-                    if ($page->screen_status === 'dynamic'){
+                    if ($page->screen_status === 'dynamic') {
                         $pageProperties['page_decoration'] = [
                             'background_color' => $page->background_color,
                             'border_color' => $page->border_color,
@@ -630,16 +757,16 @@ class ThemeController extends Controller
                         'name' => $page->name,
                         'slug' => $page->slug,
                         'component_limit' => $page->component_limit > 0 ? $page->component_limit : null,
-                        'persistent_footer_buttons' => isset($page->persistent_footer_buttons) ? (string)$page->persistent_footer_buttons : null,
+                        'persistent_footer_buttons' => isset($page->persistent_footer_buttons) ? (string) $page->persistent_footer_buttons : null,
                         'properties' => $pageProperties,
                         'customize_properties' => $pageProperties,
-                        'components' => $final
+                        'components' => $final,
                     ];
                 }
             }
             $themeData['pages'] = $pages;
 
-            if (isset($data) && !empty($data)) {
+            if (isset($data) && ! empty($data)) {
                 $response = new JsonResponse([
                     'status' => Response::HTTP_OK,
                     'url' => $request->getUri(),
@@ -649,6 +776,7 @@ class ThemeController extends Controller
                 ], Response::HTTP_OK);
                 $response->setEncodingOptions(JSON_UNESCAPED_SLASHES);
                 $response->headers->set('Content-Type', 'application/json');
+
                 return $response;
             }
             $response = new JsonResponse([
@@ -658,41 +786,22 @@ class ThemeController extends Controller
                 'message' => 'Data Not Found',
             ], Response::HTTP_NOT_FOUND);
             $response->headers->set('Content-Type', 'application/json');
+
             return $response;
         } catch (Exception $ex) {
             return \response([
-                'message' => $ex->getMessage()
+                'message' => $ex->getMessage(),
             ]);
         }
     }
 
-    // Function to fetch styles for the component
-    function getPageComponentStyles($componentId)
+    /**
+     * Build component general properties for page components.
+     */
+    private function buildPageComponentGeneralProperties(array $pagesComponent, string $pluginSlug, string $pluginPrefix): array
     {
-        $styleArrayId = ComponentStyleGroup::where([['component_id', $componentId], ['is_checked', true]])->pluck('style_group_id');
-
-        return DB::table('appfiy_component_style_group_properties')
-            ->join('appfiy_style_group', 'appfiy_style_group.id', '=', 'appfiy_component_style_group_properties.style_group_id')
-            ->select(['appfiy_component_style_group_properties.id', 'appfiy_component_style_group_properties.name',
-                'appfiy_component_style_group_properties.input_type', 'appfiy_component_style_group_properties.value', 'appfiy_style_group.id as style_group_id',
-                'appfiy_style_group.slug'])
-            ->where('appfiy_component_style_group_properties.component_id', $componentId)
-            ->whereIn('appfiy_component_style_group_properties.style_group_id', $styleArrayId)
-            ->where('appfiy_component_style_group_properties.is_active', 1)
-            ->whereNull('appfiy_component_style_group_properties.deleted_at')
-            ->get();
-    }
-
-    // Function to build component general properties
-    private function buildPageComponentGeneralProperties($pagesComponent, $pluginSlug)
-    {
-        $getPluginPrefix = SupportsPlugin::getPluginPrefix($pluginSlug);
         $componentPluginSlug = $pagesComponent['plugin_slug'];
-        /*if ($componentPluginSlug=='wordpress'){
-            $classType = 'WPCore_'.$pagesComponent['product_type'];
-        }else{*/
-        $classType = $getPluginPrefix . $pagesComponent['product_type'];
-//        }
+        $classType = $pluginPrefix.$pagesComponent['product_type'];
 
         $componentProperties = [
             'label' => $pagesComponent['label'],
@@ -719,48 +828,51 @@ class ThemeController extends Controller
         }
 
         // Handle special case for BannerSliderHorizontal layout
-        if ('BannerSliderHorizontal' === $pagesComponent['layout_type']) {
+        if ($pagesComponent['layout_type'] === 'BannerSliderHorizontal') {
             $staticProterties = [
                 [
-                    "name" => "Banner 1",
-                    "image" => $pagesComponent['image'] ? config('app.image_public_path') . $pagesComponent['image'] : null,
-                    "category" => null,
-                    "button_text" => "Sale2",
-                    "button_color" => "#ffffff"
+                    'name' => 'Banner 1',
+                    'image' => $pagesComponent['image'] ? config('app.image_public_path').$pagesComponent['image'] : null,
+                    'category' => null,
+                    'button_text' => 'Sale2',
+                    'button_color' => '#ffffff',
                 ],
                 [
-                    "name" => "Banner 2",
-                    "image" => $pagesComponent['image'] ? config('app.image_public_path') . $pagesComponent['image'] : null,
-                    "category" => null,
-                    "button_text" => "Sale2",
-                    "button_color" => "#ffffff"
-                ]
+                    'name' => 'Banner 2',
+                    'image' => $pagesComponent['image'] ? config('app.image_public_path').$pagesComponent['image'] : null,
+                    'category' => null,
+                    'button_text' => 'Sale2',
+                    'button_color' => '#ffffff',
+                ],
             ];
             $componentProperties['items'] = $staticProterties;
         }
 
         if ($pagesComponent['layout_type'] == 'ListViewVertical' || $pagesComponent['layout_type'] == 'ListViewHorizontal' || $pagesComponent['layout_type'] == 'ListViewGrid') {
-            $componentProperties['show_no_data_view'] = $pagesComponent['show_no_data_view']== 1 ? true : false ;
+            $componentProperties['show_no_data_view'] = $pagesComponent['show_no_data_view'] == 1 ? true : false;
         }
 
         return $componentProperties;
     }
 
-    // Function to build component structure
-    private function buildPageComponentStructure($pagesComponent, $newStyle, $pluginSlug)
+    /**
+     * Build component structure for page components.
+     */
+    private function buildPageComponentStructure(array $pagesComponent, array $newStyle, string $pluginSlug, string $pluginPrefix): array
     {
+        $componentProperties = $this->buildPageComponentGeneralProperties($pagesComponent, $pluginSlug, $pluginPrefix);
+
         return [
             'name' => $pagesComponent['name'],
             'slug' => $pagesComponent['slug'],
             'support_extension' => $pagesComponent['plugin_slug'],
-            'component_image' => $pagesComponent['image'] ? config('app.image_public_path') . $pagesComponent['image'] : null,
-            'image_url' => $pagesComponent['image_url'] ? config('app.image_public_path') . $pagesComponent['image_url'] : null,
+            'component_image' => $pagesComponent['image'] ? config('app.image_public_path').$pagesComponent['image'] : null,
+            'image_url' => $pagesComponent['image_url'] ? config('app.image_public_path').$pagesComponent['image_url'] : null,
             'is_active' => $pagesComponent['is_active'] == 1,
-            'properties' => $this->buildPageComponentGeneralProperties($pagesComponent, $pluginSlug),
-            'customize_properties' => $this->buildPageComponentGeneralProperties($pagesComponent, $pluginSlug),
+            'properties' => $componentProperties,
+            'customize_properties' => $componentProperties,
             'styles' => $newStyle,
             'customize_styles' => $newStyle,
         ];
     }
-
 }

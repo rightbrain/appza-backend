@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ThemeResource;
+use App\Models\ComponentStyleGroup;
 use App\Models\Currency;
 use App\Models\Lead;
 use App\Models\SupportsPlugin;
@@ -113,7 +114,21 @@ class ThemeControllerBk extends Controller
             return $response;
         }
         try {
+            $requiredParams = [
+                'slug' => 'Theme slug is required',
+                'plugin_slug' => 'Plugin slug is required',
+            ];
 
+            foreach ($requiredParams as $param => $message) {
+                if (!$request->query($param)) {
+                    return response()->json([
+                        'status' => Response::HTTP_BAD_REQUEST,
+                        'url' => $request->getUri(),
+                        'method' => $request->getMethod(),
+                        'message' => $message,
+                    ], Response::HTTP_BAD_REQUEST);
+                }
+            }
 
             $themeSlug = $request->query('slug');
             $pluginSlug = $request->query('plugin_slug');
@@ -366,6 +381,7 @@ class ThemeControllerBk extends Controller
                                     // Format styles into key-value pairs
                                     $newStyle = [];
                                     foreach ($getComponentsStyle as $sty) {
+                                        $newStyle['group_label'] = ComponentStyleGroup::where('style_group_id', $group->style_group_id)->where('component_id', $component['id'])->value('style_group_label');
                                         $newStyle[$sty->name] = $sty->value;
                                     }
 
@@ -470,74 +486,37 @@ class ThemeControllerBk extends Controller
                         ->join('appfiy_layout_type', 'appfiy_layout_type.id', '=', 'appfiy_component.layout_type_id')
                         ->where('appfiy_theme_component.theme_id', $themeID)
                         ->whereIn('appfiy_component.plugin_slug', [$pluginSlug, 'wordpress'])
-                        ->where('appfiy_theme_component.theme_page_id', $page->id)
+                        ->where('appfiy_theme_component.theme_page_id', $page['id'])
                         ->where('appfiy_theme_component.selected_id', 1)
                         ->orderBy('sort_ordering')
-                        ->get();
+                        ->get()->toArray();
 
                     // Fetch the components and build them
                     $final = [];
                     if (count($getPagesComponents) > 0) {
-
-                        $componentIds = $getPagesComponents->pluck('id')->toArray();
-
-                        /**
-                         * 1️⃣ Get checked style groups
-                         */
-                        $checkedStyleGroups = DB::table('appfiy_component_style_group')
-                            ->whereIn('component_id', $componentIds)
-                            ->where('is_checked', 1)
-                            ->pluck('style_group_id', 'component_id');
-                        /**
-                         * 2️⃣ Get style properties
-                         */
-                        $styles = DB::table('appfiy_component_style_group_properties')
-                            ->join(
-                                'appfiy_style_group',
-                                'appfiy_style_group.id',
-                                '=',
-                                'appfiy_component_style_group_properties.style_group_id'
-                            )
-                            ->select(
-                                'appfiy_component_style_group_properties.component_id',
-                                'appfiy_component_style_group_properties.name',
-                                'appfiy_component_style_group_properties.value',
-                                'appfiy_style_group.slug'
-                            )
-                            ->whereIn('appfiy_component_style_group_properties.component_id', $componentIds)
-//                            ->whereIn('appfiy_component_style_group_properties.style_group_id', $checkedStyleGroups)
-                            ->where('appfiy_component_style_group_properties.is_active', 1)
-                            ->whereNull('appfiy_component_style_group_properties.deleted_at')
-                            ->get()
-                            ->groupBy('component_id');
-
-
-                        $final = [];
-
                         foreach ($getPagesComponents as $pagesComponent) {
+                            $pagesComponent = (array)$pagesComponent;
 
+                            // Fetch active styles for the component
+                            $styleGroups = $this->getPageComponentStyles($pagesComponent['id']);
                             $newStyle = [];
-
-                            if (isset($styles[$pagesComponent->id])) {
-                                foreach ($styles[$pagesComponent->id] as $sty) {
-                                    $newStyle[$sty->slug][$sty->name] = $sty->value;
-                                }
+                            foreach ($styleGroups as $sty) {
+                                $sty = (array)$sty;
+                                $newStyle[$sty['slug']]['group_label'] = ComponentStyleGroup::where('style_group_id', $sty['style_group_id'])->where('component_id', $pagesComponent['id'])->value('style_group_label');
+                                $newStyle[$sty['slug']][$sty['name']] = $sty['value'];
                             }
 
-                            $componentGeneral = $this->buildPageComponentStructure(
-                                (array)$pagesComponent,
-                                $newStyle ?: new stdClass(),
-                                $pluginSlug
-                            );
+                            // Build component structure
+                            $componentGeneral = $this->buildPageComponentStructure($pagesComponent, $newStyle, $pluginSlug);
 
-                            if ($pagesComponent->layout_type == 'ListViewVertical') {
+                            if ($pagesComponent['layout_type'] == 'ListViewVertical') {
                                 /*IF EMPTY OBJECT NOT REPLACE TO ARRAY & SAME OBJECT SEND API FROM DB BY REQ BY SAIFUL START*/
                                 foreach (['items', 'dev_data', 'filters', 'pagination'] as $key) {
-                                    if (empty($pagesComponent->$key)) {
+                                    if (empty($pagesComponent[$key])) {
                                         continue;
                                     }
 
-                                    $decoded = $pagesComponent->$key;
+                                    $decoded = $pagesComponent[$key];
 
                                     if (is_string($decoded)) {
                                         $first = json_decode($decoded, false); // 🧠 decode as object
@@ -629,10 +608,8 @@ class ThemeControllerBk extends Controller
 
                             }
 
-
                             $final[] = $componentGeneral;
                         }
-
                     }
 
                     $pageProperties = [
@@ -688,6 +665,24 @@ class ThemeControllerBk extends Controller
             ]);
         }
     }
+
+    // Function to fetch styles for the component
+    function getPageComponentStyles($componentId)
+    {
+        $styleArrayId = ComponentStyleGroup::where([['component_id', $componentId], ['is_checked', true]])->pluck('style_group_id');
+
+        return DB::table('appfiy_component_style_group_properties')
+            ->join('appfiy_style_group', 'appfiy_style_group.id', '=', 'appfiy_component_style_group_properties.style_group_id')
+            ->select(['appfiy_component_style_group_properties.id', 'appfiy_component_style_group_properties.name',
+                'appfiy_component_style_group_properties.input_type', 'appfiy_component_style_group_properties.value', 'appfiy_style_group.id as style_group_id',
+                'appfiy_style_group.slug'])
+            ->where('appfiy_component_style_group_properties.component_id', $componentId)
+            ->whereIn('appfiy_component_style_group_properties.style_group_id', $styleArrayId)
+            ->where('appfiy_component_style_group_properties.is_active', 1)
+            ->whereNull('appfiy_component_style_group_properties.deleted_at')
+            ->get();
+    }
+
     // Function to build component general properties
     private function buildPageComponentGeneralProperties($pagesComponent, $pluginSlug)
     {
