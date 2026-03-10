@@ -46,7 +46,6 @@ Route::get('reset-password/{token}', [ResetPasswordController::class, 'showReset
 // Handle reset form submission
 Route::post('reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
 
-
 Route::get('/', function () {
     return view('welcome');
 });
@@ -55,11 +54,10 @@ Route::get('/api', function () {
     return view('welcome');
 });
 
-//Auth::routes();
+// Auth::routes();
 Auth::routes([
     'register' => false,
 ]);
-
 
 Route::prefix('admin')
     ->middleware(['auth']) // Example: Apply authentication and admin-specific middleware
@@ -71,8 +69,7 @@ Route::prefix('admin')
 Route::post('/build-orders/{id}/delete-dir', [BuildOrderController::class, 'deleteBuildDir'])
     ->name('build_orders.delete_dir');
 
-
-Route::prefix('/appza')->middleware(['auth'])->group(function() {
+Route::prefix('/appza')->middleware(['auth'])->group(function () {
     // for download test
     Route::get('download/apk', [\App\Http\Controllers\Api\V1\ApkBuildHistoryController::class, 'downloadApk'])->name('download_apk');
     /* layout type route start */
@@ -89,36 +86,34 @@ Route::prefix('/appza')->middleware(['auth'])->group(function() {
         Route::get('edit/{id}', [StyleGroupController::class, 'edit'])->name('style_group_edit');
         Route::patch('update/{id}', [StyleGroupController::class, 'update'])->name('style_group_update');
         Route::get('assign/properties/{id}', [StyleGroupController::class, 'assignProperties'])->name('style_group_assign_properties');
-        Route::PATCH('properties/update/{id}',[StyleGroupController::class,'assignPropertiesUpdate'])->name('style_group_properties_update');
+        Route::PATCH('properties/update/{id}', [StyleGroupController::class, 'assignPropertiesUpdate'])->name('style_group_properties_update');
     });
     /* style group route start */
 
     /* component group route start */
     Route::prefix('component-group')->group(function () {
         Route::get('list', [ComponentGroupController::class, 'index'])->name('component_group_list');
-        Route::get('create',[ComponentGroupController::class,'create'])->name('component_group_add');
-        Route::POST('add',[ComponentGroupController::class,'store'])->name('component_group_create');
-        Route::get('edit/{id}',[ComponentGroupController::class, 'edit'])->name('component_group_edit');
-        Route::PATCH('update/{id}',[ComponentGroupController::class, 'update'])->name('component_group_update');
-        Route::get('delete/{id}',[ComponentGroupController::class,'destroy'])->name('component_group_delete');
+        Route::get('create', [ComponentGroupController::class, 'create'])->name('component_group_add');
+        Route::POST('add', [ComponentGroupController::class, 'store'])->name('component_group_create');
+        Route::get('edit/{id}', [ComponentGroupController::class, 'edit'])->name('component_group_edit');
+        Route::PATCH('update/{id}', [ComponentGroupController::class, 'update'])->name('component_group_update');
+        Route::get('delete/{id}', [ComponentGroupController::class, 'destroy'])->name('component_group_delete');
     });
     /* component group route end */
 
-
     /* component route start */
     Route::prefix('component')->group(function () {
-        Route::get('list',[ComponentController::class,'index'])->name('component_list');
-        Route::get('create',[ComponentController::class,'create'])->name('component_add');
-        Route::post('store',[ComponentController::class,'store'])->name('component_store');
-        Route::get('delete/{id}',[ComponentController::class,'destroy'])->name('component_delete');
-        Route::get('edit/{id}',[ComponentController::class, 'edit'])->name('component_edit');
-        Route::get('style-group/inline/update',[ComponentController::class, 'componentStyleGroupInlineUpdate'])
+        Route::get('list', [ComponentController::class, 'index'])->name('component_list');
+        Route::get('create', [ComponentController::class, 'create'])->name('component_add');
+        Route::post('store', [ComponentController::class, 'store'])->name('component_store');
+        Route::get('delete/{id}', [ComponentController::class, 'destroy'])->name('component_delete');
+        Route::get('edit/{id}', [ComponentController::class, 'edit'])->name('component_edit');
+        Route::patch('style-group/inline/update', [ComponentController::class, 'componentStyleGroupInlineUpdate'])
             ->name('component_style_group_inline_update');
-        Route::get('properties/inline/update',[ComponentController::class, 'componentPropertiesInlineUpdate'])
+        Route::patch('properties/inline/update', [ComponentController::class, 'componentPropertiesInlineUpdate'])
             ->name('component_properties_inline_update');
-        Route::PATCH('update/{id}',[ComponentController::class, 'update'])->name('component_update');
-        Route::POST('plugin-slug/update',[ComponentController::class, 'updatePluginSlug'])->name('plugin_slug_update_component');
-
+        Route::PATCH('update/{id}', [ComponentController::class, 'update'])->name('component_update');
+        Route::POST('plugin-slug/update', [ComponentController::class, 'updatePluginSlug'])->name('plugin_slug_update_component');
 
         /* COMPONENT MIGRATION route START */
         // DEV routes
@@ -131,9 +126,8 @@ Route::prefix('/appza')->middleware(['auth'])->group(function() {
         Route::post('migrate/import', [ComponentMigrationController::class, 'importFromFile'])->name('component_migrate_import_file');
         Route::get('/component/migrate/logs', [ComponentMigrationController::class, 'showImportLogs'])->name('component_migrate_logs');
 
-
         // PROD API route for direct import
-//        Route::post('migrate/import', [ComponentMigrationController::class, 'importFromApi']);
+        //        Route::post('migrate/import', [ComponentMigrationController::class, 'importFromApi']);
         /* COMPONENT MIGRATION route END */
 
     });
@@ -141,156 +135,151 @@ Route::prefix('/appza')->middleware(['auth'])->group(function() {
 
     /* global config route start */
     Route::prefix('global-config')->group(function () {
-        Route::get('list',[GlobalConfigController::class,'index'])->name('global_config_list');
-        Route::get('create/{mode}',[GlobalConfigController::class,'create'])->name('global_config_add');
-        Route::get('edit/{id}',[GlobalConfigController::class, 'edit'])->name('global_config_edit');
-        Route::PATCH('update/{id}',[GlobalConfigController::class, 'update'])->name('global_config_update');
-        Route::get('assign-component',[GlobalConfigController::class, 'globalConfigAssignComponent'])->name('global_config_assign_component');
-        Route::get('assign-component-position',[GlobalConfigController::class, 'globalConfigAssignComponentPosition'])->name('global_config_assign_component_position');
-        Route::POST('plugin-slug/update',[GlobalConfigController::class, 'updatePluginSlug'])->name('plugin_slug_update_config');
+        Route::get('list', [GlobalConfigController::class, 'index'])->name('global_config_list');
+        Route::get('create/{mode}', [GlobalConfigController::class, 'create'])->name('global_config_add');
+        Route::get('edit/{id}', [GlobalConfigController::class, 'edit'])->name('global_config_edit');
+        Route::PATCH('update/{id}', [GlobalConfigController::class, 'update'])->name('global_config_update');
+        Route::get('assign-component', [GlobalConfigController::class, 'globalConfigAssignComponent'])->name('global_config_assign_component');
+        Route::get('assign-component-position', [GlobalConfigController::class, 'globalConfigAssignComponentPosition'])->name('global_config_assign_component_position');
+        Route::POST('plugin-slug/update', [GlobalConfigController::class, 'updatePluginSlug'])->name('plugin_slug_update_config');
     });
     /* global config route end */
 
     /* theme route start */
     Route::prefix('theme')->group(function () {
-        Route::get('list',[ThemeController::class,'index'])->name('theme_list');
-        Route::get('create',[ThemeController::class,'create'])->name('theme_add');
-        Route::POST('store',[ThemeController::class,'store'])->name('theme_store');
+        Route::get('list', [ThemeController::class, 'index'])->name('theme_list');
+        Route::get('create', [ThemeController::class, 'create'])->name('theme_add');
+        Route::POST('store', [ThemeController::class, 'store'])->name('theme_store');
 
-        Route::get('assign/component/{id}',[ThemeController::class, 'themeAssignComponent'])->name('theme_assign_component');
-        Route::get('assign/component-update',[ThemeController::class, 'themeAssignComponentUpdate'])->name('theme_assign_component_update');
-        Route::get('page/inline/update',[ThemeController::class, 'themePageInlineUpdate'])->name('theme_page_inline_update');
-        Route::post('page/inline/image-upload/static',[ThemeController::class, 'themePageInlineImageUpload'])->name('theme_page_inline_image_upload');
+        Route::get('assign/component/{id}', [ThemeController::class, 'themeAssignComponent'])->name('theme_assign_component');
+        Route::get('assign/component-update', [ThemeController::class, 'themeAssignComponentUpdate'])->name('theme_assign_component_update');
+        Route::get('page/inline/update', [ThemeController::class, 'themePageInlineUpdate'])->name('theme_page_inline_update');
+        Route::post('page/inline/image-upload/static', [ThemeController::class, 'themePageInlineImageUpload'])->name('theme_page_inline_image_upload');
 
-
-        Route::get('edit/{id}',[ThemeController::class,'edit'])->name('theme_edit');
-        Route::PATCH('update/{id}',[ThemeController::class, 'update'])->name('theme_update');
-        Route::get('delete/{id}',[ThemeController::class, 'destroy'])->name('theme_delete');
+        Route::get('edit/{id}', [ThemeController::class, 'edit'])->name('theme_edit');
+        Route::PATCH('update/{id}', [ThemeController::class, 'update'])->name('theme_update');
+        Route::get('delete/{id}', [ThemeController::class, 'destroy'])->name('theme_delete');
 
         Route::get('sort', [ThemeController::class, 'sortTheme'])->name('theme_sort');
-        Route::get('sort/data',[ThemeController::class, 'themeSortData'])->name('theme_sort_data');
-        Route::put('sort/update',[ThemeController::class, 'themeSortUpdate'])->name('theme_sort_update');
+        Route::get('sort/data', [ThemeController::class, 'themeSortData'])->name('theme_sort_data');
+        Route::put('sort/update', [ThemeController::class, 'themeSortUpdate'])->name('theme_sort_update');
 
-        Route::post('/store-theme-photo-gallery',[ThemeController::class, 'storePhotoGallery'])->name('store_photo_gallery_for_theme');
-        Route::get('/gallery/image/{id}',[ThemeController::class, 'photoGalleryImageDelete'])->name('theme_gallery_image_delete');
+        Route::post('/store-theme-photo-gallery', [ThemeController::class, 'storePhotoGallery'])->name('store_photo_gallery_for_theme');
+        Route::get('/gallery/image/{id}', [ThemeController::class, 'photoGalleryImageDelete'])->name('theme_gallery_image_delete');
     });
-    /*theme route end*/
+    /* theme route end */
 
     /* page route start */
     Route::prefix('page')->group(function () {
-        Route::get('list',[PageController::class,'index'])->name('page_list');
-        Route::get('scope/list',[PageController::class,'scopeIndex'])->name('scope_list');
-        Route::get('create',[PageController::class,'create'])->name('page_add');
-        Route::POST('store',[PageController::class,'store'])->name('page_store');
-        Route::get('edit/{id}',[PageController::class, 'edit'])->name('page_edit');
-        Route::PATCH('update/{page}',[PageController::class, 'update'])->name('page_update');
-        Route::get('delete/{id}',[PageController::class,'destroy'])->name('page_delete');
-        Route::get('force-delete/{id}',[PageController::class,'forceDestroy'])->name('page_force_delete');
+        Route::get('list', [PageController::class, 'index'])->name('page_list');
+        Route::get('scope/list', [PageController::class, 'scopeIndex'])->name('scope_list');
+        Route::get('create', [PageController::class, 'create'])->name('page_add');
+        Route::POST('store', [PageController::class, 'store'])->name('page_store');
+        Route::get('edit/{id}', [PageController::class, 'edit'])->name('page_edit');
+        Route::PATCH('update/{page}', [PageController::class, 'update'])->name('page_update');
+        Route::get('delete/{id}', [PageController::class, 'destroy'])->name('page_delete');
+        Route::get('force-delete/{id}', [PageController::class, 'forceDestroy'])->name('page_force_delete');
     });
     /* page route end */
 
     /* plugin route start */
     Route::prefix('plugin')->group(function () {
-        Route::get('list',[PluginController::class,'index'])->name('plugin_list');
-        Route::get('create',[PluginController::class,'create'])->name('plugin_add');
-        Route::POST('store',[PluginController::class,'store'])->name('plugin_store');
-        Route::get('edit/{id}',[PluginController::class, 'edit'])->name('plugin_edit');
-        Route::PATCH('update/{plugin}',[PluginController::class, 'update'])->name('plugin_update');
+        Route::get('list', [PluginController::class, 'index'])->name('plugin_list');
+        Route::get('create', [PluginController::class, 'create'])->name('plugin_add');
+        Route::POST('store', [PluginController::class, 'store'])->name('plugin_store');
+        Route::get('edit/{id}', [PluginController::class, 'edit'])->name('plugin_edit');
+        Route::PATCH('update/{plugin}', [PluginController::class, 'update'])->name('plugin_update');
 
         Route::get('sort', [PluginController::class, 'sortPlugin'])->name('plugin_sort');
-        Route::get('sort/data',[PluginController::class, 'pluginSortData'])->name('plugin_sort_data');
-        Route::put('sort/update',[PluginController::class, 'pluginSortUpdate'])->name('plugin_sort_update');
+        Route::get('sort/data', [PluginController::class, 'pluginSortData'])->name('plugin_sort_data');
+        Route::put('sort/update', [PluginController::class, 'pluginSortUpdate'])->name('plugin_sort_update');
     });
     /* plugin route end */
 
     /* addon-version route start */
     Route::prefix('addon-version')->group(function () {
-        Route::get('list',[AddonController::class,'index'])->name('addon_version_list');
-        Route::get('create',[AddonController::class,'create'])->name('addon_version_add');
-        Route::POST('store',[AddonController::class,'store'])->name('addon_version_store');
+        Route::get('list', [AddonController::class, 'index'])->name('addon_version_list');
+        Route::get('create', [AddonController::class, 'create'])->name('addon_version_add');
+        Route::POST('store', [AddonController::class, 'store'])->name('addon_version_store');
 
-        Route::get('added/{addon_id}', [AddonController::class,'addedVersion'])->name('addon_version_added');
-        Route::post('added/store/{addon_id}', [AddonController::class,'addedVersionStore'])->name('added_version_store');
-        Route::post('added/update/{addon_id}', [AddonController::class,'addedVersionUpdate'])->name('added_version_update');
+        Route::get('added/{addon_id}', [AddonController::class, 'addedVersion'])->name('addon_version_added');
+        Route::post('added/store/{addon_id}', [AddonController::class, 'addedVersionStore'])->name('added_version_store');
+        Route::post('added/update/{addon_id}', [AddonController::class, 'addedVersionUpdate'])->name('added_version_update');
 
     });
     /* addon-version route start */
 
-
-
     /* mobile-version route start */
     Route::prefix('mobile-version')->group(function () {
-        Route::get('list',[MobileVersionController::class,'index'])->name('mobile_version_list');
-        Route::get('create',[MobileVersionController::class,'create'])->name('mobile_version_add');
-        Route::POST('store',[MobileVersionController::class,'store'])->name('mobile_version_store');
-        Route::get('edit/{id}',[MobileVersionController::class, 'edit'])->name('mobile_version_edit');
-        Route::PATCH('update/{id}',[MobileVersionController::class, 'update'])->name('mobile_version_update');
+        Route::get('list', [MobileVersionController::class, 'index'])->name('mobile_version_list');
+        Route::get('create', [MobileVersionController::class, 'create'])->name('mobile_version_add');
+        Route::POST('store', [MobileVersionController::class, 'store'])->name('mobile_version_store');
+        Route::get('edit/{id}', [MobileVersionController::class, 'edit'])->name('mobile_version_edit');
+        Route::PATCH('update/{id}', [MobileVersionController::class, 'update'])->name('mobile_version_update');
     });
     /* mobile-version route start */
 
     /* build-order start */
     Route::prefix('build-order')->group(function () {
-        Route::get('list',[BuildOrderController::class,'index'])->name('build_order_list');
+        Route::get('list', [BuildOrderController::class, 'index'])->name('build_order_list');
     });
     /* build-order route end */
-
 
     /* license message logic route start */
     Route::prefix('license')->group(function () {
         Route::prefix('logic')->group(function () {
-            Route::get('list',[LicenseLogicController::class,'index'])->name('license_logic_list');
-            Route::get('create',[LicenseLogicController::class,'create'])->name('license_logic_add');
-            Route::POST('store',[LicenseLogicController::class,'store'])->name('license_logic_store');
-            Route::get('edit/{id}',[LicenseLogicController::class, 'edit'])->name('license_logic_edit');
-            Route::PATCH('update/{id}',[LicenseLogicController::class, 'update'])->name('license_logic_update');
-            Route::get('delete/{id}',[LicenseLogicController::class,'destroy'])->name('license_logic_delete');
+            Route::get('list', [LicenseLogicController::class, 'index'])->name('license_logic_list');
+            Route::get('create', [LicenseLogicController::class, 'create'])->name('license_logic_add');
+            Route::POST('store', [LicenseLogicController::class, 'store'])->name('license_logic_store');
+            Route::get('edit/{id}', [LicenseLogicController::class, 'edit'])->name('license_logic_edit');
+            Route::PATCH('update/{id}', [LicenseLogicController::class, 'update'])->name('license_logic_update');
+            Route::get('delete/{id}', [LicenseLogicController::class, 'destroy'])->name('license_logic_delete');
         });
         Route::prefix('message')->group(function () {
-            Route::get('list',[LicenseMessageController::class,'index'])->name('license_message_list');
-            Route::get('create',[LicenseMessageController::class,'create'])->name('license_message_add');
-            Route::POST('store',[LicenseMessageController::class,'store'])->name('license_message_store');
-            Route::get('edit/{id}',[LicenseMessageController::class, 'edit'])->name('license_message_edit');
-            Route::PATCH('update/{id}',[LicenseMessageController::class, 'update'])->name('license_message_update');
-            Route::get('delete/{id}',[LicenseMessageController::class,'destroy'])->name('license_message_delete');
+            Route::get('list', [LicenseMessageController::class, 'index'])->name('license_message_list');
+            Route::get('create', [LicenseMessageController::class, 'create'])->name('license_message_add');
+            Route::POST('store', [LicenseMessageController::class, 'store'])->name('license_message_store');
+            Route::get('edit/{id}', [LicenseMessageController::class, 'edit'])->name('license_message_edit');
+            Route::PATCH('update/{id}', [LicenseMessageController::class, 'update'])->name('license_message_update');
+            Route::get('delete/{id}', [LicenseMessageController::class, 'destroy'])->name('license_message_delete');
         });
     });
     /* license message logic route end */
 
-
-    /*ONLY FOR DEVELOPER*/
+    /* ONLY FOR DEVELOPER */
     /* request log start */
     Route::prefix('request-log')->group(function () {
-        Route::get('list',[RequestLogController::class,'index'])->name('request_log_list');
+        Route::get('list', [RequestLogController::class, 'index'])->name('request_log_list');
     });
     /* request log route end */
 
     /* setup start */
     Route::prefix('setup')->group(function () {
-        Route::get('list',[SetupController::class,'index'])->name('setup_list');
-        Route::get('create',[SetupController::class,'create'])->name('setup_add');
-        Route::post('store',[SetupController::class,'store'])->name('setup_store');
-        Route::get('edit/{id}',[SetupController::class, 'edit'])->name('setup_edit');
-        Route::PATCH('update/{setup}',[SetupController::class, 'update'])->name('setup_update');
-        Route::get('delete/{id}',[SetupController::class,'destroy'])->name('setup_delete');
+        Route::get('list', [SetupController::class, 'index'])->name('setup_list');
+        Route::get('create', [SetupController::class, 'create'])->name('setup_add');
+        Route::post('store', [SetupController::class, 'store'])->name('setup_store');
+        Route::get('edit/{id}', [SetupController::class, 'edit'])->name('setup_edit');
+        Route::PATCH('update/{setup}', [SetupController::class, 'update'])->name('setup_update');
+        Route::get('delete/{id}', [SetupController::class, 'destroy'])->name('setup_delete');
     });
     /* setup route end */
 
     /* request log start */
     Route::prefix('lead')->group(function () {
-        Route::get('list',[LeadController::class,'index'])->name('lead_list');
-        Route::get('delete/{id}',[LeadController::class,'destroy'])->name('lead_delete');
+        Route::get('list', [LeadController::class, 'index'])->name('lead_list');
+        Route::get('delete/{id}', [LeadController::class, 'destroy'])->name('lead_delete');
 
     });
     Route::prefix('free-trial')->group(function () {
-        Route::get('list',[FreeTrialController::class,'index'])->name('free_trial_list');
-        Route::get('delete/{id}',[FreeTrialController::class,'destroy'])->name('free_trial_delete');
+        Route::get('list', [FreeTrialController::class, 'index'])->name('free_trial_list');
+        Route::get('delete/{id}', [FreeTrialController::class, 'destroy'])->name('free_trial_delete');
     });
 
     Route::prefix('product')->group(function () {
-        Route::get('list',[ProductController::class,'index'])->name('product_list');
-        Route::get('edit/{id}',[ProductController::class,'edit'])->name('product_edit');
-        Route::patch('update/{id}',[ProductController::class,'update'])->name('product_update');
-//        Route::get('delete/{id}',[FreeTrialController::class,'destroy'])->name('free_trial_delete');
+        Route::get('list', [ProductController::class, 'index'])->name('product_list');
+        Route::get('edit/{id}', [ProductController::class, 'edit'])->name('product_edit');
+        Route::patch('update/{id}', [ProductController::class, 'update'])->name('product_update');
+        //        Route::get('delete/{id}',[FreeTrialController::class,'destroy'])->name('free_trial_delete');
     });
 
     Route::prefix('report')->group(function () {
@@ -304,4 +293,3 @@ Route::prefix('/appza')->middleware(['auth'])->group(function() {
     /* request log route end */
 
 });
-

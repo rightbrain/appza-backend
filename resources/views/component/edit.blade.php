@@ -1071,11 +1071,11 @@
             if(value && component_properties_id && route) {
                 $.ajax({
                     url: route,
-                    method: "get",
+                    method: "PATCH",
                     dataType: "json",
                     data: {component_properties_id: component_properties_id, value: value},
-                    beforeSend: function (xhr) {
-
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     }
                 }).done(function (response) {
                     console.log(response)
@@ -1107,11 +1107,11 @@
             if(value && component_style_group && route) {
                 $.ajax({
                     url: route,
-                    method: "get",
+                    method: "PATCH",
                     dataType: "json",
                     data: {id: component_style_group, value: value},
-                    beforeSend: function (xhr) {
-
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                     }
                 }).done(function (response) {
                     console.log(response)

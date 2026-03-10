@@ -439,11 +439,11 @@
 
             $.ajax({
                 url: route,
-                method: "get",
+                method: "PATCH",
                 dataType: "json",
                 data: {component_properties_id: component_properties_id,value:value},
-                beforeSend: function( xhr ) {
-
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             }).done(function( response ) {
                 console.log(response)
