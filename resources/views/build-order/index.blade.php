@@ -39,7 +39,7 @@
                                 <tr>
                                     <th>{{__('messages.SL')}}</th>
                                     <th>{{__('messages.OrderAt')}}</th>
-                                    <th>Process Time</th>
+{{--                                    <th>Process Time</th>--}}
                                     <th>{{__('messages.Plugin')}}</th>
 {{--                                    <th>{{__('messages.packageName')}}</th>--}}
                                     <th>{{__('messages.appName')}}</th>
@@ -73,7 +73,7 @@
                                                     {{$serial++}}
                                                 </td>
                                                 <td>{{$buildOrder->created_at->format('d-M-Y')}}</td>
-                                                <td>
+                                                {{--<td>
                                                     @php
                                                         $created_at = Carbon::parse($buildOrder->process_start);
                                                         $updated_at = Carbon::parse($buildOrder->updated_at);
@@ -85,7 +85,7 @@
                                                         $displayProcessTime = $currentProcessTime < 0 ? 0 : $currentProcessTime;
                                                     @endphp
                                                     {{number_format($displayProcessTime,2).' minutes'}}
-                                                </td>
+                                                </td>--}}
                                                 <td>{{$buildOrder->build_plugin_slug}}</td>
 {{--                                                <td>{{$buildOrder->package_name}}</td>--}}
                                                 <td>{{$buildOrder->app_name}}</td>
