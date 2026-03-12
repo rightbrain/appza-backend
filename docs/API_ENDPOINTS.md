@@ -1,50 +1,59 @@
-# Complete API Endpoints Reference
+# API V1 Endpoints Reference
 
-Comprehensive documentation for all API endpoints in Appza Backend.
+Comprehensive documentation for all API V1 endpoints in Appza Backend.
 
 ## Table of Contents
 
-1. [Base URLs](#base-urls)
+1. [Base URL & Middleware](#base-url--middleware)
 2. [Authentication](#authentication)
 3. [Lead Management](#lead-management)
 4. [Theme Management](#theme-management)
 5. [Page Components](#page-components)
 6. [Global Configuration](#global-configuration)
 7. [Free Trial](#free-trial)
-8. [License Management](#license-management)
-9. [APK Build](#apk-build)
-10. [Plugin Management](#plugin-management)
-11. [Firebase Integration](#firebase-integration)
-12. [Mobile Version Check](#mobile-version-check)
+8. [Firebase Integration](#firebase-integration)
+9. [License Management](#license-management)
+10. [Version Check](#version-check)
+11. [App APIs](#app-apis)
+12. [Build Management](#build-management)
+13. [Plugin Management](#plugin-management)
+14. [Error Responses](#error-responses)
 
 ---
 
-## Base URLs
+## Base URL & Middleware
 
-### API Version URLs
-- **v1**: `/appza/v1/...`
-- **v2**: `/appza/v2/...`
+### Base URL
+
+```
+/appza/v1
+```
 
 ### Middleware Applied
-All routes include:
-- `LogRequestResponse` - Request/response logging
-- `LogActivity` - Activity logging
-- `ApiVersionDeprecationMiddleware` - Version deprecation warnings
+
+All V1 routes include the following middleware:
+
+| Middleware | Description |
+|-----------|-------------|
+| `LogRequestResponse` | Logs API requests and responses (gated by `config('app.is_request_log')`) |
+| `LogActivity` | Spatie activity log integration |
+| `ApiVersionDeprecationMiddleware` | Returns deprecation warnings for sunset API versions |
 
 ---
 
 ## Authentication
 
-All endpoints require authorization via hash headers:
+All endpoints require authorization via product-specific hash headers. The appropriate header depends on the product being accessed.
 
 ### Headers
+
 ```http
 appza-hash: {your_hash_token}
 lazy-task-hash: {your_hash_token}
 Fcom-mobile-hash: {your_hash_token}
 ```
 
-Use the appropriate header based on your product.
+Use the header that matches your product. The hash is generated when a Lead is created and returned in the lead creation response.
 
 ---
 
@@ -52,45 +61,60 @@ Use the appropriate header based on your product.
 
 ### Create Lead
 
-**POST** `/appza/v1/lead/store/{product}`  
-**POST** `/appza/v2/lead/store/{product}`
+**Method:** `POST`
 
-Create a new customer lead.
+**URL:** `/appza/v1/lead/store/{product}`
+
+**Description:** Create a new customer lead. Also automatically creates a free trial (7-day expiration + 14-day grace period) if one does not already exist for the given domain and product.
 
 #### Path Parameters
-- `product` (required) - Product type: `appza`, `lazy_task`, `fcom_mobile`
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| product | string | Yes | Product type. Allowed values: `appza`, `lazy_task`, `fcom_mobile` |
 
 #### Request Body
+
 ```json
 {
   "first_name": "John",
   "last_name": "Doe",
   "email": "john@example.com",
-  "mobile": "+1234567890",
   "domain": "https://example.com",
   "note": "Interested in premium features"
 }
 ```
 
+#### Request Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| first_name | string | Yes | Lead's first name |
+| last_name | string | Yes | Lead's last name |
+| email | string | Yes | Lead's email address (must be valid email format) |
+| domain | string | Yes | Lead's website URL (must be valid URL) |
+| note | string | No | Additional notes about the lead |
+
 #### Response Success (200)
+
 ```json
 {
-  "success": true,
-  "message": "Lead created successfully",
+  "status": 200,
+  "message": "Created Successfully",
   "data": {
-    "id": 123,
-    "first_name": "John",
-    "last_name": "Doe",
-    "email": "john@example.com",
-    "domain": "https://example.com",
-    "plugin_name": "appza",
     "appza_hash": "generated_hash_token",
-    "created_at": "2026-01-01T00:00:00.000000Z"
+    ...setup_data
   }
 }
 ```
 
+The hash key in the response varies by product:
+- `appza` → `appza_hash`
+- `fcom_mobile` → `fcom_mobile_hash`
+- `lazy_task` → `lazy_task_hash`
+
 #### Response Error (422)
+
 ```json
 {
   "success": false,
@@ -102,96 +126,152 @@ Create a new customer lead.
 }
 ```
 
+#### Response Error (500)
+
+```json
+{
+  "status": 500,
+  "message": "Error description"
+}
+```
+
 ---
 
 ## Theme Management
 
 ### Get All Themes
 
-**GET** `/appza/v1/themes`  
-**GET** `/appza/v2/themes`
+**Method:** `GET`
 
-Retrieve list of available themes.
+**URL:** `/appza/v1/themes`
+
+**Description:** Retrieve a list of all available themes filtered by plugin slug(s). Returns themes as a collection with styling and page preview data.
 
 #### Query Parameters
-- `page` (optional) - Page number for pagination
-- `per_page` (optional) - Items per page (default: 15)
-- `plugin_slug` (optional) - Filter by plugin (appza, lazy_task, fcom_mobile)
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| plugin_slug | array | Yes | Array of plugin slugs to filter themes (e.g., `plugin_slug[]=appza`) |
 
 #### Response Success (200)
+
 ```json
 {
-  "success": true,
-  "data": {
-    "current_page": 1,
-    "data": [
-      {
-        "id": 1,
-        "name": "Modern Theme",
-        "slug": "modern-theme",
-        "image": "https://cdn.../themes/1/image.png",
-        "background_color": "#FFFFFF",
-        "font_family": "Roboto",
-        "text_color": "#000000",
-        "font_size": 14,
-        "plugin_slug": "appza",
-        "is_active": true,
-        "created_at": "2025-01-01T00:00:00.000000Z"
-      }
-    ],
-    "total": 50,
-    "per_page": 15,
-    "last_page": 4
-  }
+  "data": [
+    {
+      "id": 1,
+      "name": "Modern Theme",
+      "slug": "modern-theme",
+      "plugin_slug": "appza",
+      "created": "01-Jan-2026",
+      "background_color": "#FFFFFF",
+      "font_family": "Roboto",
+      "text_color": "#000000",
+      "font_size": 14,
+      "is_transparent_background": false,
+      "dashboard_page": "home",
+      "login_page": null,
+      "login_modal": null,
+      "image_url": "https://cdn.../themes/1/image.png",
+      "pages_preview": ["home", "category", "cart"],
+      "default_active_page_slug": "home"
+    }
+  ]
 }
 ```
+
+#### Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| id | integer | Theme ID |
+| name | string | Theme display name |
+| slug | string | Theme URL-safe identifier |
+| plugin_slug | string | Associated plugin |
+| created | string | Creation date in `d-M-Y` format |
+| background_color | string | Theme background color hex code |
+| font_family | string | Theme font family |
+| text_color | string | Theme text color hex code |
+| font_size | integer | Base font size |
+| is_transparent_background | boolean | Whether background is transparent |
+| dashboard_page | string | Default dashboard page slug |
+| login_page | string/null | Login page slug |
+| login_modal | string/null | Login modal configuration |
+| image_url | string | Theme preview image URL |
+| pages_preview | array | List of page slugs included in theme |
+| default_active_page_slug | string | Default active page |
 
 ---
 
 ### Get Single Theme
 
-**GET** `/appza/v1/themes/get-theme`  
-**GET** `/appza/v2/themes/get-theme`
+**Method:** `GET`
 
-Get detailed information about a specific theme.
+**URL:** `/appza/v1/themes/get-theme`
+
+**Description:** Get detailed information about a specific theme including global configs (appbar, navbar, drawer), pages with their components, styling properties, and all nested relationships.
 
 #### Query Parameters
-- `theme_id` (required) - Theme ID
-- `site_url` (optional) - Site URL for context
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| slug | string | Yes | Theme slug identifier |
+| plugin_slug | string | Yes | Plugin slug |
 
 #### Response Success (200)
+
 ```json
 {
-  "success": true,
   "data": {
-    "id": 1,
-    "name": "Modern Theme",
-    "slug": "modern-theme",
-    "image": "https://cdn.../themes/1/image.png",
-    "appbar": {
-      "id": 1,
-      "name": "Default AppBar",
-      "background_color": "#2196F3"
-    },
-    "navbar": {
-      "id": 2,
-      "name": "Bottom NavBar",
-      "selected_color": "#2196F3"
-    },
-    "drawer": {
-      "id": 3,
-      "name": "Side Drawer"
+    "theme_name": "Modern Theme",
+    "theme_slug": "modern-theme",
+    "plugin_slug": "appza",
+    "background_color": "#FFFFFF",
+    "font_family": "Roboto",
+    "text_color": "#000000",
+    "font_size": 14,
+    "is_transparent_background": false,
+    "dashboard_page": "home",
+    "login_page": null,
+    "login_modal": null,
+    "global_config": {
+      "navbar": {
+        "unique_id": "md5_hash",
+        "id": 1,
+        "mode": "navbar",
+        "name": "Bottom NavBar",
+        "slug": "bottom-navbar",
+        "properties": {
+          "padding_left": "0",
+          "padding_right": "0",
+          "background_color": "#FFFFFF",
+          "...50+ styling fields"
+        },
+        "components": []
+      },
+      "appbar": { "..." },
+      "drawer": { "..." }
     },
     "pages": [
       {
-        "id": 1,
+        "unique_id": "md5_hash",
         "name": "Home",
         "slug": "home",
-        "components": []
+        "is_persistent_footer_button": false,
+        "persistent_footer_buttons": null,
+        "components": [
+          {
+            "unique_id": "md5_hash",
+            "name": "Component Name",
+            "slug": "component-slug",
+            "is_upcoming": false,
+            "properties": {},
+            "customize_properties": {},
+            "styles": {}
+          }
+        ]
       }
-    ],
-    "components": [],
-    "photo_gallery": []
+    ]
   }
 }
 ```
@@ -202,35 +282,69 @@ Get detailed information about a specific theme.
 
 ### Get Page Components
 
-**GET** `/appza/v1/page-component`  
-**GET** `/appza/v2/page-component`
+**Method:** `GET`
 
-Get components for a specific page.
+**URL:** `/appza/v1/page-component`
+
+**Description:** Retrieve available components for a specific page, grouped by component type. Each component includes its properties, styling, and customization options.
 
 #### Query Parameters
-- `page_id` (required) - Page ID
-- `theme_id` (optional) - Theme ID for theme-specific components
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| page_slug | string | Yes | Page identifier slug |
+| plugin_slug | array | Yes | Array of plugin slugs (e.g., `plugin_slug[]=appza`) |
 
 #### Response Success (200)
+
 ```json
 {
-  "success": true,
   "data": [
     {
-      "id": 1,
-      "page_id": 1,
-      "component_id": 5,
-      "component_name": "Product Grid",
-      "sort_order": 1,
-      "config_data": {
-        "columns": 2,
-        "spacing": 10
-      },
-      "is_active": true
+      "name": "Group Name",
+      "icon": "icon_code",
+      "items": [
+        {
+          "page_id": null,
+          "unique_id": "random_md5_hash",
+          "name": "Product Grid",
+          "slug": "product-grid",
+          "is_upcoming": false,
+          "properties": {
+            "label": "Product Grid",
+            "group_name": "Ecommerce",
+            "layout_type": "grid",
+            "icon_code": "0xe123",
+            "event": "load_products",
+            "scope": "page",
+            "class_type": "product",
+            "is_multiple": true,
+            "selected_design": 0,
+            "detailsPage": null,
+            "is_transparent_background": false
+          },
+          "customize_properties": {},
+          "styles": {}
+        }
+      ]
     }
   ]
 }
 ```
+
+#### Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| name | string | Component group name |
+| icon | string | Group icon code |
+| items | array | Array of components in this group |
+| items[].unique_id | string | Unique MD5 identifier for the component instance |
+| items[].name | string | Component display name |
+| items[].slug | string | Component slug |
+| items[].is_upcoming | boolean | Whether component is coming soon |
+| items[].properties | object | Component properties (label, layout, events, etc.) |
+| items[].styles | object | Component styling data |
 
 ---
 
@@ -238,36 +352,59 @@ Get components for a specific page.
 
 ### Get Global Config
 
-**GET** `/appza/v1/global-config`  
-**GET** `/appza/v2/global-config`
+**Method:** `GET`
 
-Get application-wide configuration.
+**URL:** `/appza/v1/global-config`
+
+**Description:** Retrieve global configuration items (appbar, navbar, drawer) with their nested components and full styling properties (50+ fields including padding, margin, shadow, colors, etc.).
 
 #### Query Parameters
-- `site_url` (required) - Website URL
-- `product` (optional) - Product slug
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| mode | string | Yes | Config mode: `appbar`, `navbar`, or `drawer` |
+| plugin_slug | array | Yes | Array of plugin slugs (e.g., `plugin_slug[]=appza`) |
 
 #### Response Success (200)
+
 ```json
 {
-  "success": true,
-  "data": {
-    "app_name": "My App",
-    "app_version": "1.0.0",
-    "build_version": "1",
-    "theme": {
+  "data": [
+    {
+      "unique_id": "md5_hash",
       "id": 1,
-      "name": "Modern Theme"
-    },
-    "features": {
-      "push_notifications": true,
-      "in_app_purchase": false
-    },
-    "colors": {
-      "primary": "#2196F3",
-      "secondary": "#FFC107"
+      "mode": "navbar",
+      "name": "Bottom NavBar",
+      "slug": "bottom-navbar",
+      "plugin_slug": "appza",
+      "image_url": "https://cdn.../config/image.png",
+      "is_active": true,
+      "is_upcoming": false,
+      "properties": {
+        "padding_left": "0",
+        "padding_right": "0",
+        "padding_top": "0",
+        "padding_bottom": "0",
+        "margin_left": "0",
+        "margin_right": "0",
+        "background_color": "#FFFFFF",
+        "shadow_color": "#000000",
+        "icon_active_color": "#2196F3",
+        "icon_inactive_color": "#9E9E9E",
+        "text_active_color": "#2196F3",
+        "text_inactive_color": "#9E9E9E"
+      },
+      "components": [
+        {
+          "unique_id": "md5_hash",
+          "name": "Home Icon",
+          "slug": "home-icon",
+          "properties": {},
+          "styles": {}
+        }
+      ]
     }
-  }
+  ]
 }
 ```
 
@@ -277,48 +414,107 @@ Get application-wide configuration.
 
 ### Activate Free Trial
 
-**POST** `/appza/v1/free/trial/{product}`  
-**POST** `/appza/v2/free/trial/{product}`
+**Method:** `POST`
 
-Activate a free trial for a website.
+**URL:** `/appza/v1/free/trial/{product}`
+
+**Description:** Activate a free trial for a website. Creates a trial with 7-day expiration and 14-day grace period. Prevents duplicate trials using database locking.
 
 #### Path Parameters
-- `product` (required) - Product type: `appza`, `lazy_task`, `fcom_mobile`
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| product | string | Yes | Product type. Allowed values: `appza`, `lazy_task`, `fcom_mobile` |
 
 #### Request Body
+
 ```json
 {
-  "site_url": "https://example.com",
   "name": "John Doe",
-  "email": "john@example.com"
+  "email": "john@example.com",
+  "site_url": "https://example.com",
+  "plugin_slug": "appza"
 }
 ```
 
+#### Request Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| name | string | Yes | User's name |
+| email | string | Yes | User's email (must be valid email format) |
+| site_url | string | Yes | Website URL (must be valid URL) |
+| plugin_slug | string | Yes | Plugin slug identifier |
+
 #### Response Success (200)
+
 ```json
 {
-  "success": true,
-  "message": "Free trial activated successfully",
+  "status": 200,
+  "url": "/appza/v1/free/trial/appza",
+  "method": "POST",
+  "message": "Created Successfully",
   "data": {
-    "id": 123,
-    "product_slug": "appza",
-    "site_url": "https://example.com",
-    "email": "john@example.com",
-    "grace_period_date": "2026-01-15T00:00:00.000000Z",
-    "is_fluent_license_check": false,
-    "created_at": "2026-01-01T00:00:00.000000Z"
+    "addon_name": "Appza Plugin",
+    "version": "1.0.0",
+    "download_url": "https://cdn.../plugin.zip"
   }
 }
 ```
 
 #### Response Error (422)
+
 ```json
 {
   "success": false,
-  "message": "Free trial already exists for this site",
+  "message": "Validation failed",
   "errors": {
-    "site_url": ["This site already has an active free trial."]
+    "site_url": ["The site url field is required."],
+    "email": ["The email must be a valid email address."]
   }
+}
+```
+
+---
+
+## Firebase Integration
+
+### Get Firebase Credentials
+
+**Method:** `GET`
+
+**URL:** `/appza/v1/firebase/credential/{product}`
+
+**Description:** Retrieve Firebase configuration credentials for a specific product. Requires authorization via product hash header.
+
+#### Path Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| product | string | Yes | Product slug. Allowed values: `appza`, `lazy_task`, `fcom_mobile` |
+
+#### Response Success (200)
+
+```json
+{
+  "status": 200,
+  "data": {
+    "api_key": "AIzaSy...",
+    "auth_domain": "project.firebaseapp.com",
+    "project_id": "project-id",
+    "storage_bucket": "project.appspot.com",
+    "messaging_sender_id": "123456789",
+    "app_id": "1:123456789:web:abcdef"
+  }
+}
+```
+
+#### Response Error (404)
+
+```json
+{
+  "status": 404,
+  "message": "Firebase credentials not found"
 }
 ```
 
@@ -328,19 +524,24 @@ Activate a free trial for a website.
 
 ### Check License (Web)
 
-**GET** `/appza/v1/license/check`  
-**GET** `/appza/v2/license/check` (V2 uses different controller)
+**Method:** `GET`
 
-Check if a license is valid.
+**URL:** `/appza/v1/license/check`
+
+**Description:** Check if a license key is valid for a given site URL. Validates against the Fluent external license provider.
 
 #### Query Parameters
-- `site_url` (required) - Website URL
-- `license_key` (required) - License key
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| site_url | string | Yes | Website URL |
+| license_key | string | Yes | License key to validate |
 
 #### Response Success (200)
+
 ```json
 {
-  "success": true,
+  "status": 200,
   "message": "License is valid",
   "data": {
     "license_key": "XXXX-XXXX-XXXX-XXXX",
@@ -355,64 +556,11 @@ Check if a license is valid.
 ```
 
 #### Response Error (404)
+
 ```json
 {
-  "success": false,
-  "message": "License not found",
-  "status": 404
-}
-```
-
----
-
-### Check App License
-
-**GET** `/appza/v1/app/license-check`  
-**GET** `/appza/v2/app/license-check`
-
-Check license status for mobile app (includes free trial check).
-
-#### Query Parameters
-- `site_url` (required) - Website URL
-- `product` (required) - Product slug
-
-#### Response Success - Free Trial (200)
-```json
-{
-  "success": true,
-  "license_type": "free_trial",
-  "message": "Free trial is active",
-  "data": {
-    "site_url": "https://example.com",
-    "product": "appza",
-    "grace_period_date": "2026-01-15T00:00:00.000000Z",
-    "days_remaining": 14
-  }
-}
-```
-
-#### Response Success - Premium (200)
-```json
-{
-  "success": true,
-  "license_type": "premium",
-  "message": "Premium license is active",
-  "data": {
-    "license_key": "XXXX-XXXX-XXXX-XXXX",
-    "site_url": "https://example.com",
-    "product_title": "Appza Premium",
-    "expiration_date": "2027-01-01T00:00:00.000000Z"
-  }
-}
-```
-
-#### Response Error - Expired (403)
-```json
-{
-  "success": false,
-  "message": "License has expired",
-  "license_type": "expired",
-  "status": 403
+  "status": 404,
+  "message": "License not found"
 }
 ```
 
@@ -420,12 +568,14 @@ Check license status for mobile app (includes free trial check).
 
 ### Activate License
 
-**POST** `/appza/v1/license/activate`  
-**POST** `/appza/v2/license/activate`
+**Method:** `POST`
 
-Activate a premium license for a website.
+**URL:** `/appza/v1/license/activate`
+
+**Description:** Activate a premium license for a website. Validates free trial status, calls the Fluent API for activation, and updates BuildDomain and FluentLicenseInfo records.
 
 #### Request Body
+
 ```json
 {
   "site_url": "https://example.com",
@@ -434,10 +584,19 @@ Activate a premium license for a website.
 }
 ```
 
+#### Request Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| site_url | string | Yes | Website URL to activate |
+| license_key | string | Yes | License key for activation |
+| email | string | No | User's email address |
+
 #### Response Success (200)
+
 ```json
 {
-  "success": true,
+  "status": 200,
   "message": "License activated successfully",
   "data": {
     "activation_hash": "generated_hash",
@@ -453,9 +612,10 @@ Activate a premium license for a website.
 ```
 
 #### Response Error (422)
+
 ```json
 {
-  "success": false,
+  "status": 422,
   "message": "License activation failed",
   "errors": {
     "license_key": ["Invalid license key"],
@@ -468,46 +628,59 @@ Activate a premium license for a website.
 
 ### Deactivate License
 
-**GET** `/appza/v1/license/deactivate`  
-**GET** `/appza/v2/license/deactivate`
+**Method:** `GET`
 
-Deactivate a license or mark plugin as deleted.
+**URL:** `/appza/v1/license/deactivate`
+
+**Description:** Deactivate a license or mark a plugin as deleted for a given site.
 
 #### Query Parameters
-- `site_url` (required) - Website URL
-- `product` (required) - Product slug
-- `appza_action` (required) - Action: `license_deactivate` or `plugin_delete`
-- `license_key` (conditional) - Required if action is `license_deactivate`
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| site_url | string | Yes | Website URL (must be valid URL) |
+| product | string | Yes | Product slug. Allowed values: `appza`, `lazy_task`, `fcom_mobile` |
+| appza_action | string | Yes | Action to perform. Allowed values: `license_deactivate`, `plugin_delete` |
+| license_key | string | Conditional | Required if `appza_action` is `license_deactivate` |
 
 #### Response Success (200)
+
 ```json
 {
-  "success": true,
+  "status": 200,
   "message": "License deactivated successfully"
 }
 ```
 
 ---
 
-### Version Check
+### License Version Check
 
-**POST** `/appza/v1/license/version/check`  
-**POST** `/appza/v2/license/version/check`
+**Method:** `POST`
 
-Get latest version information for a licensed product.
+**URL:** `/appza/v1/license/version/check`
+
+**Description:** Get the latest version information for a licensed product from the Fluent API.
 
 #### Request Body
+
 ```json
 {
-  "license_key": "XXXX-XXXX-XXXX-XXXX",
-  "current_version": "1.0.0"
+  "license_key": "XXXX-XXXX-XXXX-XXXX"
 }
 ```
 
+#### Request Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| license_key | string | Yes | License key to check version for |
+
 #### Response Success (200)
+
 ```json
 {
-  "success": true,
+  "status": 200,
   "data": {
     "latest_version": "1.2.0",
     "download_url": "https://cdn.../plugin-v1.2.0.zip",
@@ -519,34 +692,228 @@ Get latest version information for a licensed product.
 
 ---
 
-## APK Build
+## Version Check
 
-### Create Build Resource
+### Version Check (Plugin)
 
-**POST** `/appza/v1/build/resource`  
-**POST** `/appza/v2/build/resource`
+**Method:** `GET`
 
-Create build resources (icons, splash screens, etc.).
+**URL:** `/appza/v1/version-check`
 
-#### Request Body
+**Description:** Check the latest mobile and plugin versions for compatibility mapping. Returns compatible version pairs between mobile app and plugin.
+
+#### Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| app_name | string | Yes | Application name |
+| mobile_version | string | Yes | Current mobile version (semantic versioning format: `x.y.z`) |
+| plugin_version | string | Yes | Current plugin version (semantic versioning format: `x.y.z`) |
+| plugin_slug | string | Yes | Plugin slug identifier |
+
+#### Response Success (200)
+
 ```json
 {
-  "site_url": "https://example.com",
-  "app_logo": "base64_encoded_image",
-  "app_splash_screen": "base64_encoded_image",
-  "app_name": "My App",
-  "package_name": "com.example.app"
+  "status": 200,
+  "latest_mobile": "2.0.0",
+  "latest_plugin": "1.5.0",
+  "compitable_mobile_version_vs_plugin": ["1.4.0", "1.5.0"],
+  "compitable_plugin_version_vs_mobile": ["1.9.0", "2.0.0"]
 }
 ```
 
-#### Response Success (200)
+#### Response Error (404)
+
 ```json
 {
-  "success": true,
+  "status": 404,
+  "message": "App not found"
+}
+```
+
+---
+
+## App APIs
+
+### App License Check
+
+**Method:** `GET`
+
+**URL:** `/appza/v1/app/license-check`
+
+**Description:** Check license status for the mobile app. Checks free trial validity first, then premium license via Fluent API with caching. Returns license type, status, and active popup messages.
+
+#### Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| site_url | string | Yes | Website URL (must be valid URL) |
+| product | string | Yes | Product slug. Allowed values: `appza`, `lazy_task`, `fcom_mobile` |
+
+#### Response Success - Free Trial (200)
+
+```json
+{
+  "status": "ok",
+  "license_type": "free_trial",
+  "message": "Free trial is active",
+  "data": {
+    "site_url": "https://example.com",
+    "product": "appza",
+    "grace_period_date": "2026-01-15T00:00:00.000000Z",
+    "days_remaining": 14
+  },
+  "popup_message": []
+}
+```
+
+#### Response Success - Premium (200)
+
+```json
+{
+  "status": "ok",
+  "license_type": "premium",
+  "message": "Premium license is active",
+  "data": {
+    "license_key": "XXXX-XXXX-XXXX-XXXX",
+    "site_url": "https://example.com",
+    "product_title": "Appza Premium",
+    "expiration_date": "2027-01-01T00:00:00.000000Z"
+  },
+  "popup_message": [
+    {
+      "title": "New Feature",
+      "message": "Check out our latest update!",
+      "type": "info"
+    }
+  ]
+}
+```
+
+#### Response Error (403)
+
+```json
+{
+  "status": "error",
+  "license_type": "expired",
+  "message": "License has expired"
+}
+```
+
+---
+
+### Mobile Version Check
+
+**Method:** `GET`
+
+**URL:** `/appza/v1/app/version-check`
+
+**Description:** Check if a mobile app version requires an update. Returns update status based on version comparison with the registered app.
+
+#### Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| app_name | string | Yes | Application name |
+| mobile_version | string | Yes | Current mobile version (semantic versioning format: `x.y.z`) |
+| plugin_version | string | Yes | Current plugin version (semantic versioning format: `x.y.z`) |
+
+#### Response Success - Up to Date (200)
+
+```json
+{
+  "status": "ok",
+  "message": "App is up to date"
+}
+```
+
+#### Response - Optional Update (200)
+
+```json
+{
+  "status": "optional_update",
+  "message": "A new version is available",
+  "latest_mobile": "2.0.0"
+}
+```
+
+#### Response - Force Update (200)
+
+```json
+{
+  "status": "force_update",
+  "message": "Please update to the latest version",
+  "latest_mobile": "2.0.0"
+}
+```
+
+#### Response Error (422)
+
+```json
+{
+  "status": "error",
+  "message": "Validation failed",
+  "errors": {
+    "app_name": ["The app name field is required."],
+    "mobile_version": ["The mobile version format is invalid."]
+  }
+}
+```
+
+---
+
+## Build Management
+
+### Create Build Resource
+
+**Method:** `POST`
+
+**URL:** `/appza/v1/build/resource`
+
+**Description:** Upload build resources (logo, splash screen) and configure platform selection. Validates license via Fluent API, uploads files to Cloudflare R2, and saves platform configuration to BuildDomain.
+
+#### Request Body
+
+```json
+{
+  "app_name": "My App",
+  "app_logo": "base64_or_url_encoded_image",
+  "app_splash_screen_image": "base64_or_url_encoded_image",
+  "site_url": "https://example.com",
+  "license_key": "XXXX-XXXX-XXXX-XXXX",
+  "email": "user@example.com",
+  "plugin_slug": "appza",
+  "platform": ["android", "ios"]
+}
+```
+
+#### Request Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| app_name | string | Conditional | Required if Android platform is selected |
+| app_logo | string | Yes | App logo image (base64 or URL) |
+| app_splash_screen_image | string | Yes | Splash screen image (base64 or URL) |
+| site_url | string | Yes | Website URL (must be valid URL) |
+| license_key | string | Yes | License key for validation |
+| email | string | Yes | User's email address (must be valid email) |
+| plugin_slug | string | Yes | Plugin slug identifier |
+| platform | array | Yes | Target platforms. Values: `android`, `ios`, or both |
+| ios_issuer_id | string | Conditional | Required if any iOS field is provided |
+| ios_key_id | string | Conditional | Required if any iOS field is provided |
+| ios_p8_file_content | string | Conditional | Base64 encoded .p8 key content. Required if any iOS field is provided |
+| ios_team_id | string | Conditional | Required if any iOS field is provided |
+
+#### Response Success (200)
+
+```json
+{
+  "status": 200,
   "message": "Build resources created successfully",
   "data": {
-    "app_logo_url": "https://cdn.../logo.png",
-    "app_splash_url": "https://cdn.../splash.png"
+    "package_name": "com.example.app",
+    "bundle_name": "com.example.app"
   }
 }
 ```
@@ -555,29 +922,57 @@ Create build resources (icons, splash screens, etc.).
 
 ### iOS Keys Verify
 
-**POST** `/appza/v1/build/ios-keys-verify`  
-**POST** `/appza/v2/build/ios-keys-verify`
+**Method:** `POST`
 
-Verify iOS signing certificates and keys.
+**URL:** `/appza/v1/build/ios-keys-verify`
+
+**Description:** Upload and verify iOS signing certificate (.p8 key). Uploads the key file to Cloudflare R2 and validates it via IosBuildValidationService against Apple services.
 
 #### Request Body
+
 ```json
 {
   "site_url": "https://example.com",
+  "license_key": "XXXX-XXXX-XXXX-XXXX",
   "ios_issuer_id": "xxxx-xxxx-xxxx",
   "ios_key_id": "XXXXXXXXXX",
-  "ios_p8_file_content": "-----BEGIN PRIVATE KEY-----...",
-  "team_id": "XXXXXXXXXX"
+  "ios_p8_file_content": "base64_encoded_p8_key_content",
+  "ios_team_id": "XXXXXXXXXX"
 }
 ```
 
+#### Request Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| site_url | string | Yes | Website URL |
+| license_key | string | Yes | License key for validation |
+| ios_issuer_id | string | Yes | Apple App Store Connect Issuer ID |
+| ios_key_id | string | Yes | Apple API Key ID |
+| ios_p8_file_content | string | Yes | Base64 encoded .p8 private key content |
+| ios_team_id | string | Yes | Apple Developer Team ID |
+
 #### Response Success (200)
+
 ```json
 {
-  "success": true,
+  "status": 200,
   "message": "iOS keys verified successfully",
   "data": {
-    "valid": true
+    "valid": true,
+    "bundle_name": "com.example.app"
+  }
+}
+```
+
+#### Response Error (422)
+
+```json
+{
+  "status": 422,
+  "message": "iOS key verification failed",
+  "errors": {
+    "ios_p8_file_content": ["Invalid .p8 key file"]
   }
 }
 ```
@@ -586,23 +981,33 @@ Verify iOS signing certificates and keys.
 
 ### iOS Check App Name
 
-**POST** `/appza/v1/build/ios-check-app-name`  
-**POST** `/appza/v2/build/ios-check-app-name`
+**Method:** `POST`
 
-Check if iOS app name is available.
+**URL:** `/appza/v1/build/ios-check-app-name`
+
+**Description:** Validate iOS app name availability with Apple services.
 
 #### Request Body
+
 ```json
 {
   "site_url": "https://example.com",
-  "ios_app_name": "My App"
+  "license_key": "XXXX-XXXX-XXXX-XXXX"
 }
 ```
 
+#### Request Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| site_url | string | Yes | Website URL (must be valid URL) |
+| license_key | string | Yes | License key for validation |
+
 #### Response Success (200)
+
 ```json
 {
-  "success": true,
+  "status": 200,
   "data": {
     "available": true,
     "app_name": "My App"
@@ -612,41 +1017,112 @@ Check if iOS app name is available.
 
 ---
 
-### Create APK Build
+### Push Notification Resource
 
-**POST** `/appza/v1/build`  
-**POST** `/appza/v2/build`
+**Method:** `POST`
 
-Initiate a new APK/IPA build.
+**URL:** `/appza/v1/build/push-notification-resource`
+
+**Description:** Upload push notification configuration files (FCM JSON for Android, APNs plist for iOS). Files are uploaded to Cloudflare R2 and old files are automatically deleted.
 
 #### Request Body
+
 ```json
 {
   "site_url": "https://example.com",
-  "package_name": "com.example.app",
-  "app_name": "My App",
-  "theme_id": 1,
-  "version_id": 1,
-  "build_version": "1.0.0",
-  "is_android": true,
-  "is_ios": false,
-  "firebase_config": {
-    "api_key": "...",
-    "project_id": "..."
+  "license_key": "XXXX-XXXX-XXXX-XXXX",
+  "android_notification_content": "{fcm_json_content}",
+  "ios_notification_content": "{apns_plist_content}"
+}
+```
+
+#### Request Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| site_url | string | Yes | Website URL (must be valid URL) |
+| license_key | string | Yes | License key for validation |
+| android_notification_content | string | Conditional | FCM JSON configuration. Required if `ios_notification_content` is not provided |
+| ios_notification_content | string | Conditional | APNs plist configuration. Required if `android_notification_content` is not provided |
+
+#### Response Success (200)
+
+```json
+{
+  "status": 200,
+  "message": "Push notification configured successfully"
+}
+```
+
+---
+
+### Create Build
+
+**Method:** `POST`
+
+**URL:** `/appza/v1/build`
+
+**Description:** Initiate a new APK/IPA build. Creates a BuildDomainHistory record, dispatches ProcessBuild jobs per platform, and sends email notification. The build is processed asynchronously via a queued job.
+
+#### Request Body
+
+```json
+{
+  "site_url": "https://example.com",
+  "license_key": "XXXX-XXXX-XXXX-XXXX",
+  "is_push_notification": true
+}
+```
+
+#### Request Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| site_url | string | Yes | Website URL (must be valid URL) |
+| license_key | string | Yes | License key for validation |
+| is_push_notification | boolean | No | Whether to include push notification in the build |
+
+#### Response Success (200)
+
+```json
+{
+  "status": 200,
+  "message": "Build started successfully",
+  "data": {
+    "id": 123,
+    "version_id": 1,
+    "build_domain_id": 45,
+    "app_name": "My App",
+    "ios_app_name": "My iOS App",
+    "build_id": 678
   }
 }
 ```
 
-#### Response Success (200)
+#### Response Error - Locked (423)
+
 ```json
 {
-  "success": true,
-  "message": "Build started successfully",
-  "data": {
-    "build_id": 123,
-    "status": "queued",
-    "created_at": "2026-01-01T00:00:00.000000Z"
-  }
+  "status": "locked",
+  "message": "A build is already in progress"
+}
+```
+
+#### Response Error - Unauthorized (401)
+
+```json
+{
+  "status": "unauthorized",
+  "message": "License validation failed"
+}
+```
+
+#### Response Error - Not Found (404)
+
+```json
+{
+  "status": "not_found",
+  "message": "Build domain not found"
 }
 ```
 
@@ -654,107 +1130,127 @@ Initiate a new APK/IPA build.
 
 ### Get Build History
 
-**GET** `/appza/v1/build/history`  
-**GET** `/appza/v2/build/history`
+**Method:** `GET`
 
-Get build history for a site.
+**URL:** `/appza/v1/build/history`
+
+**Description:** Retrieve build history for a site. Returns a list of all builds with their status, download URLs, and timestamps.
 
 #### Query Parameters
-- `site_url` (required) - Website URL
-- `page` (optional) - Page number
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| site_url | string | Yes | Website URL |
+| license_key | string | Yes | License key for validation |
 
 #### Response Success (200)
+
 ```json
 {
-  "success": true,
-  "data": {
-    "current_page": 1,
-    "data": [
-      {
-        "id": 123,
-        "app_name": "My App",
-        "build_version": "1.0.0",
-        "build_status": "completed",
-        "download_url": "https://cdn.../app.apk",
-        "created_at": "2026-01-01T00:00:00.000000Z"
-      }
-    ],
-    "total": 10
-  }
+  "status": 200,
+  "data": [
+    {
+      "app_name": "My App",
+      "build_target": "android",
+      "status": "Completed",
+      "created_date": "12-Mar-2026",
+      "created_time": "10:30:00 AM",
+      "apk_name": "my-app.apk",
+      "aab_name": "my-app.aab",
+      "apk_url": "https://cdn.../builds/my-app.apk",
+      "aab_url": "https://cdn.../builds/my-app.aab"
+    },
+    {
+      "app_name": "My App",
+      "build_target": "ios",
+      "status": "Completed",
+      "created_date": "12-Mar-2026",
+      "created_time": "10:30:00 AM"
+    }
+  ]
 }
 ```
+
+#### Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| app_name | string | Application name |
+| build_target | string | Build platform: `android` or `ios` |
+| status | string | Build status (Pending, Processing, Completed, Failed, Delete) |
+| created_date | string | Creation date in `d-M-Y` format |
+| created_time | string | Creation time in `H:i:s A` format |
+| apk_name | string | APK filename (Android only) |
+| aab_name | string | AAB filename (Android only) |
+| apk_url | string | APK download URL (Android only) |
+| aab_url | string | AAB download URL (Android only) |
 
 ---
 
-### Push Notification Resource
+### Build Response (Builder Callback)
 
-**POST** `/appza/v1/build/push-notification-resource`  
-**POST** `/appza/v2/build/push-notification-resource`
+**Method:** `POST`
 
-Configure push notification settings.
+**URL:** `/appza/v1/build/response/{id}`
 
-#### Request Body
-```json
-{
-  "site_url": "https://example.com",
-  "android_push_notification_url": "https://fcm.googleapis.com/...",
-  "ios_push_notification_url": "https://api.push.apple.com/..."
-}
-```
-
-#### Response Success (200)
-```json
-{
-  "success": true,
-  "message": "Push notification configured successfully"
-}
-```
-
----
-
-### Build Response (Builder App)
-
-**POST** `/appza/v1/build/response/{id}`  
-**POST** `/appza/v2/build/response/{id}`
-
-Callback endpoint for builder application to report build status.
+**Description:** Callback endpoint for the builder application to report build completion or failure. Updates build status and sends completion/failure email notifications.
 
 #### Path Parameters
-- `id` (required) - Build ID
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| id | integer | Yes | Build Order ID |
 
 #### Request Body
+
 ```json
 {
-  "status": "completed",
-  "download_url": "https://cdn.../app.apk",
-  "build_log": "Build completed successfully"
+  "build_message": "Build completed successfully"
 }
 ```
 
+#### Request Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| build_message | string | No | Build status message or error details |
+
 #### Response Success (200)
+
 ```json
 {
-  "success": true,
+  "status": 200,
   "message": "Build status updated"
 }
 ```
 
 ---
 
-### Process Start (Builder App)
+### Build Process Start (Builder Callback)
 
-**POST** `/appza/v1/build/process-start/{id}`  
-**POST** `/appza/v2/build/process-start/{id}`
+**Method:** `POST`
 
-Mark build process as started.
+**URL:** `/appza/v1/build/process-start/{id}`
+
+**Description:** Mark a build process as started. Records the process start timestamp on the build order.
 
 #### Path Parameters
-- `id` (required) - Build ID
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| id | integer | Yes | Build Order ID |
+
+#### Request Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| build_message | string | No | Optional status message |
 
 #### Response Success (200)
+
 ```json
 {
-  "success": true,
+  "status": 200,
   "message": "Build process started"
 }
 ```
@@ -765,54 +1261,107 @@ Mark build process as started.
 
 ### Get All Plugins
 
-**GET** `/appza/v1/plugins`  
-**GET** `/appza/v2/plugins`
+**Method:** `GET`
 
-Get list of available plugins/addons.
+**URL:** `/appza/v1/plugins`
 
-#### Query Parameters
-- `product` (optional) - Filter by product slug
+**Description:** Retrieve a list of all available plugins/addons.
 
 #### Response Success (200)
+
 ```json
 {
-  "success": true,
   "data": [
     {
       "id": 1,
-      "addon_name": "Payment Gateway",
-      "addon_slug": "payment-gateway",
-      "is_active": true,
-      "is_premium_plugin": true,
-      "addon_json_info": {
-        "version": "1.0.0",
-        "description": "Payment integration"
-      }
+      "name": "Payment Gateway",
+      "slug": "payment-gateway",
+      "prefix": "pg",
+      "title": "Payment Gateway Plugin",
+      "description": "Payment integration for mobile apps",
+      "others": null,
+      "created": "01-Jan-2026",
+      "is_disable": false,
+      "image": "https://cdn.../plugins/payment-gateway.png"
     }
   ]
 }
 ```
 
+#### Response Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| id | integer | Plugin ID |
+| name | string | Plugin name |
+| slug | string | Plugin slug identifier |
+| prefix | string | Plugin prefix |
+| title | string | Plugin display title |
+| description | string | Plugin description |
+| others | mixed | Additional plugin data |
+| created | string | Creation date in `d-M-Y` format |
+| is_disable | boolean | Whether the plugin is disabled |
+| image | string | Plugin image URL |
+
 ---
 
 ### Check Disabled Plugin
 
-**GET** `/appza/v1/plugin/check-disable`  
-**GET** `/appza/v2/plugin/check-disable`
+**Method:** `GET`
 
-Check if a plugin is disabled for a site.
+**URL:** `/appza/v1/plugin/check-disable`
+
+**Description:** Check if a specific plugin is disabled.
 
 #### Query Parameters
-- `site_url` (required) - Website URL
-- `plugin_slug` (required) - Plugin slug
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| plugin_slug | string | Yes | Plugin slug to check |
 
 #### Response Success (200)
+
 ```json
 {
-  "success": true,
+  "status": 200,
+  "is_disable": false
+}
+```
+
+#### Response Error (404)
+
+```json
+{
+  "status": "not_found",
+  "message": "Plugin not found"
+}
+```
+
+---
+
+### Plugin Install Latest Version
+
+**Method:** `GET`
+
+**URL:** `/appza/v1/plugin/install-latest-version`
+
+**Description:** Get the latest version and download information for a plugin addon.
+
+#### Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| plugin_slug | string | Yes | Plugin slug. Allowed values: `fcom-mobile`, `lazytasks-premium`, `lazytasks-whiteboard` |
+
+#### Response Success (200)
+
+```json
+{
+  "status": 200,
   "data": {
-    "is_disabled": false,
-    "plugin_slug": "payment-gateway"
+    "version": "1.2.0",
+    "download_url": "https://cdn.../plugin-v1.2.0.zip",
+    "changelog": "New features and bug fixes"
   }
 }
 ```
@@ -821,164 +1370,29 @@ Check if a plugin is disabled for a site.
 
 ### Plugin Version Check
 
-**GET** `/appza/v1/plugin/version-check`  
-**GET** `/appza/v2/plugin/version-check`
+**Method:** `GET`
 
-Check for plugin updates.
+**URL:** `/appza/v1/plugin/version-check`
+
+**Description:** Check for plugin updates by comparing the installed version against the latest available version.
 
 #### Query Parameters
-- `plugin_slug` (required) - Plugin slug
-- `current_version` (required) - Current version
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| installed_version | string | Yes | Currently installed plugin version |
+| plugin_slug | string | Yes | Plugin slug to check |
 
 #### Response Success (200)
+
 ```json
 {
-  "success": true,
+  "status": 200,
   "data": {
     "latest_version": "1.2.0",
     "current_version": "1.0.0",
     "update_available": true,
-    "changelog": "New features and bug fixes"
-  }
-}
-```
-
----
-
-### Plugin Install Latest Version
-
-**GET** `/appza/v1/plugin/install-latest-version`  
-**GET** `/appza/v2/plugin/install-latest-version`
-
-Get download link for latest plugin version.
-
-#### Query Parameters
-- `plugin_slug` (required) - Plugin slug
-- `license_key` (optional) - License key for premium plugins
-
-#### Response Success (200)
-```json
-{
-  "success": true,
-  "data": {
-    "version": "1.2.0",
-    "download_url": "https://cdn.../plugin-v1.2.0.zip",
-    "requires_license": true
-  }
-}
-```
-
----
-
-## Firebase Integration
-
-### Get Firebase Credentials
-
-**GET** `/appza/v1/firebase/credential/{product}`  
-**GET** `/appza/v2/firebase/credential/{product}`
-
-Get Firebase configuration for a product.
-
-#### Path Parameters
-- `product` (required) - Product slug: `appza`, `lazy_task`, `fcom_mobile`
-
-#### Query Parameters
-- `site_url` (optional) - Website URL for site-specific config
-
-#### Response Success (200)
-```json
-{
-  "success": true,
-  "data": {
-    "api_key": "AIzaSy...",
-    "auth_domain": "project.firebaseapp.com",
-    "project_id": "project-id",
-    "storage_bucket": "project.appspot.com",
-    "messaging_sender_id": "123456789",
-    "app_id": "1:123456789:web:abcdef",
-    "measurement_id": "G-XXXXXXXXXX"
-  }
-}
-```
-
----
-
-## Mobile Version Check
-
-### Check Mobile Version
-
-**GET** `/appza/v1/app/version-check`  
-**GET** `/appza/v2/app/version-check`
-
-Check for mobile app updates.
-
-#### Query Parameters
-- `platform` (required) - Platform: `android` or `ios`
-- `current_version` (required) - Current app version
-- `package_name` (optional) - Package name
-
-#### Response Success - Update Available (200)
-```json
-{
-  "success": true,
-  "data": {
-    "update_available": true,
-    "latest_version": "1.2.0",
-    "current_version": "1.0.0",
-    "download_url": "https://cdn.../app-v1.2.0.apk",
-    "force_update": false,
-    "release_notes": "Bug fixes and improvements",
-    "min_supported_version": "1.0.0"
-  }
-}
-```
-
-#### Response Success - Up to Date (200)
-```json
-{
-  "success": true,
-  "data": {
-    "update_available": false,
-    "latest_version": "1.0.0",
-    "current_version": "1.0.0"
-  }
-}
-```
-
----
-
-## API Version Information
-
-### Get API Versions
-
-**GET** `/appza/versions`
-
-Get information about all API versions.
-
-#### Response Success (200)
-```json
-{
-  "success": true,
-  "data": {
-    "current_version": "v2",
-    "recommended_version": "v2",
-    "versions": {
-      "v1": {
-        "status": "stable",
-        "deprecated": false,
-        "sunset_date": null
-      },
-      "v2": {
-        "status": "stable",
-        "deprecated": false,
-        "sunset_date": null
-      },
-      "v0": {
-        "status": "deprecated",
-        "deprecated": true,
-        "sunset_date": "2026-06-01"
-      }
-    }
+    "download_url": "https://cdn.../plugin-v1.2.0.zip"
   }
 }
 ```
@@ -990,82 +1404,70 @@ Get information about all API versions.
 ### Common Error Codes
 
 #### 401 Unauthorized
+
 ```json
 {
-  "success": false,
-  "message": "Unauthorized access",
-  "status": 401
+  "status": 401,
+  "message": "Unauthorized access"
 }
 ```
 
 #### 404 Not Found
+
 ```json
 {
-  "success": false,
-  "message": "Resource not found",
-  "status": 404
+  "status": 404,
+  "message": "Resource not found"
+}
+```
+
+#### 410 Gone (Deprecated API Version)
+
+```json
+{
+  "status": 410,
+  "message": "This API version is deprecated"
 }
 ```
 
 #### 422 Validation Error
+
 ```json
 {
-  "success": false,
+  "status": 422,
   "message": "Validation failed",
   "errors": {
     "field_name": ["Error message"]
-  },
-  "status": 422
+  }
 }
 ```
 
 #### 500 Server Error
-```json
-{
-  "success": false,
-  "message": "Internal server error",
-  "status": 500
-}
-```
 
-#### 503 Service Unavailable
 ```json
 {
-  "success": false,
-  "message": "External service unavailable",
-  "status": 503
+  "status": 500,
+  "message": "Internal server error"
 }
 ```
 
 ---
 
-## Rate Limiting
+## Build Flow Summary
 
-- **Standard endpoints**: 60 requests/minute
-- **License endpoints**: 120 requests/minute
-- **Build endpoints**: 10 requests/minute
+The build process follows a multi-step flow:
 
-Rate limit headers:
-```http
-X-RateLimit-Limit: 60
-X-RateLimit-Remaining: 59
-X-RateLimit-Reset: 1640000000
-```
-
----
-
-## Best Practices
-
-1. **Always check `success` field** in responses
-2. **Handle rate limiting** with exponential backoff
-3. **Use appropriate product hash header** for your product
-4. **Validate input** before sending requests
-5. **Log errors** for debugging
-6. **Cache responses** where appropriate (themes, configs)
-7. **Use v2 endpoints** for new implementations
+1. **POST** `/build/resource` — Validate license, upload logo/splash to R2, save platform selection
+2. **POST** `/build/ios-keys-verify` — (iOS only) Upload .p8 key, validate via Apple services
+3. **POST** `/build/ios-check-app-name` — (iOS only) Validate app name with Apple
+4. **POST** `/build/push-notification-resource` — (Optional) Upload FCM JSON / APNs plist
+5. **POST** `/build` — Create BuildDomainHistory, dispatch ProcessBuild job, send email
+6. **GET** `/build/history` — Poll build status
+7. **POST** `/build/process-start/{id}` — Builder marks process as started (builder callback)
+8. **POST** `/build/response/{id}` — Builder reports completion/failure (builder callback)
 
 ---
 
-**Last Updated**: January 2026  
-**Current Version**: v2  
-**Supported Versions**: v1, v2
+**Last Updated**: March 2026
+**API Version**: v1
+**Base URL**: `/appza/v1`
